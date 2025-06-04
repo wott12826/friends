@@ -1038,20 +1038,22 @@
     const loginForm = document.getElementById('loginForm');
     const showLoginForm = document.getElementById('showLoginForm');
     const showRegisterForm = document.getElementById('showRegisterForm');
-    showLoginForm.onclick = function(e) {
-      e.preventDefault();
-      registerForm.style.display = 'none';
-      loginForm.style.display = '';
-      showLoginForm.style.display = 'none';
-      showRegisterForm.style.display = '';
-    };
-    showRegisterForm.onclick = function(e) {
-      e.preventDefault();
-      registerForm.style.display = '';
-      loginForm.style.display = 'none';
-      showLoginForm.style.display = '';
-      showRegisterForm.style.display = 'none';
-    };
+    if (showLoginForm && showRegisterForm && registerForm && loginForm) {
+      showLoginForm.onclick = function(e) {
+        e.preventDefault();
+        registerForm.style.display = 'none';
+        loginForm.style.display = '';
+        showLoginForm.style.display = 'none';
+        showRegisterForm.style.display = '';
+      };
+      showRegisterForm.onclick = function(e) {
+        e.preventDefault();
+        registerForm.style.display = '';
+        loginForm.style.display = 'none';
+        showLoginForm.style.display = '';
+        showRegisterForm.style.display = 'none';
+      };
+    }
     // --- Вход через email/password ---
     loginForm.onsubmit = function(e) {
       e.preventDefault();
