@@ -1061,6 +1061,31 @@
       }
     });
 
+    // --- Обработчик выхода из аккаунта ---
+    const logoutBtn = document.querySelector('.wallet-logout-btn');
+    if (logoutBtn) {
+      logoutBtn.onclick = function() {
+        firebase.auth().signOut()
+          .then(() => {
+            // Возвращаем на главный экран
+            document.querySelector('.container').style.display = '';
+            document.getElementById('wallet').style.display = 'none';
+            document.getElementById('main-app').style.display = 'none';
+            // Сбрасываем формы
+            document.getElementById('registerForm').reset();
+            document.getElementById('loginForm').reset();
+            // Показываем форму регистрации
+            document.getElementById('registerForm').style.display = '';
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('showLoginForm').style.display = '';
+            document.getElementById('showRegisterForm').style.display = 'none';
+          })
+          .catch((error) => {
+            alert('Ошибка при выходе: ' + error.message);
+          });
+      };
+    }
+
     // --- Логика переключения между регистрацией и входом ---
     // Повторные объявления переменных удалены, используем уже объявленные выше
     if (showLoginForm && showRegisterForm && registerForm && loginForm) {
