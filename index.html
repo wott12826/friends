@@ -375,7 +375,7 @@
         </div>
         <div class="chat-tabs">
           <button class="chat-tab active">My room</button>
-          <button class="chat-tab">New club</button>
+          <button class="chat-tab" id="newClubBtn">New club</button>
         </div>
         <div class="chat-notify">
           <span>Stay up to date with friend.tech by turning on notifications</span>
@@ -396,6 +396,16 @@
       <div id="tab-discover" class="tab-content" style="display:none;">
         <div style="color:#888; font-size:1.2rem; margin-top:40px; text-align:center;">Discover coming soon...</div>
       </div>
+    </div>
+  </div>
+  <!-- Модалка для New club -->
+  <div id="clubModal" class="modal">
+    <div class="modal-content">
+      <span class="close" id="closeClubModal">&times;</span>
+      <h2>Enter access code</h2>
+      <input type="text" id="clubCodeInput" placeholder="Access code" style="padding:10px; border-radius:6px; border:1px solid #ddd; width:100%; margin-bottom:12px; font-size:1rem;">
+      <div id="clubCodeError" style="color:#e00; font-size:0.98rem; min-height:22px; margin-bottom:8px;"></div>
+      <button id="clubCodeSubmit" class="wallet-btn" style="width:100%;">Enter</button>
     </div>
   </div>
   <!-- Firebase App (core) -->
@@ -464,6 +474,44 @@
         showTab(this.getAttribute('data-tab'));
       };
     });
+
+    // --- New club modal logic ---
+    const newClubBtn = document.getElementById('newClubBtn');
+    const clubModal = document.getElementById('clubModal');
+    const closeClubModal = document.getElementById('closeClubModal');
+    const clubCodeInput = document.getElementById('clubCodeInput');
+    const clubCodeSubmit = document.getElementById('clubCodeSubmit');
+    const clubCodeError = document.getElementById('clubCodeError');
+    if (newClubBtn) {
+      newClubBtn.onclick = function() {
+        clubModal.style.display = 'flex';
+        clubCodeInput.value = '';
+        clubCodeError.textContent = '';
+        clubCodeInput.focus();
+      };
+    }
+    if (closeClubModal) {
+      closeClubModal.onclick = function() {
+        clubModal.style.display = 'none';
+      };
+    }
+    window.addEventListener('click', function(e) {
+      if (e.target === clubModal) clubModal.style.display = 'none';
+    });
+    clubCodeSubmit.onclick = function() {
+      if (clubCodeInput.value.trim() === 'oldcode') {
+        clubCodeError.style.color = '#0a0';
+        clubCodeError.textContent = 'Access granted!';
+        setTimeout(() => {
+          clubModal.style.display = 'none';
+          clubCodeError.textContent = '';
+          clubCodeError.style.color = '#e00';
+        }, 1000);
+      } else {
+        clubCodeError.style.color = '#e00';
+        clubCodeError.textContent = 'Invalid code!';
+      }
+    };
   </script>
 </body>
 </html> 
