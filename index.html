@@ -548,7 +548,7 @@
           <div style="margin-left:24px; color:#888; font-size:0.98rem;">Your balance:</div>
           <div style="margin-left:8px; color:#00bfff; font-weight:600; font-size:1.1rem;">0.9000</div>
         </div>
-        <button class="create-club-btn">Approve spending $FRIEND</button>
+        <button class="create-club-btn" id="createClubBtn">Approve spending $FRIEND</button>
         <div style="color:#aaa; font-size:0.95rem; margin-top:10px; text-align:center;">Once you create your club, you cannot change these details</div>
       </div>
     </div>
@@ -765,6 +765,66 @@
         this.classList.add('selected');
       };
     });
+
+    // --- Клубы ---
+    function getClubs() {
+      try {
+        return JSON.parse(localStorage.getItem('clubs') || '[]');
+      } catch { return []; }
+    }
+    function saveClubs(clubs) {
+      localStorage.setItem('clubs', JSON.stringify(clubs));
+    }
+    function renderClubs() {
+      const chatList = document.querySelector('.chat-list');
+      if (!chatList) return;
+      // Оставляем только первый (примерный) чат
+      const staticChat = chatList.querySelector('.chat-item');
+      chatList.innerHTML = '';
+      if (staticChat) chatList.appendChild(staticChat);
+      const clubs = getClubs();
+      clubs.forEach(club => {
+        const div = document.createElement('div');
+        div.className = 'chat-item';
+        div.innerHTML = `
+          <img src="${club.avatar || 'https://via.placeholder.com/40x40?text=Club'}" class="chat-avatar" alt="avatar">
+          <div class="chat-info">
+            <div class="chat-name">${club.name} <span style='color:#00bfff;font-size:0.95em;'>${club.ticker ? ('(' + club.ticker + ')') : ''}</span></div>
+            <div class="chat-msg" style="white-space:pre-line;">${club.desc || ''}</div>
+          </div>
+          <div class="chat-price">$0.00</div>
+        `;
+        chatList.appendChild(div);
+      });
+    }
+    // При загрузке страницы
+    renderClubs();
+
+    // --- Обработка создания клуба ---
+    document.getElementById('createClubBtn').onclick = function() {
+      const name = document.getElementById('clubNameInput').value.trim();
+      const ticker = document.getElementById('clubTickerInput').value.trim().toUpperCase();
+      const desc = document.getElementById('clubDescInput').value.trim();
+      const avatarEl = document.getElementById('clubPhotoPreview').querySelector('img');
+      const avatar = avatarEl ? avatarEl.src : '';
+      if (!name || !ticker) {
+        alert('Name and ticker are required!');
+        return;
+      }
+      const clubs = getClubs();
+      clubs.push({ name, ticker, desc, avatar });
+      saveClubs(clubs);
+      renderClubs();
+      document.getElementById('createClubModal').style.display = 'none';
+      // Сброс формы
+      document.getElementById('clubNameInput').value = '';
+      document.getElementById('clubTickerInput').value = '';
+      document.getElementById('clubDescInput').value = '';
+      document.getElementById('clubPhotoPreview').innerHTML = 'Tap to add<br>photo';
+      document.getElementById('clubPhotoInput').value = '';
+      document.querySelectorAll('.curve-option').forEach(o => o.classList.remove('selected'));
+      document.querySelector('.curve-option[data-curve="casual"]').classList.add('selected');
+    };
   </script>
 </body>
 </html> 
