@@ -255,6 +255,86 @@
     .curve-option svg { margin-bottom: 4px; }
     .create-club-btn { background: #00bfff; color: #fff; border: none; border-radius: 8px; padding: 16px 0; font-size: 1.15rem; font-weight: 600; margin-top: 18px; cursor: pointer; transition: background 0.2s; }
     .create-club-btn:hover { background: #0099cc; }
+    /* --- Club chat modal styles --- */
+    .club-chat-modal-content {
+      max-width: 800px;
+      width: 100%;
+      min-height: 500px;
+      padding: 0;
+      border-radius: 18px;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      background: #fff;
+    }
+    .club-chat-header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 18px 28px 10px 28px;
+      border-bottom: 1px solid #f0f0f0;
+      font-size: 1.2rem;
+      font-weight: 600;
+    }
+    .club-chat-avatar {
+      width: 40px; height: 40px; border-radius: 8px; object-fit: cover;
+    }
+    .club-chat-title { font-size: 1.15rem; font-weight: 600; color: #222; }
+    .club-chat-messages {
+      flex: 1;
+      padding: 18px 28px 12px 28px;
+      overflow-y: auto;
+      background: #fff;
+      min-height: 200px;
+      max-height: 400px;
+    }
+    .club-chat-message {
+      margin-bottom: 12px;
+      display: flex;
+      align-items: flex-end;
+      gap: 8px;
+    }
+    .club-chat-message.me { flex-direction: row-reverse; }
+    .club-chat-bubble {
+      background: #eaf7fd;
+      color: #222;
+      border-radius: 16px;
+      padding: 8px 16px;
+      max-width: 60%;
+      font-size: 1.05rem;
+      word-break: break-word;
+    }
+    .club-chat-message.me .club-chat-bubble {
+      background: #00bfff;
+      color: #fff;
+    }
+    .club-chat-form {
+      display: flex;
+      align-items: center;
+      border-top: 1px solid #f0f0f0;
+      padding: 12px 28px;
+      background: #fafbfc;
+    }
+    #clubChatInput {
+      flex: 1;
+      padding: 10px 14px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-size: 1.05rem;
+      margin-right: 10px;
+    }
+    .club-chat-send-btn {
+      background: #00bfff;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 8px 18px;
+      font-size: 1.2rem;
+      cursor: pointer;
+      font-weight: 600;
+      transition: background 0.2s;
+    }
+    .club-chat-send-btn:hover { background: #0099cc; }
   </style>
 </head>
 <body>
@@ -553,6 +633,21 @@
       </div>
     </div>
   </div>
+  <!-- Модалка для чата клуба -->
+  <div id="clubChatModal" class="modal">
+    <div class="modal-content club-chat-modal-content">
+      <span class="close" id="closeClubChatModal">&times;</span>
+      <div class="club-chat-header">
+        <img id="clubChatAvatar" class="club-chat-avatar" src="" alt="avatar">
+        <span id="clubChatTitle" class="club-chat-title"></span>
+      </div>
+      <div id="clubChatMessages" class="club-chat-messages"></div>
+      <form id="clubChatForm" class="club-chat-form">
+        <input id="clubChatInput" type="text" placeholder="Write something..." autocomplete="off">
+        <button type="submit" class="club-chat-send-btn">➤</button>
+      </form>
+    </div>
+  </div>
   <!-- Firebase App (core) -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <!-- Firebase Auth -->
@@ -824,6 +919,66 @@
       document.getElementById('clubPhotoInput').value = '';
       document.querySelectorAll('.curve-option').forEach(o => o.classList.remove('selected'));
       document.querySelector('.curve-option[data-curve="casual"]').classList.add('selected');
+    };
+
+    // --- Открытие чата клуба ---
+    let currentClubKey = null;
+    document.querySelector('.chat-list').addEventListener('click', function(e) {
+      let item = e.target;
+      while (item && !item.classList.contains('chat-item')) item = item.parentElement;
+      if (!item) return;
+      // Пропускаем первый (статичный) чат
+      const idx = Array.from(this.children).indexOf(item);
+      if (idx === 0) return;
+      const clubs = getClubs();
+      const club = clubs[idx - 1];
+      if (!club) return;
+      currentClubKey = club.name + '|' + club.ticker;
+      document.getElementById('clubChatAvatar').src = club.avatar || 'https://via.placeholder.com/40x40?text=Club';
+      document.getElementById('clubChatTitle').textContent = club.name + (club.ticker ? ' (' + club.ticker + ')' : '');
+      renderClubChatMessages();
+      document.getElementById('clubChatModal').style.display = 'flex';
+      setTimeout(() => {
+        const msgBox = document.getElementById('clubChatMessages');
+        msgBox.scrollTop = msgBox.scrollHeight;
+      }, 100);
+    });
+
+    document.getElementById('closeClubChatModal').onclick = function() {
+      document.getElementById('clubChatModal').style.display = 'none';
+    };
+
+    function getClubMessages(key) {
+      try {
+        return JSON.parse(localStorage.getItem('clubmsg_' + key) || '[]');
+      } catch { return []; }
+    }
+    function saveClubMessages(key, msgs) {
+      localStorage.setItem('clubmsg_' + key, JSON.stringify(msgs));
+    }
+    function renderClubChatMessages() {
+      const box = document.getElementById('clubChatMessages');
+      box.innerHTML = '';
+      if (!currentClubKey) return;
+      const msgs = getClubMessages(currentClubKey);
+      msgs.forEach(m => {
+        const div = document.createElement('div');
+        div.className = 'club-chat-message me';
+        div.innerHTML = `<div class="club-chat-bubble">${m.text}</div>`;
+        box.appendChild(div);
+      });
+      setTimeout(() => { box.scrollTop = box.scrollHeight; }, 50);
+    }
+    document.getElementById('clubChatForm').onsubmit = function(e) {
+      e.preventDefault();
+      const input = document.getElementById('clubChatInput');
+      const text = input.value.trim();
+      if (!text || !currentClubKey) return;
+      const msgs = getClubMessages(currentClubKey);
+      msgs.push({ text });
+      saveClubMessages(currentClubKey, msgs);
+      input.value = '';
+      renderClubChatMessages();
     };
   </script>
 </body>
