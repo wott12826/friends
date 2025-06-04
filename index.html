@@ -944,7 +944,18 @@
           showTab('chat');
         })
         .catch((error) => {
-          alert('Ошибка регистрации: ' + error.message);
+          if (error.code === 'auth/email-already-in-use') {
+            alert('Этот email уже зарегистрирован. Пожалуйста, войдите.');
+            // Переключаем на форму входа и подставляем email
+            registerForm.style.display = 'none';
+            loginForm.style.display = '';
+            showLoginForm.style.display = 'none';
+            showRegisterForm.style.display = '';
+            loginForm.querySelector('input[type="email"]').value = email;
+            loginForm.querySelector('input[type="password"]').focus();
+          } else {
+            alert('Ошибка регистрации: ' + error.message);
+          }
         });
     };
 
