@@ -231,6 +231,30 @@
     .discover-title { font-weight: 600; color: #222; font-size: 1.05rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .discover-desc { color: #aaa; font-size: 0.95rem; }
     .discover-price { color: #00bfff; font-size: 0.98rem; font-weight: 500; margin-left: 8px; white-space: nowrap; }
+    /* --- Create club modal styles --- */
+    .create-club-modal-content {
+      max-width: 600px;
+      width: 100%;
+      padding: 32px 32px 24px 32px;
+      border-radius: 18px;
+      position: relative;
+    }
+    .create-club-form { display: flex; flex-direction: column; gap: 18px; }
+    .create-club-photo-label { display: block; width: 120px; height: 120px; margin-bottom: 8px; cursor: pointer; }
+    .create-club-photo-preview {
+      width: 100%; height: 100%; background: #f5f5f5; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #aaa; font-size: 1.1rem; text-align: center; border: 1.5px dashed #e0e0e0; cursor: pointer;
+    }
+    .create-club-row { display: flex; align-items: center; gap: 12px; margin-bottom: 0; }
+    .create-club-input { font-size: 1.1rem; padding: 10px 14px; border: 1px solid #ddd; border-radius: 8px; margin-bottom: 0; background: #fff; }
+    .create-club-input[type="text"] { flex: 1; }
+    .create-club-input[type="number"] { width: 80px; }
+    .create-club-section-label { color: #888; font-size: 1rem; margin-bottom: 6px; margin-top: 8px; }
+    .create-club-curves { display: flex; gap: 18px; margin-bottom: 0; }
+    .curve-option { border: 2px solid #eee; border-radius: 10px; padding: 8px 18px; display: flex; flex-direction: column; align-items: center; cursor: pointer; transition: border 0.2s; }
+    .curve-option.selected { border: 2px solid #00bfff; background: #eaf7fd; }
+    .curve-option svg { margin-bottom: 4px; }
+    .create-club-btn { background: #00bfff; color: #fff; border: none; border-radius: 8px; padding: 16px 0; font-size: 1.15rem; font-weight: 600; margin-top: 18px; cursor: pointer; transition: background 0.2s; }
+    .create-club-btn:hover { background: #0099cc; }
   </style>
 </head>
 <body>
@@ -483,6 +507,52 @@
       <button id="clubCodeSubmit" class="wallet-btn" style="width:100%;">Enter</button>
     </div>
   </div>
+  <!-- Модалка для Create club -->
+  <div id="createClubModal" class="modal">
+    <div class="modal-content create-club-modal-content">
+      <span class="close" id="closeCreateClubModal">&times;</span>
+      <h2 style="margin-top:0;">Create club</h2>
+      <div class="create-club-form">
+        <label class="create-club-photo-label">
+          <input type="file" id="clubPhotoInput" accept="image/*" style="display:none;">
+          <div id="clubPhotoPreview" class="create-club-photo-preview">Tap to add<br>photo</div>
+        </label>
+        <div class="create-club-row">
+          <input type="text" id="clubNameInput" class="create-club-input" placeholder="Name">
+          <input type="text" id="clubTickerInput" class="create-club-input" placeholder="$TICKER" maxlength="8" style="text-transform:uppercase;">
+        </div>
+        <textarea id="clubDescInput" class="create-club-input" placeholder="Add a description for your club (optional)" style="resize:none;"></textarea>
+        <div class="create-club-section-label">Select price curve</div>
+        <div class="create-club-curves">
+          <div class="curve-option selected" data-curve="casual">
+            <svg width="48" height="32"><polyline points="0,28 16,24 32,20 48,8" fill="none" stroke="#22c55e" stroke-width="3"/></svg>
+            <div>Casual</div>
+          </div>
+          <div class="curve-option" data-curve="standard">
+            <svg width="48" height="32"><polyline points="0,28 12,24 24,16 36,8 48,4" fill="none" stroke="#a855f7" stroke-width="3"/></svg>
+            <div>Standard</div>
+          </div>
+          <div class="curve-option" data-curve="exclusive">
+            <svg width="48" height="32"><polyline points="0,28 8,24 16,20 32,16 40,8 48,0" fill="none" stroke="#fbbf24" stroke-width="3"/></svg>
+            <div>Exclusive</div>
+          </div>
+        </div>
+        <div class="create-club-section-label" style="margin-top:18px;">Buy club keys</div>
+        <div class="create-club-row">
+          <input type="number" id="clubKeysInput" class="create-club-input" value="1" min="1" max="10" style="width:80px;">
+          <div style="margin-left:12px; color:#888; font-size:0.98rem;">Be the first holder of your club key. The first key is free.</div>
+        </div>
+        <div class="create-club-row" style="margin-top:8px; align-items:center;">
+          <div style="color:#888; font-size:0.98rem;">You will spend:</div>
+          <div style="margin-left:8px; color:#00bfff; font-weight:600; font-size:1.1rem;">--</div>
+          <div style="margin-left:24px; color:#888; font-size:0.98rem;">Your balance:</div>
+          <div style="margin-left:8px; color:#00bfff; font-weight:600; font-size:1.1rem;">0.9000</div>
+        </div>
+        <button class="create-club-btn">Approve spending $FRIEND</button>
+        <div style="color:#aaa; font-size:0.95rem; margin-top:10px; text-align:center;">Once you create your club, you cannot change these details</div>
+      </div>
+    </div>
+  </div>
   <!-- Firebase App (core) -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <!-- Firebase Auth -->
@@ -589,6 +659,7 @@
           clubModal.style.display = 'none';
           clubCodeError.textContent = '';
           clubCodeError.style.color = '#e00';
+          document.getElementById('createClubModal').style.display = 'flex';
         }, 1000);
       } else {
         clubCodeError.style.color = '#e00';
@@ -665,6 +736,35 @@
           alert('Ошибка входа: ' + error.message);
         });
     };
+
+    // Закрытие модалки Create club
+    document.getElementById('closeCreateClubModal').onclick = function() {
+      document.getElementById('createClubModal').style.display = 'none';
+    };
+
+    // Загрузка и предпросмотр фото
+    document.getElementById('clubPhotoPreview').onclick = function() {
+      document.getElementById('clubPhotoInput').click();
+    };
+
+    document.getElementById('clubPhotoInput').onchange = function(e) {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(ev) {
+          document.getElementById('clubPhotoPreview').innerHTML = '<img src="' + ev.target.result + '" style="width:100%;height:100%;object-fit:cover;border-radius:12px;">';
+        };
+        reader.readAsDataURL(file);
+      }
+    };
+
+    // Выбор кривой цены
+    document.querySelectorAll('.curve-option').forEach(opt => {
+      opt.onclick = function() {
+        document.querySelectorAll('.curve-option').forEach(o => o.classList.remove('selected'));
+        this.classList.add('selected');
+      };
+    });
   </script>
 </body>
 </html> 
