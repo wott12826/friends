@@ -1052,12 +1052,17 @@
     if (showLoginForm && showRegisterForm && registerForm && loginForm) {
       showLoginForm.onclick = function(e) {
         e.preventDefault();
+        // Получаем email из формы регистрации, если есть
+        const regEmail = registerForm.querySelector('input[type="email"]').value;
         registerForm.style.display = 'none';
         loginForm.style.display = '';
         showLoginForm.style.display = 'none';
         showRegisterForm.style.display = '';
-        // Автофокус на email
-        loginForm.querySelector('input[type="email"]').focus();
+        // Подставляем email, если был введён
+        if (regEmail) {
+          loginForm.querySelector('input[type="email"]').value = regEmail;
+        }
+        loginForm.querySelector('input[type="password"]').focus();
       };
       showRegisterForm.onclick = function(e) {
         e.preventDefault();
