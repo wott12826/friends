@@ -513,6 +513,10 @@
       .wallet-profile-btn, .wallet-profile-withdraw, .wallet-fund-btn, .wallet-logout-btn { font-size: 0.98rem; padding: 8px 0; }
       .wallet-profile-fund-row { flex-direction: column; gap: 8px; }
     }
+    /* --- Login/Register switch styles --- */
+    .login-switch-row { display: flex; gap: 18px; justify-content: center; margin-top: 10px; }
+    .login-switch-link { color: #00bfff; font-size: 0.98rem; text-decoration: none; cursor: pointer; transition: text-decoration 0.2s; }
+    .login-switch-link:hover { text-decoration: underline; }
   </style>
 </head>
 <body>
@@ -550,8 +554,10 @@
         <input type="password" placeholder="Password" required>
         <button type="submit" class="register-btn">Sign In</button>
       </form>
-      <a href="#" id="showLoginForm" style="display:block; margin-top:8px; color:#00bfff; font-size:0.98rem;">Already have an account? Sign in</a>
-      <a href="#" id="showRegisterForm" style="display:none; margin-top:8px; color:#00bfff; font-size:0.98rem;">No account? Register</a>
+      <div class="login-switch-row">
+        <a href="#" id="showLoginForm" class="login-switch-link">Already have an account? Sign in</a>
+        <a href="#" id="showRegisterForm" class="login-switch-link" style="display:none;">No account? Register</a>
+      </div>
     </div>
   </div>
   <!-- Wallet section (изначально скрыта) -->
@@ -1404,6 +1410,34 @@
       if (prev) prev.remove();
       imgInput.value = '';
     }
+    // --- Переключение между регистрацией и входом (как на friends-sand.vercel.app) ---
+    (function(){
+      const showLoginForm = document.getElementById('showLoginForm');
+      const showRegisterForm = document.getElementById('showRegisterForm');
+      const registerForm = document.getElementById('registerForm');
+      const loginForm = document.getElementById('loginForm');
+      if (showLoginForm && showRegisterForm && registerForm && loginForm) {
+        showLoginForm.onclick = function(e) {
+          e.preventDefault();
+          registerForm.style.display = 'none';
+          loginForm.style.display = '';
+          showLoginForm.style.display = 'none';
+          showRegisterForm.style.display = '';
+          // Автофокус на email
+          loginForm.querySelector('input[type="email"]').focus();
+        };
+        showRegisterForm.onclick = function(e) {
+          e.preventDefault();
+          registerForm.style.display = '';
+          loginForm.style.display = 'none';
+          showLoginForm.style.display = '';
+          showRegisterForm.style.display = 'none';
+          // Автофокус на email
+          registerForm.querySelector('input[type="email"]').focus();
+        };
+      }
+    })();
+    // --- Конец блока переключения ---
   </script>
 </body>
 </html> 
