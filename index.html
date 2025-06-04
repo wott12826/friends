@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>friend.tech</title>
+  <link href="https://fonts.googleapis.com/css?family=Inter:400,500,700&display=swap" rel="stylesheet">
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      font-family: 'Inter', Arial, sans-serif;
+      background: #fff;
+    }
+    .container {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+    .content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-top: 10vh;
+    }
+    .logo {
+      width: 100px;
+      margin-bottom: 48px;
+    }
+    h1 {
+      font-size: 2.5rem;
+      margin: 0 0 18px 0;
+      font-weight: 700;
+    }
+    .blue {
+      color: #00bfff;
+    }
+    .black {
+      color: #222;
+    }
+    .subtitle {
+      color: #888;
+      margin: 0 0 40px 0;
+      font-size: 1.2rem;
+    }
+    .login-btn {
+      background: #00bfff;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 16px 80px;
+      font-size: 1.2rem;
+      cursor: pointer;
+      font-weight: 500;
+      margin-bottom: 0;
+      transition: background 0.2s;
+    }
+    .login-btn:hover {
+      background: #0099cc;
+    }
+    .footer {
+      position: fixed;
+      bottom: 30px;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      gap: 60px;
+    }
+    .footer-link {
+      color: #00bfff;
+      text-decoration: none;
+      font-size: 1rem;
+      transition: text-decoration 0.2s;
+    }
+    .footer-link:hover {
+      text-decoration: underline;
+    }
+    /* --- Modal styles --- */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0; top: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.3);
+      justify-content: center; align-items: center;
+    }
+    .modal-content {
+      background: #fff; padding: 32px 24px; border-radius: 12px; min-width: 320px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+      position: relative; display: flex; flex-direction: column; align-items: center;
+    }
+    .close {
+      position: absolute; right: 16px; top: 12px; font-size: 2rem; cursor: pointer; color: #888;
+    }
+    .twitter-btn {
+      background: #1da1f2; color: #fff; border: none; border-radius: 6px;
+      padding: 12px 32px; font-size: 1rem; margin-bottom: 16px; cursor: pointer;
+    }
+    .divider {
+      margin: 12px 0; color: #aaa; font-size: 0.9rem;
+    }
+    #registerForm {
+      display: flex; flex-direction: column; gap: 10px; width: 100%;
+    }
+    #registerForm input {
+      padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 1rem;
+    }
+    .register-btn {
+      background: #00bfff; color: #fff; border: none; border-radius: 6px;
+      padding: 10px; font-size: 1rem; cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="content">
+      <!-- SVG логотип -->
+      <svg class="logo" viewBox="0 0 120 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <ellipse cx="40" cy="40" rx="20" ry="35" fill="#00bfff"/>
+        <ellipse cx="80" cy="50" rx="15" ry="25" fill="#00bfff"/>
+        <ellipse cx="70" cy="60" rx="8" ry="15" fill="#00bfff"/>
+      </svg>
+      <h1><span class="blue">friend</span><span class="black">.tech</span></h1>
+      <p class="subtitle">precious spaces online and onchain</p>
+      <button class="login-btn">Log in</button>
+    </div>
+    <div class="footer">
+      <a href="#" class="footer-link">Previously used Privy? →</a>
+      <a href="#" class="footer-link">Terms of Service →</a>
+    </div>
+  </div>
+  <!-- Модальное окно -->
+  <div id="modal" class="modal">
+    <div class="modal-content">
+      <span class="close" id="closeModal">&times;</span>
+      <h2>Log in / Register</h2>
+      <button class="twitter-btn" id="twitterLogin">Log in with Twitter</button>
+      <div class="divider">or</div>
+      <form id="registerForm">
+        <input type="email" placeholder="Email" required>
+        <input type="password" placeholder="Password" required>
+        <button type="submit" class="register-btn">Register</button>
+      </form>
+    </div>
+  </div>
+  <!-- Firebase App (core) -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <!-- Firebase Auth -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script>
+    const modal = document.getElementById('modal');
+    const loginBtn = document.querySelector('.login-btn');
+    const closeModal = document.getElementById('closeModal');
+    const twitterLogin = document.getElementById('twitterLogin');
+    const registerForm = document.getElementById('registerForm');
+
+    loginBtn.onclick = () => { modal.style.display = 'flex'; }
+    closeModal.onclick = () => { modal.style.display = 'none'; }
+    window.onclick = (e) => { if (e.target == modal) modal.style.display = 'none'; }
+
+    // --- Firebase config (замените на свои значения) ---
+    const firebaseConfig = {
+      apiKey: "AIzaSyBvcUP3TD0ZUjYQvWUhVgE2Tt9Xivi3m7s",
+      authDomain: "testtest-c94df.firebaseapp.com",
+      projectId: "testtest-c94df",
+      storageBucket: "testtest-c94df.appspot.com",
+      messagingSenderId: "112669024582",
+      appId: "1:112669024582:web:9cfa5fcd8c6325085fc547",
+      measurementId: "G-1QQTFLJ7WG"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const provider = new firebase.auth.TwitterAuthProvider();
+
+    twitterLogin.onclick = () => {
+      firebase.auth().signInWithPopup(provider)
+        .then((result) => {
+          const user = result.user;
+          alert('Добро пожаловать, ' + user.displayName + '!');
+          modal.style.display = 'none';
+          // Здесь можно использовать user.displayName, user.photoURL и т.д.
+        })
+        .catch((error) => {
+          alert('Ошибка авторизации: ' + error.message);
+        });
+    };
+
+    registerForm.onsubmit = (e) => {
+      e.preventDefault();
+      alert('Регистрация завершена!');
+      modal.style.display = 'none';
+    };
+  </script>
+</body>
+</html> 
