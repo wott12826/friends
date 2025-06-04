@@ -461,6 +461,58 @@
     .fschat-img-btn { background: none; border: none; font-size: 1.3rem; cursor: pointer; color: #888; }
     .fschat-img-btn:hover { color: #00bfff; }
     .fschat-img-preview { max-width: 180px; max-height: 120px; border-radius: 10px; margin: 6px 0; display: block; }
+    /* --- Wallet profile styles --- */
+    .wallet-profile-block {
+      background: #fff;
+      border-radius: 18px;
+      margin: 0 auto 32px auto;
+      max-width: 700px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.03);
+      padding: 32px 32px 24px 32px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+    .wallet-profile-header { display: flex; align-items: center; gap: 24px; }
+    .wallet-profile-avatar { width: 64px; height: 64px; border-radius: 50%; object-fit: cover; }
+    .wallet-profile-info { flex: 1; }
+    .wallet-profile-name { font-size: 1.3rem; font-weight: 700; color: #222; }
+    .wallet-profile-handle { color: #aaa; font-size: 1.05rem; margin-left: 8px; }
+    .wallet-profile-addr { color: #888; font-size: 1.05rem; margin: 4px 0; display: flex; align-items: center; gap: 6px; }
+    .wallet-copy-btn { background: none; border: none; font-size: 1.1rem; cursor: pointer; color: #00bfff; }
+    .wallet-profile-twitter { color: #00bfff; font-size: 1.05rem; margin-bottom: 2px; }
+    .wallet-profile-actions { display: flex; flex-direction: column; gap: 8px; }
+    .wallet-profile-btn { background: #fff; color: #00bfff; border: 1px solid #00bfff; border-radius: 8px; padding: 6px 18px; font-size: 1rem; font-weight: 500; cursor: pointer; transition: background 0.2s, color 0.2s; }
+    .wallet-profile-btn:hover { background: #eaf7fd; }
+    .wallet-profile-balances { display: flex; flex-direction: column; gap: 8px; margin-top: 8px; }
+    .wallet-profile-fees { color: #888; font-size: 1.05rem; }
+    .wallet-profile-fee-val { color: #00bfff; font-weight: 600; margin-left: 6px; }
+    .wallet-profile-balance-row { display: flex; align-items: center; gap: 18px; }
+    .wallet-profile-balance { color: #00bfff; font-weight: 600; margin-left: 6px; }
+    .wallet-profile-withdraw { background: #eaf7fd; color: #00bfff; border: none; border-radius: 8px; padding: 6px 18px; font-size: 1rem; font-weight: 500; cursor: pointer; margin-left: auto; transition: background 0.2s; }
+    .wallet-profile-withdraw:hover { background: #00bfff; color: #fff; }
+    .wallet-profile-fund-label { color: #888; font-size: 1.05rem; margin-top: 12px; }
+    .wallet-profile-fund-row { display: flex; gap: 12px; margin: 8px 0 0 0; }
+    .wallet-fund-btn { flex: 1; font-size: 1.15rem; font-weight: 600; border-radius: 10px; border: none; padding: 14px 0; cursor: pointer; margin: 0; transition: background 0.2s, color 0.2s; }
+    .wallet-fund-base { background: #0052ff; color: #fff; }
+    .wallet-fund-coinbase { background: #0066ff; color: #fff; }
+    .wallet-fund-eth { background: #eee; color: #222; }
+    .wallet-fund-btn:hover { filter: brightness(0.95); }
+    .wallet-logout-btn { margin: 24px auto 0 auto; display: block; background: #fff; color: #888; border: 1.5px solid #ccc; border-radius: 8px; padding: 10px 0; width: 100%; font-size: 1.1rem; font-weight: 500; cursor: pointer; transition: background 0.2s, color 0.2s; }
+    .wallet-logout-btn:hover { background: #f5f5f5; color: #222; }
+    @media (max-width: 900px) {
+      .wallet-profile-block { max-width: 99vw; padding: 18px 4vw 12px 4vw; }
+      .wallet-profile-header { flex-direction: column; align-items: flex-start; gap: 12px; }
+      .wallet-profile-actions { flex-direction: row; gap: 8px; }
+      .wallet-profile-avatar { width: 48px; height: 48px; }
+    }
+    @media (max-width: 600px) {
+      .wallet-profile-block { padding: 10px 2vw 8px 2vw; }
+      .wallet-profile-header { gap: 8px; }
+      .wallet-profile-avatar { width: 36px; height: 36px; }
+      .wallet-profile-btn, .wallet-profile-withdraw, .wallet-fund-btn, .wallet-logout-btn { font-size: 0.98rem; padding: 8px 0; }
+      .wallet-profile-fund-row { flex-direction: column; gap: 8px; }
+    }
   </style>
 </head>
 <body>
@@ -568,7 +620,36 @@
     <div class="main-content">
       <!-- Wallet tab -->
       <div id="tab-wallet" class="tab-content">
-        <div class="wallet-header">
+        <div class="wallet-profile-block">
+          <div class="wallet-profile-header">
+            <img class="wallet-profile-avatar" src="https://randomuser.me/api/portraits/men/35.jpg" alt="avatar">
+            <div class="wallet-profile-info">
+              <div class="wallet-profile-name">Smirnoff <span class="wallet-profile-handle">@Smirnoff_ETH</span></div>
+              <div class="wallet-profile-addr">0x3430...0043 <button class="wallet-copy-btn" title="Copy address">📋</button></div>
+              <div class="wallet-profile-twitter"><a href="#" style="color:#00bfff;">@Smirnoff_ETH</a> <span style="color:#00bfff;">✔️</span></div>
+            </div>
+            <div class="wallet-profile-actions">
+              <button class="wallet-profile-btn">Edit profile</button>
+              <button class="wallet-profile-btn">Sync Twitter</button>
+              <button class="wallet-profile-btn">Unlink Twitter</button>
+            </div>
+          </div>
+          <div class="wallet-profile-balances">
+            <div class="wallet-profile-fees">Trading fees earned <span class="wallet-profile-fee-val">Ξ 0.002</span></div>
+            <div class="wallet-profile-balance-row">
+              <div>Wallet balance <span class="wallet-profile-balance">Ξ 0.001</span></div>
+              <button class="wallet-profile-withdraw"><span style="color:#00bfff;">▶</span> Withdraw ETH</button>
+            </div>
+          </div>
+          <div class="wallet-profile-fund-label">Fund your wallet from</div>
+          <div class="wallet-profile-fund-row">
+            <button class="wallet-fund-btn wallet-fund-base"><img src="https://cryptologos.cc/logos/base-base-logo.png" style="height:20px;vertical-align:middle;margin-right:8px;">BASE</button>
+            <button class="wallet-fund-btn wallet-fund-coinbase">coinbase <span style="font-size:0.9em;">PAY</span></button>
+            <button class="wallet-fund-btn wallet-fund-eth"><img src="https://cryptologos.cc/logos/ethereum-eth-logo.png" style="height:20px;vertical-align:middle;margin-right:8px;">ethereum</button>
+          </div>
+          <button class="wallet-logout-btn">Log out</button>
+        </div>
+        <div class="wallet-header wallet-header-coins">
           <div>
             <div class="wallet-label">Wallet value</div>
             <div class="wallet-value">$1.75</div>
@@ -705,18 +786,8 @@
   </div>
   <!-- Модалка для New club -->
   <div id="clubModal" class="modal">
-    <div class="modal-content">
-      <span class="close" id="closeClubModal">&times;</span>
-      <h2>Enter access code</h2>
-      <input type="text" id="clubCodeInput" placeholder="Access code" style="padding:10px; border-radius:6px; border:1px solid #ddd; width:100%; margin-bottom:12px; font-size:1rem;">
-      <div id="clubCodeError" style="color:#e00; font-size:0.98rem; min-height:22px; margin-bottom:8px;"></div>
-      <button id="clubCodeSubmit" class="wallet-btn" style="width:100%;">Enter</button>
-    </div>
-  </div>
-  <!-- Модалка для Create club -->
-  <div id="createClubModal" class="modal">
     <div class="modal-content create-club-modal-content">
-      <span class="close" id="closeCreateClubModal">&times;</span>
+      <span class="close" id="closeClubModal">&times;</span>
       <h2 style="margin-top:0;">Create club</h2>
       <div class="create-club-form">
         <label class="create-club-photo-label">
