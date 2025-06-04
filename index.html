@@ -1004,21 +1004,23 @@
     window.addEventListener('click', function(e) {
       if (e.target === clubModal) clubModal.style.display = 'none';
     });
-    clubCodeSubmit.onclick = function() {
-      if (clubCodeInput.value.trim() === 'oldcode') {
-        clubCodeError.style.color = '#0a0';
-        clubCodeError.textContent = 'Access granted!';
-        setTimeout(() => {
-          clubModal.style.display = 'none';
-          clubCodeError.textContent = '';
+    if (clubCodeSubmit) {
+      clubCodeSubmit.onclick = function() {
+        if (clubCodeInput.value.trim() === 'oldcode') {
+          clubCodeError.style.color = '#0a0';
+          clubCodeError.textContent = 'Access granted!';
+          setTimeout(() => {
+            clubModal.style.display = 'none';
+            clubCodeError.textContent = '';
+            clubCodeError.style.color = '#e00';
+            document.getElementById('createClubModal').style.display = 'flex';
+          }, 1000);
+        } else {
           clubCodeError.style.color = '#e00';
-          document.getElementById('createClubModal').style.display = 'flex';
-        }, 1000);
-      } else {
-        clubCodeError.style.color = '#e00';
-        clubCodeError.textContent = 'Invalid code!';
-      }
-    };
+          clubCodeError.textContent = 'Invalid code!';
+        }
+      };
+    }
 
     // --- Discover tab logic ---
     const discoverRankingsBtn = document.getElementById('discoverRankingsBtn');
