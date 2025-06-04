@@ -1060,9 +1060,7 @@
     });
 
     // --- Логика переключения между регистрацией и входом ---
-    const loginForm = document.getElementById('loginForm');
-    const showLoginForm = document.getElementById('showLoginForm');
-    const showRegisterForm = document.getElementById('showRegisterForm');
+    // Повторные объявления переменных удалены, используем уже объявленные выше
     if (showLoginForm && showRegisterForm && registerForm && loginForm) {
       showLoginForm.onclick = function(e) {
         e.preventDefault();
