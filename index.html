@@ -1064,6 +1064,8 @@
     if (showLoginForm && showRegisterForm && registerForm && loginForm) {
       showLoginForm.onclick = function(e) {
         e.preventDefault();
+        // Показываем модальное окно
+        modal.style.display = 'flex';
         // Получаем email из формы регистрации, если есть
         const regEmail = registerForm.querySelector('input[type="email"]').value;
         registerForm.style.display = 'none';
