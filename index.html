@@ -1095,10 +1095,14 @@
       const password = loginForm.querySelector('input[type="password"]').value;
       firebase.auth().signInWithEmailAndPassword(email, password)
         .then((userCredential) => {
+          // Скрываем модальное окно и начальный контейнер
           modal.style.display = 'none';
           document.querySelector('.container').style.display = 'none';
+          // Скрываем кошелек
           document.getElementById('wallet').style.display = 'none';
+          // Показываем основное приложение
           document.getElementById('main-app').style.display = 'flex';
+          // Переключаемся на вкладку чата
           showTab('chat');
         })
         .catch((error) => {
