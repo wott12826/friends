@@ -397,12 +397,12 @@
         <ellipse cx="80" cy="50" rx="15" ry="25" fill="#00bfff"/>
         <ellipse cx="70" cy="60" rx="8" ry="15" fill="#00bfff"/>
       </svg>
-      <h1><span class="blue">friend</span><span class="black">.tech</span></h1>
+      <h1><span class="blue">Post</span><span class="black">to</span><span class="blue">coin</span></h1>
       <p class="subtitle">precious spaces online and onchain</p>
       <button class="login-btn">Log in</button>
     </div>
     <div class="footer">
-      <a href="#" class="footer-link">Previously used Privy? →</a>
+      <a href="#" class="footer-link">Previously used Post? →</a>
       <a href="#" class="footer-link">Terms of Service →</a>
     </div>
   </div>
@@ -699,6 +699,31 @@
       </form>
     </div>
   </div>
+  <!-- Модалка для кода доступа к Discover-чату -->
+  <div id="discoverCodeModal" class="modal">
+    <div class="modal-content" style="max-width:340px;">
+      <span class="close" id="closeDiscoverCodeModal">&times;</span>
+      <h2>Enter access code</h2>
+      <input type="text" id="discoverCodeInput" placeholder="Access code" style="padding:10px; border-radius:6px; border:1px solid #ddd; width:100%; margin-bottom:12px; font-size:1rem;">
+      <div id="discoverCodeError" style="color:#e00; font-size:0.98rem; min-height:22px; margin-bottom:8px;"></div>
+      <button id="discoverCodeSubmit" class="wallet-btn" style="width:100%;">Enter</button>
+    </div>
+  </div>
+  <!-- Фуллскрин чат -->
+  <div id="fullscreenChat" style="display:none; position:fixed; z-index:5000; left:0; top:0; width:100vw; height:100vh; background:#fff; flex-direction:column;">
+    <div class="club-chat-modal-content" style="height:100vh; max-width:100vw; border-radius:0;">
+      <div style="display:flex;align-items:center;gap:10px;padding:18px 28px 10px 28px;border-bottom:1px solid #f0f0f0;">
+        <button id="closeFullscreenChat" style="background:none;border:none;font-size:2rem;cursor:pointer;color:#00bfff;margin-right:8px;">&#8592;</button>
+        <img id="fullscreenChatAvatar" class="club-chat-avatar" src="" alt="avatar">
+        <span id="fullscreenChatTitle" class="club-chat-title"></span>
+      </div>
+      <div id="fullscreenChatMessages" class="club-chat-messages" style="max-height:calc(100vh - 180px);"></div>
+      <form id="fullscreenChatForm" class="club-chat-form">
+        <input id="fullscreenChatInput" type="text" placeholder="Write something..." autocomplete="off">
+        <button type="submit" class="club-chat-send-btn">➤</button>
+      </form>
+    </div>
+  </div>
   <!-- Firebase App (core) -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <!-- Firebase Auth -->
@@ -985,20 +1010,67 @@
       const club = clubs[idx - 1];
       if (!club) return;
       currentClubKey = club.name + '|' + club.ticker;
-      document.getElementById('clubChatAvatar').src = club.avatar || 'https://via.placeholder.com/40x40?text=Club';
-      document.getElementById('clubChatTitle').textContent = club.name + (club.ticker ? ' (' + club.ticker + ')' : '');
-      renderClubChatMessages();
-      document.getElementById('clubChatModal').style.display = 'flex';
-      setTimeout(() => {
-        const msgBox = document.getElementById('clubChatMessages');
-        msgBox.scrollTop = msgBox.scrollHeight;
-      }, 100);
+      openFullscreenChat({
+        avatar: club.avatar || 'https://via.placeholder.com/40x40?text=Club',
+        title: club.name + (club.ticker ? ' (' + club.ticker + ')' : ''),
+        key: currentClubKey
+      });
     });
 
-    document.getElementById('closeClubChatModal').onclick = function() {
-      document.getElementById('clubChatModal').style.display = 'none';
+    // --- Открытие чата из Discover с кодом ---
+    let discoverChatData = null;
+    document.getElementById('discover-rankings').addEventListener('click', function(e) {
+      let item = e.target;
+      while (item && !item.classList.contains('discover-item')) item = item.parentElement;
+      if (!item) return;
+      const avatar = item.querySelector('.discover-avatar')?.src || '';
+      const name = item.querySelector('.discover-title')?.textContent || '';
+      const ticker = (item.querySelector('.discover-title')?.textContent.match(/\(([^)]+)\)/) || [])[1] || '';
+      discoverChatData = {
+        avatar,
+        title: name + (ticker ? ' (' + ticker + ')' : ''),
+        key: 'discover|' + name + '|' + ticker
+      };
+      document.getElementById('discoverCodeModal').style.display = 'flex';
+      document.getElementById('discoverCodeInput').value = '';
+      document.getElementById('discoverCodeError').textContent = '';
+      document.getElementById('discoverCodeInput').focus();
+    });
+    document.getElementById('closeDiscoverCodeModal').onclick = function() {
+      document.getElementById('discoverCodeModal').style.display = 'none';
+    };
+    document.getElementById('discoverCodeSubmit').onclick = function() {
+      const code = document.getElementById('discoverCodeInput').value.trim();
+      if (code === 'oldcode') {
+        document.getElementById('discoverCodeError').style.color = '#0a0';
+        document.getElementById('discoverCodeError').textContent = 'Access granted!';
+        setTimeout(() => {
+          document.getElementById('discoverCodeModal').style.display = 'none';
+          if (discoverChatData) openFullscreenChat(discoverChatData);
+        }, 700);
+      } else {
+        document.getElementById('discoverCodeError').style.color = '#e00';
+        document.getElementById('discoverCodeError').textContent = 'Invalid code!';
+      }
     };
 
+    // --- Фуллскрин чат ---
+    function openFullscreenChat({avatar, title, key}) {
+      document.getElementById('fullscreenChatAvatar').src = avatar;
+      document.getElementById('fullscreenChatTitle').textContent = title;
+      currentClubKey = key;
+      renderFullscreenChatMessages();
+      document.getElementById('fullscreenChat').style.display = 'flex';
+      document.querySelector('.main-app').style.display = 'none';
+      setTimeout(() => {
+        const msgBox = document.getElementById('fullscreenChatMessages');
+        msgBox.scrollTop = msgBox.scrollHeight;
+      }, 100);
+    }
+    document.getElementById('closeFullscreenChat').onclick = function() {
+      document.getElementById('fullscreenChat').style.display = 'none';
+      document.querySelector('.main-app').style.display = 'flex';
+    };
     function getClubMessages(key) {
       try {
         return JSON.parse(localStorage.getItem('clubmsg_' + key) || '[]');
@@ -1007,8 +1079,8 @@
     function saveClubMessages(key, msgs) {
       localStorage.setItem('clubmsg_' + key, JSON.stringify(msgs));
     }
-    function renderClubChatMessages() {
-      const box = document.getElementById('clubChatMessages');
+    function renderFullscreenChatMessages() {
+      const box = document.getElementById('fullscreenChatMessages');
       box.innerHTML = '';
       if (!currentClubKey) return;
       const msgs = getClubMessages(currentClubKey);
@@ -1020,38 +1092,17 @@
       });
       setTimeout(() => { box.scrollTop = box.scrollHeight; }, 50);
     }
-    document.getElementById('clubChatForm').onsubmit = function(e) {
+    document.getElementById('fullscreenChatForm').onsubmit = function(e) {
       e.preventDefault();
-      const input = document.getElementById('clubChatInput');
+      const input = document.getElementById('fullscreenChatInput');
       const text = input.value.trim();
       if (!text || !currentClubKey) return;
       const msgs = getClubMessages(currentClubKey);
       msgs.push({ text });
       saveClubMessages(currentClubKey, msgs);
       input.value = '';
-      renderClubChatMessages();
+      renderFullscreenChatMessages();
     };
-
-    // --- Открытие чата из Discover ---
-    document.getElementById('discover-rankings').addEventListener('click', function(e) {
-      let item = e.target;
-      while (item && !item.classList.contains('discover-item')) item = item.parentElement;
-      if (!item) return;
-      const idx = Array.from(this.children).indexOf(item);
-      // Получаем данные клуба из DOM
-      const avatar = item.querySelector('.discover-avatar')?.src || '';
-      const name = item.querySelector('.discover-title')?.textContent || '';
-      const ticker = (item.querySelector('.discover-title')?.textContent.match(/\(([^)]+)\)/) || [])[1] || '';
-      currentClubKey = 'discover|' + name + '|' + ticker;
-      document.getElementById('clubChatAvatar').src = avatar || 'https://via.placeholder.com/40x40?text=Club';
-      document.getElementById('clubChatTitle').textContent = name + (ticker ? ' (' + ticker + ')' : '');
-      renderClubChatMessages();
-      document.getElementById('clubChatModal').style.display = 'flex';
-      setTimeout(() => {
-        const msgBox = document.getElementById('clubChatMessages');
-        msgBox.scrollTop = msgBox.scrollHeight;
-      }, 100);
-    });
   </script>
 </body>
 </html> 
