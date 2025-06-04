@@ -111,6 +111,18 @@
       background: #00bfff; color: #fff; border: none; border-radius: 6px;
       padding: 10px; font-size: 1rem; cursor: pointer;
     }
+    /* --- Wallet styles --- */
+    .wallet-section { padding: 40px; }
+    .wallet-header { display: flex; gap: 60px; margin-bottom: 40px; }
+    .wallet-label { color: #888; font-size: 1rem; }
+    .wallet-value, .wallet-friend-price { font-size: 2rem; font-weight: bold; color: #222; }
+    .wallet-friend-price { color: #00bfff; }
+    .wallet-grid { display: flex; justify-content: center; gap: 60px; flex-wrap: wrap; }
+    .wallet-item { display: flex; flex-direction: column; align-items: center; min-width: 120px; }
+    .wallet-icon { margin-bottom: 8px; }
+    .wallet-item-label { color: #888; font-size: 0.95rem; margin-bottom: 2px; }
+    .wallet-item-value { font-size: 1.1rem; font-weight: 500; margin-bottom: 8px; }
+    .wallet-btn { background: #00bfff; color: #fff; border: none; border-radius: 6px; padding: 8px 18px; font-size: 1rem; cursor: pointer; margin-bottom: 8px; }
   </style>
 </head>
 <body>
@@ -143,6 +155,57 @@
         <input type="password" placeholder="Password" required>
         <button type="submit" class="register-btn">Register</button>
       </form>
+    </div>
+  </div>
+  <!-- Wallet section (изначально скрыта) -->
+  <div id="wallet" class="wallet-section" style="display:none;">
+    <div class="wallet-header">
+      <div>
+        <div class="wallet-label">Wallet value</div>
+        <div class="wallet-value">$1.75</div>
+      </div>
+      <div>
+        <div class="wallet-label">$FRIEND price</div>
+        <div class="wallet-friend-price">$0.04</div>
+      </div>
+    </div>
+    <div class="wallet-grid">
+      <div class="wallet-item">
+        <img src="https://cryptologos.cc/logos/ethereum-eth-logo.png" alt="ETH" class="wallet-icon" style="width:48px;">
+        <div class="wallet-item-label">ETH</div>
+        <div class="wallet-item-value">0.001</div>
+        <button class="wallet-btn">Send/Receive</button>
+      </div>
+      <div class="wallet-item">
+        <svg class="wallet-icon" width="48" height="48" viewBox="0 0 120 80" fill="none" xmlns="http://www.w3.org/2000/svg"><ellipse cx="40" cy="40" rx="20" ry="35" fill="#00bfff"/><ellipse cx="80" cy="50" rx="15" ry="25" fill="#00bfff"/><ellipse cx="70" cy="60" rx="8" ry="15" fill="#00bfff"/></svg>
+        <div class="wallet-item-label">$FRIEND</div>
+        <div class="wallet-item-value">0.9</div>
+        <button class="wallet-btn">Buy/Sell</button>
+      </div>
+      <div class="wallet-item">
+        <img src="https://cdn-icons-png.flaticon.com/512/484/484167.png" alt="Keys" class="wallet-icon" style="width:48px;">
+        <div class="wallet-item-label">Keys</div>
+        <div class="wallet-item-value">$0.16</div>
+        <button class="wallet-btn">Chat</button>
+      </div>
+      <div class="wallet-item">
+        <img src="https://cdn-icons-png.flaticon.com/512/616/616554.png" alt="Farm" class="wallet-icon" style="width:48px;">
+        <div class="wallet-item-label">Your farm</div>
+        <div class="wallet-item-value">0 and 0</div>
+        <button class="wallet-btn">Add/Remove</button>
+      </div>
+      <div class="wallet-item">
+        <img src="https://cdn-icons-png.flaticon.com/512/3075/3075977.png" alt="Farm rewards" class="wallet-icon" style="width:48px;">
+        <div class="wallet-item-label">Farm rewards</div>
+        <div class="wallet-item-value">0</div>
+        <button class="wallet-btn">Claim</button>
+      </div>
+      <div class="wallet-item">
+        <img src="https://cdn-icons-png.flaticon.com/512/2622/2622795.png" alt="Airdrop" class="wallet-icon" style="width:48px;">
+        <div class="wallet-item-label">Airdrop</div>
+        <div class="wallet-item-value">9</div>
+        <button class="wallet-btn">Claim</button>
+      </div>
     </div>
   </div>
   <!-- Firebase App (core) -->
@@ -179,6 +242,8 @@
           const user = result.user;
           alert('Добро пожаловать, ' + user.displayName + '!');
           modal.style.display = 'none';
+          document.querySelector('.container').style.display = 'none';
+          document.getElementById('wallet').style.display = 'block';
           // Здесь можно использовать user.displayName, user.photoURL и т.д.
         })
         .catch((error) => {
@@ -190,6 +255,8 @@
       e.preventDefault();
       alert('Регистрация завершена!');
       modal.style.display = 'none';
+      document.querySelector('.container').style.display = 'none';
+      document.getElementById('wallet').style.display = 'block';
     };
   </script>
 </body>
