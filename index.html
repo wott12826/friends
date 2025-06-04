@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>friend.tech</title>
   <link href="https://fonts.googleapis.com/css?family=Inter:400,500,700&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/png" href="images/logo.png">
   <style>
     html, body {
       height: 100%;
@@ -218,6 +219,18 @@
     .chat-name { font-weight: 600; color: #222; }
     .chat-msg { color: #aaa; font-size: 0.95rem; }
     .chat-price { color: #bbb; font-size: 0.95rem; }
+    /* --- Discover styles --- */
+    .discover-tabs { display: flex; gap: 12px; margin-bottom: 24px; margin-left: 8px; }
+    .discover-tab { background: #f5f5f5; border: none; border-radius: 8px; padding: 8px 18px; font-size: 1rem; color: #00bfff; cursor: pointer; font-weight: 500; }
+    .discover-tab.active { background: #00bfff; color: #fff; }
+    .discover-list { max-width: 600px; margin: 0 auto; }
+    .discover-item { display: flex; align-items: center; gap: 16px; padding: 12px 0; border-bottom: 1px solid #f0f0f0; }
+    .discover-rank { width: 28px; text-align: right; font-size: 1.1rem; color: #bbb; font-weight: 600; }
+    .discover-avatar { width: 40px; height: 40px; border-radius: 8px; object-fit: cover; }
+    .discover-info { flex: 1; min-width: 0; }
+    .discover-title { font-weight: 600; color: #222; font-size: 1.05rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .discover-desc { color: #aaa; font-size: 0.95rem; }
+    .discover-price { color: #00bfff; font-size: 0.98rem; font-weight: 500; margin-left: 8px; white-space: nowrap; }
   </style>
 </head>
 <body>
@@ -394,7 +407,62 @@
       </div>
       <!-- Discover tab (заглушка) -->
       <div id="tab-discover" class="tab-content" style="display:none;">
-        <div style="color:#888; font-size:1.2rem; margin-top:40px; text-align:center;">Discover coming soon...</div>
+        <div class="discover-tabs">
+          <button class="discover-tab active" id="discoverRankingsBtn">Rankings</button>
+          <button class="discover-tab" id="discoverRecentBtn">Recent</button>
+        </div>
+        <div id="discover-rankings" class="discover-list">
+          <!-- Примерные данные, можно расширить -->
+          <div class="discover-item">
+            <div class="discover-rank">1</div>
+            <img class="discover-avatar" src="https://randomuser.me/api/portraits/men/1.jpg" alt="club">
+            <div class="discover-info">
+              <div class="discover-title">WLM CLUB</div>
+              <div class="discover-desc">Public club</div>
+            </div>
+            <div class="discover-price">Price: 0.0029 $FRIEND</div>
+          </div>
+          <div class="discover-item">
+            <div class="discover-rank">2</div>
+            <img class="discover-avatar" src="https://randomuser.me/api/portraits/men/2.jpg" alt="club">
+            <div class="discover-info">
+              <div class="discover-title">Brutalist World Order</div>
+              <div class="discover-desc">Public club</div>
+            </div>
+            <div class="discover-price">Price: 0.0027 $FRIEND</div>
+          </div>
+          <div class="discover-item">
+            <div class="discover-rank">3</div>
+            <img class="discover-avatar" src="https://randomuser.me/api/portraits/men/3.jpg" alt="club">
+            <div class="discover-info">
+              <div class="discover-title">infinite</div>
+              <div class="discover-desc">Public club</div>
+            </div>
+            <div class="discover-price">Price: 0.0025 $FRIEND</div>
+          </div>
+          <div class="discover-item">
+            <div class="discover-rank">4</div>
+            <img class="discover-avatar" src="https://randomuser.me/api/portraits/men/4.jpg" alt="club">
+            <div class="discover-info">
+              <div class="discover-title">Auto Giveaways by F...</div>
+              <div class="discover-desc">Public club</div>
+            </div>
+            <div class="discover-price">Price: 0.0023 $FRIEND</div>
+          </div>
+          <div class="discover-item">
+            <div class="discover-rank">5</div>
+            <img class="discover-avatar" src="https://randomuser.me/api/portraits/men/5.jpg" alt="club">
+            <div class="discover-info">
+              <div class="discover-title">Onchain Friends</div>
+              <div class="discover-desc">Public club</div>
+            </div>
+            <div class="discover-price">Price: 0.0021 $FRIEND</div>
+          </div>
+          <!-- ... ещё элементы ... -->
+        </div>
+        <div id="discover-recent" class="discover-list" style="display:none;">
+          <div style="color:#888; font-size:1.1rem; margin:40px auto; text-align:center;">Recent clubs coming soon...</div>
+        </div>
       </div>
     </div>
   </div>
@@ -512,6 +580,40 @@
         clubCodeError.textContent = 'Invalid code!';
       }
     };
+
+    // --- Discover tab logic ---
+    const discoverRankingsBtn = document.getElementById('discoverRankingsBtn');
+    const discoverRecentBtn = document.getElementById('discoverRecentBtn');
+    const discoverRankings = document.getElementById('discover-rankings');
+    const discoverRecent = document.getElementById('discover-recent');
+    if (discoverRankingsBtn && discoverRecentBtn) {
+      discoverRankingsBtn.onclick = function() {
+        discoverRankingsBtn.classList.add('active');
+        discoverRecentBtn.classList.remove('active');
+        discoverRankings.style.display = '';
+        discoverRecent.style.display = 'none';
+      };
+      discoverRecentBtn.onclick = function() {
+        discoverRecentBtn.classList.add('active');
+        discoverRankingsBtn.classList.remove('active');
+        discoverRankings.style.display = 'none';
+        discoverRecent.style.display = '';
+      };
+    }
+
+    // --- Firebase auto-login ---
+    firebase.auth().onAuthStateChanged(function(user) {
+      if (user) {
+        document.querySelector('.container').style.display = 'none';
+        document.getElementById('wallet').style.display = 'none';
+        document.getElementById('main-app').style.display = 'flex';
+        showTab('chat');
+      } else {
+        document.querySelector('.container').style.display = '';
+        document.getElementById('wallet').style.display = 'none';
+        document.getElementById('main-app').style.display = 'none';
+      }
+    });
   </script>
 </body>
 </html> 
