@@ -1104,9 +1104,12 @@
     };
 
     // Закрытие модалки Create club
-    document.getElementById('closeCreateClubModal').onclick = function() {
-      document.getElementById('createClubModal').style.display = 'none';
-    };
+    const closeCreateClubModal = document.getElementById('closeCreateClubModal');
+    if (closeCreateClubModal) {
+      closeCreateClubModal.onclick = function() {
+        document.getElementById('createClubModal').style.display = 'none';
+      };
+    }
 
     // Загрузка и предпросмотр фото
     document.getElementById('clubPhotoPreview').onclick = function() {
