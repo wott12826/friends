@@ -37,7 +37,7 @@
       font-weight: 700;
     }
     .purple {
-      color: #800080;
+      color: #a020f0;
     }
     .blue {
       color: #00bfff;
@@ -389,6 +389,78 @@
       transition: background 0.2s;
     }
     .club-chat-send-btn:hover { background: #0099cc; }
+    /* --- Fullscreen Web3 Chat Styles --- */
+    .fullscreen-chat {
+      display: none; position: fixed; z-index: 5000; left: 0; top: 0; width: 100vw; height: 100vh; background: #fff; flex-direction: column;
+    }
+    .fschat-header {
+      display: flex; justify-content: space-between; align-items: center; padding: 0 24px; height: 64px; border-bottom: 1px solid #f0f0f0; background: #fff; position: sticky; top: 0; z-index: 10;
+    }
+    .fschat-header-left { display: flex; align-items: center; gap: 12px; }
+    .fschat-back { background: none; border: none; font-size: 2rem; cursor: pointer; color: #00bfff; margin-right: 4px; }
+    .fschat-avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; }
+    .fschat-title { font-size: 1.15rem; font-weight: 600; color: #222; margin-left: 2px; }
+    .fschat-header-right { display: flex; align-items: center; gap: 16px; }
+    .fschat-balance { background: #00bfff; color: #fff; border: none; border-radius: 8px; padding: 8px 18px; font-size: 1rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 4px; }
+    .fschat-menu-wrap { position: relative; }
+    .fschat-menu-btn { background: none; border: none; font-size: 1.6rem; color: #888; cursor: pointer; padding: 0 8px; }
+    .fschat-menu { display: none; position: absolute; right: 0; top: 32px; background: #fff; border-radius: 10px; box-shadow: 0 2px 12px rgba(0,0,0,0.07); min-width: 180px; border: 1px solid #eee; }
+    .fschat-menu-item { padding: 12px 18px; cursor: pointer; color: #222; font-size: 1rem; }
+    .fschat-menu-item:hover { background: #f5f5f5; }
+    .fschat-menu-wrap.open .fschat-menu { display: block; }
+    .fschat-messages {
+      flex: 1; overflow-y: auto; background: #fff; display: flex; flex-direction: column; align-items: center; padding: 32px 0 0 0;
+    }
+    .fschat-message-row { width: 100%; display: flex; margin-bottom: 32px; }
+    .fschat-message-row.me { justify-content: flex-end; }
+    .fschat-message { display: flex; flex-direction: column; align-items: flex-start; max-width: 420px; }
+    .fschat-message.me { align-items: flex-end; }
+    .fschat-msg-header { display: flex; align-items: center; gap: 8px; margin-bottom: 2px; }
+    .fschat-msg-avatar { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; }
+    .fschat-msg-nick { font-weight: 600; font-size: 1rem; color: #222; }
+    .fschat-msg-time { color: #aaa; font-size: 0.92rem; margin-left: 4px; }
+    .fschat-bubble { background: #eaf7fd; color: #222; border-radius: 18px; padding: 12px 18px; font-size: 1.08rem; word-break: break-word; margin-bottom: 2px; }
+    .fschat-message.me .fschat-bubble { background: #fff; color: #222; border: 1px solid #eaf7fd; }
+    .fschat-tip { color: #aaa; font-size: 0.98rem; text-align: center; margin: 0 0 8px 0; }
+    .fschat-form { display: flex; align-items: center; gap: 8px; border-top: 1px solid #f0f0f0; background: #fff; padding: 12px 24px; position: sticky; bottom: 0; }
+    .fschat-emoji { background: none; border: none; font-size: 1.4rem; cursor: pointer; color: #888; }
+    #fullscreenChatInput { flex: 1; padding: 12px 16px; border: 1px solid #ddd; border-radius: 8px; font-size: 1.08rem; }
+    .fschat-send { background: #00bfff; color: #fff; border: none; border-radius: 8px; padding: 8px 16px; font-size: 1.3rem; cursor: pointer; font-weight: 600; display: flex; align-items: center; }
+    .fschat-send:hover { background: #0099cc; }
+    @media (max-width: 700px) {
+      .fschat-header, .fschat-form { padding: 0 8px; }
+      .fschat-messages { padding-top: 16px; }
+      .fschat-message { max-width: 98vw; }
+    }
+    @media (max-width: 500px) {
+      .fschat-header, .fschat-form { padding: 0 2vw; }
+      .fschat-messages { padding-top: 8px; }
+      .fschat-message { max-width: 99vw; }
+    }
+    /* --- Emoji panel styles --- */
+    .fschat-emoji-panel {
+      position: absolute;
+      bottom: 56px;
+      left: 12px;
+      background: #fff;
+      border: 1px solid #eee;
+      border-radius: 12px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+      padding: 8px 10px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      z-index: 10000;
+      min-width: 180px;
+    }
+    .fschat-emoji-btn {
+      background: none; border: none; font-size: 1.3rem; cursor: pointer; padding: 4px 6px; border-radius: 6px;
+      transition: background 0.15s;
+    }
+    .fschat-emoji-btn:hover { background: #eaf7fd; }
+    .fschat-img-btn { background: none; border: none; font-size: 1.3rem; cursor: pointer; color: #888; }
+    .fschat-img-btn:hover { color: #00bfff; }
+    .fschat-img-preview { max-width: 180px; max-height: 120px; border-radius: 10px; margin: 6px 0; display: block; }
   </style>
 </head>
 <body>
@@ -713,19 +785,35 @@
     </div>
   </div>
   <!-- Фуллскрин чат -->
-  <div id="fullscreenChat" style="display:none; position:fixed; z-index:5000; left:0; top:0; width:100vw; height:100vh; background:#fff; flex-direction:column;">
-    <div class="club-chat-modal-content" style="height:100vh; max-width:100vw; border-radius:0;">
-      <div style="display:flex;align-items:center;gap:10px;padding:18px 28px 10px 28px;border-bottom:1px solid #f0f0f0;">
-        <button id="closeFullscreenChat" style="background:none;border:none;font-size:2rem;cursor:pointer;color:#00bfff;margin-right:8px;">&#8592;</button>
-        <img id="fullscreenChatAvatar" class="club-chat-avatar" src="" alt="avatar">
-        <span id="fullscreenChatTitle" class="club-chat-title"></span>
+  <div id="fullscreenChat" class="fullscreen-chat">
+    <div class="fschat-header">
+      <div class="fschat-header-left">
+        <button id="closeFullscreenChat" class="fschat-back">&#8592;</button>
+        <img id="fullscreenChatAvatar" class="fschat-avatar" src="" alt="avatar">
+        <span id="fullscreenChatTitle" class="fschat-title"></span>
       </div>
-      <div id="fullscreenChatMessages" class="club-chat-messages" style="max-height:calc(100vh - 180px);"></div>
-      <form id="fullscreenChatForm" class="club-chat-form">
-        <input id="fullscreenChatInput" type="text" placeholder="Write something..." autocomplete="off">
-        <button type="submit" class="club-chat-send-btn">➤</button>
-      </form>
+      <div class="fschat-header-right">
+        <button class="fschat-balance"><img src="images/logo.png" style="width:18px;vertical-align:middle;margin-right:4px;">0.0000</button>
+        <div class="fschat-menu-wrap">
+          <button class="fschat-menu-btn">⋮</button>
+          <div class="fschat-menu">
+            <div class="fschat-menu-item">Share link</div>
+            <div class="fschat-menu-item">Turn on notifications</div>
+            <div class="fschat-menu-item">Pin to top of chat list</div>
+          </div>
+        </div>
+      </div>
     </div>
+    <div id="fullscreenChatMessages" class="fschat-messages"></div>
+    <div class="fschat-tip">Tip: Chat with your key holders here. They can see your messages and only you can see their messages, unless you reply</div>
+    <form id="fullscreenChatForm" class="fschat-form" style="position:relative;">
+      <button type="button" class="fschat-emoji">😊</button>
+      <button type="button" class="fschat-img-btn" id="fschatImgBtn">🖼️</button>
+      <input type="file" id="fschatImgInput" accept="image/*" style="display:none;">
+      <input id="fullscreenChatInput" type="text" placeholder="Write something..." autocomplete="off" style="margin-left:0;">
+      <button type="submit" class="fschat-send"><span style="font-size:1.3em;">&#128073;</span></button>
+      <div id="fschatEmojiPanel" class="fschat-emoji-panel" style="display:none;"></div>
+    </form>
   </div>
   <!-- Firebase App (core) -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -1057,7 +1145,22 @@
       }
     };
 
-    // --- Фуллскрин чат ---
+    // --- Web3 Chat: меню ---
+    (function(){
+      const menuBtn = document.querySelector('.fschat-menu-btn');
+      const menuWrap = document.querySelector('.fschat-menu-wrap');
+      if(menuBtn && menuWrap) {
+        menuBtn.onclick = function(e) {
+          e.stopPropagation();
+          menuWrap.classList.toggle('open');
+        };
+        document.body.addEventListener('click', function(){
+          menuWrap.classList.remove('open');
+        });
+      }
+    })();
+
+    // --- Web3 Chat: открытие ---
     function openFullscreenChat({avatar, title, key}) {
       document.getElementById('fullscreenChatAvatar').src = avatar;
       document.getElementById('fullscreenChatTitle').textContent = title;
@@ -1082,16 +1185,46 @@
     function saveClubMessages(key, msgs) {
       localStorage.setItem('clubmsg_' + key, JSON.stringify(msgs));
     }
+    // --- Web3 Chat: сообщения ---
+    const demoUsers = [
+      { nick: 'Exo', avatar: 'https://randomuser.me/api/portraits/men/32.jpg' },
+      { nick: '#roc', avatar: 'https://randomuser.me/api/portraits/men/33.jpg' },
+      { nick: 'Gamb', avatar: 'https://randomuser.me/api/portraits/men/34.jpg' },
+      { nick: 'Smiroff', avatar: 'https://randomuser.me/api/portraits/men/35.jpg' }
+    ];
     function renderFullscreenChatMessages() {
       const box = document.getElementById('fullscreenChatMessages');
       box.innerHTML = '';
       if (!currentClubKey) return;
-      const msgs = getClubMessages(currentClubKey);
-      msgs.forEach(m => {
-        const div = document.createElement('div');
-        div.className = 'club-chat-message me';
-        div.innerHTML = `<div class="club-chat-bubble">${m.text}</div>`;
-        box.appendChild(div);
+      let msgs = getClubMessages(currentClubKey);
+      // Если сообщений нет, показываем демо-чат
+      if (!msgs.length) {
+        msgs = [
+          { user: 0, text: 'Hahahha', time: '5/30/23 6:57PM' },
+          { user: 0, text: 'Welcome', time: '5/30/23 6:57PM' },
+          { user: 1, text: 'gm', time: '5/31/23 9:04AM' },
+          { user: 2, text: 'gm', time: '6/1/23 9:07AM' },
+          { user: 1, text: '把眼睛睁开，就会知道未来...', time: '6/1/23 9:07PM' },
+          { user: 1, text: 'Best of luck!', time: '6/2/23 8:33AM' },
+          { user: 3, text: '👀 💬', time: '6/2/23 8:34AM' }
+        ];
+      }
+      msgs.forEach((m, i) => {
+        const isMe = (m.user === 3) || (!m.user && m.nick === 'Smiroff');
+        const user = demoUsers[m.user ?? (isMe ? 3 : 0)] || demoUsers[0];
+        const row = document.createElement('div');
+        row.className = 'fschat-message-row' + (isMe ? ' me' : '');
+        row.innerHTML = `
+          <div class="fschat-message${isMe ? ' me' : ''}">
+            <div class="fschat-msg-header">
+              <img class="fschat-msg-avatar" src="${user.avatar}" alt="avatar">
+              <span class="fschat-msg-nick">${user.nick}</span>
+              <span class="fschat-msg-time">${m.time || ''}</span>
+            </div>
+            <div class="fschat-bubble">${m.text || ''}${m.img ? `<br><img src='${m.img}' style='max-width:180px;max-height:120px;border-radius:10px;margin-top:6px;'>` : ''}</div>
+          </div>
+        `;
+        box.appendChild(row);
       });
       setTimeout(() => { box.scrollTop = box.scrollHeight; }, 50);
     }
@@ -1099,13 +1232,85 @@
       e.preventDefault();
       const input = document.getElementById('fullscreenChatInput');
       const text = input.value.trim();
-      if (!text || !currentClubKey) return;
+      if ((!text && !imgToSend) || !currentClubKey) return;
       const msgs = getClubMessages(currentClubKey);
-      msgs.push({ text });
+      const now = new Date();
+      const time = now.toLocaleDateString() + ' ' + now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) + (now.getHours() >= 12 ? 'PM' : 'AM');
+      if (imgToSend) {
+        msgs.push({ user: 3, text, img: imgToSend, time });
+      } else {
+        msgs.push({ user: 3, text, time });
+      }
       saveClubMessages(currentClubKey, msgs);
       input.value = '';
+      clearImgPreview();
       renderFullscreenChatMessages();
     };
+
+    // --- Emoji panel logic ---
+    const emojiPanel = document.getElementById('fschatEmojiPanel');
+    const emojiBtn = document.querySelector('.fschat-emoji');
+    const chatInput = document.getElementById('fullscreenChatInput');
+    const emojiList = [
+      '😀','😁','😂','🤣','😅','😊','😍','😘','😎','🤩','😏','😜','🤔','😇','🥳','😱','😡','😭','😴','👍','👀','💬','🔥','💎','🚀','🎉','❤️','💰','🤑','🤝','🙌','🙏','👋','🤖','🦄','🌈','⚡','☀️','🌙','⭐','🍀','🍕','🍔','🍟','🍣','🍺','🥇','🏆','🎲','🎮','🎧','📈','🖼️'
+    ];
+    emojiBtn.onclick = function(e) {
+      e.preventDefault();
+      emojiPanel.innerHTML = '';
+      emojiList.forEach(em => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'fschat-emoji-btn';
+        btn.textContent = em;
+        btn.onclick = function(ev) {
+          ev.preventDefault();
+          chatInput.value += em;
+          emojiPanel.style.display = 'none';
+          chatInput.focus();
+        };
+        emojiPanel.appendChild(btn);
+      });
+      emojiPanel.style.display = emojiPanel.style.display === 'none' ? 'flex' : 'none';
+    };
+    document.body.addEventListener('click', function(e) {
+      if (!emojiPanel.contains(e.target) && e.target !== emojiBtn) emojiPanel.style.display = 'none';
+    });
+
+    // --- Image upload logic ---
+    const imgBtn = document.getElementById('fschatImgBtn');
+    const imgInput = document.getElementById('fschatImgInput');
+    let imgToSend = null;
+    imgBtn.onclick = function(e) {
+      e.preventDefault();
+      imgInput.click();
+    };
+    imgInput.onchange = function(e) {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(ev) {
+          imgToSend = ev.target.result;
+          // Показываем превью
+          if (!document.getElementById('fschatImgPreview')) {
+            const preview = document.createElement('img');
+            preview.id = 'fschatImgPreview';
+            preview.className = 'fschat-img-preview';
+            preview.src = imgToSend;
+            chatInput.parentNode.insertBefore(preview, chatInput);
+          } else {
+            document.getElementById('fschatImgPreview').src = imgToSend;
+          }
+        };
+        reader.readAsDataURL(file);
+      }
+    };
+    // Удалять превью при отправке или очистке
+    function clearImgPreview() {
+      imgToSend = null;
+      const prev = document.getElementById('fschatImgPreview');
+      if (prev) prev.remove();
+      imgInput.value = '';
+    }
   </script>
 </body>
 </html> 
