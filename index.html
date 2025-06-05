@@ -1926,43 +1926,67 @@
 
     // Сохранение изменений профиля
     if (saveProfile) {
-      saveProfile.onclick = function() {
+      saveProfile.onclick = async function() {
         const user = firebase.auth().currentUser;
         if (user) {
-          const newName = editProfileName.value.trim();
-          const newUsername = editProfileUsername.value.trim();
-          
-          // Обновляем имя в Firebase
-          user.updateProfile({
-            displayName: newName
-          }).then(() => {
+          try {
+            const newName = editProfileName.value.trim();
+            const newUsername = editProfileUsername.value.trim();
+            const newPhotoURL = editProfileAvatar.src;
+
+            // Если аватарка была изменена и это base64
+            if (newPhotoURL !== user.photoURL && newPhotoURL.startsWith('data:image')) {
+              // Конвертируем base64 в blob
+              const response = await fetch(newPhotoURL);
+              const blob = await response.blob();
+              
+              // Загружаем в Firebase Storage
+              const storageRef = firebase.storage().ref();
+              const avatarRef = storageRef.child(`avatars/${user.uid}`);
+              await avatarRef.put(blob);
+              
+              // Получаем URL загруженного файла
+              const photoURL = await avatarRef.getDownloadURL();
+              
+              // Обновляем профиль с новой аватаркой
+              await user.updateProfile({
+                displayName: newName,
+                photoURL: photoURL
+              });
+              
+              // Обновляем аватар в UI
+              const profileAvatar = document.querySelector('.wallet-profile-avatar');
+              if (profileAvatar) {
+                profileAvatar.src = photoURL;
+              }
+            } else {
+              // Обновляем только имя
+              await user.updateProfile({
+                displayName: newName
+              });
+            }
+
             // Сохраняем username в localStorage
             localStorage.setItem(`username_${user.uid}`, newUsername);
-            
-            // Обновляем отображение в профиле
+
+            // Обновляем отображение имени/юзернейма
             const profileName = document.querySelector('.wallet-profile-name');
             if (profileName) {
               profileName.innerHTML = `${newName}<span class="wallet-profile-handle">@${newUsername}</span>`;
             }
-            
-            // Если есть Twitter блок, обновляем его
+
+            // Обновляем Twitter-блок, если есть
             const twitterInfo = document.querySelector('.wallet-profile-twitter');
             if (twitterInfo && user.providerData[0]?.providerId === 'twitter.com') {
               twitterInfo.innerHTML = `<a href="https://twitter.com/${newUsername}" style="color:#00bfff;">@${newUsername}</a> <span style="color:#00bfff;">✔️</span>`;
             }
 
-            // Если загружена новая аватарка
-            if (editProfileAvatar.src !== user.photoURL) {
-              // В реальном приложении здесь был бы код загрузки изображения в storage
-              // и обновления photoURL пользователя
-              document.querySelector('.wallet-profile-avatar').src = editProfileAvatar.src;
-            }
-
+            // Закрываем окно
             editProfileModal.style.display = 'none';
-          }).catch(error => {
-            console.error('Error updating profile:', error);
-            alert('Failed to update profile');
-          });
+          } catch (error) {
+            console.error('Ошибка обновления профиля:', error);
+            alert('Ошибка обновления профиля');
+          }
         }
       };
     }
