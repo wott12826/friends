@@ -3165,58 +3165,59 @@
   if (!walletAddressEl) return;
 
   const address = localStorage.getItem('wallet_address');
-  // ВСЕГДА показываем кнопку Connect Wallet
-  walletAddressEl.innerHTML = `
-    ${address ? address.substring(0,6) + '...' + address.substring(address.length-4) : ''}
-    <button id="connectPhantomBtn" class="connect-wallet-btn" style="margin-right:6px;">Connect Wallet</button>
-    ${address ? `<button class="wallet-disconnect-btn" title="Disconnect wallet" style="margin-right:6px;">Disconnect</button>
-    <button class="wallet-copy-btn" data-address="${address}" title="Copy address"><img src="images/copy-icon.jpg" style="width:14px;height:14px;vertical-align:middle;"></button>` : ''}
-  `;
-
-  // Обработчик Connect Wallet (всегда вызывает Phantom)
-  const connectBtn = document.getElementById('connectPhantomBtn');
-  if (connectBtn) {
-    connectBtn.addEventListener('click', async function () {
-      try {
-        if (!window.solana || !window.solana.isPhantom) {
-          alert('Please install Phantom wallet');
-          window.open('https://phantom.app/', '_blank');
-          return;
+  if (!address) {
+    // Кошелёк не подключён — показываем только Connect Wallet
+    walletAddressEl.innerHTML = `
+      <button id="connectPhantomBtn" class="connect-wallet-btn">Connect Wallet</button>
+    `;
+    const connectBtn = document.getElementById('connectPhantomBtn');
+    if (connectBtn) {
+      connectBtn.addEventListener('click', async function () {
+        try {
+          if (!window.solana || !window.solana.isPhantom) {
+            alert('Please install Phantom wallet');
+            window.open('https://phantom.app/', '_blank');
+            return;
+          }
+          const resp = await window.solana.connect({ onlyIfTrusted: false });
+          const address = resp.publicKey.toString();
+          localStorage.setItem('wallet_address', address);
+          renderWalletAddress();
+        } catch (err) {
+          alert('Error connecting to wallet');
         }
-        // ВСЕГДА открываем Phantom для выбора кошелька
-        const resp = await window.solana.connect({ onlyIfTrusted: false });
-        const address = resp.publicKey.toString();
-        localStorage.setItem('wallet_address', address);
+      });
+    }
+  } else {
+    // Кошелёк подключён — показываем адрес, Disconnect и Copy
+    walletAddressEl.innerHTML = `
+      ${address.substring(0,6)}...${address.substring(address.length-4)}
+      <button class="wallet-disconnect-btn" title="Disconnect wallet" style="margin-right:6px;">Disconnect</button>
+      <button class="wallet-copy-btn" data-address="${address}" title="Copy address"><img src="images/copy-icon.jpg" style="width:14px;height:14px;vertical-align:middle;"></button>
+    `;
+    // Disconnect
+    const disconnectBtn = walletAddressEl.querySelector('.wallet-disconnect-btn');
+    if (disconnectBtn) {
+      disconnectBtn.addEventListener('click', function () {
+        localStorage.removeItem('wallet_address');
         renderWalletAddress();
-      } catch (err) {
-        alert('Error connecting to wallet');
-      }
-    });
-  }
-
-  // Обработчик Disconnect
-  const disconnectBtn = walletAddressEl.querySelector('.wallet-disconnect-btn');
-  if (disconnectBtn) {
-    disconnectBtn.addEventListener('click', function () {
-      localStorage.removeItem('wallet_address');
-      renderWalletAddress();
-    });
-  }
-
-  // Обработчик копирования
-  const newCopyBtn = walletAddressEl.querySelector('.wallet-copy-btn');
-  if (newCopyBtn) {
-    newCopyBtn.addEventListener('click', function () {
-      const addr = this.dataset.address;
-      if (addr) {
-        navigator.clipboard.writeText(addr)
-          .then(() => {
-            this.title = 'Copied!';
-            setTimeout(() => { this.title = 'Copy address'; }, 1500);
-          })
-          .catch(() => alert('Copy failed. Please copy manually.'));
-      }
-    });
+      });
+    }
+    // Copy
+    const newCopyBtn = walletAddressEl.querySelector('.wallet-copy-btn');
+    if (newCopyBtn) {
+      newCopyBtn.addEventListener('click', function () {
+        const addr = this.dataset.address;
+        if (addr) {
+          navigator.clipboard.writeText(addr)
+            .then(() => {
+              this.title = 'Copied!';
+              setTimeout(() => { this.title = 'Copy address'; }, 1500);
+            })
+            .catch(() => alert('Copy failed. Please copy manually.'));
+        }
+      });
+    }
   }
 }
     // Вызовем при загрузке страницы
