@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,13 +8,15 @@
   <link href="https://fonts.googleapis.com/css?family=Inter:400,500,700&display=swap" rel="stylesheet">
   <link rel="icon" type="image/png" href="images/logo2.png">
   <style>
-    html, body {
+    html,
+    body {
       height: 100%;
       margin: 0;
       font-family: 'Inter', Arial, sans-serif;
       background: #fff;
       min-width: 0;
     }
+
     .container {
       min-height: 100vh;
       display: flex;
@@ -21,35 +24,43 @@
       justify-content: center;
       align-items: center;
     }
+
     .content {
       display: flex;
       flex-direction: column;
       align-items: center;
       margin-top: 10vh;
     }
+
     .logo {
       width: 100px;
       margin-bottom: 48px;
     }
+
     h1 {
       font-size: 2.5rem;
       margin: 0 0 18px 0;
       font-weight: 700;
     }
+
     .purple {
       color: #a020f0;
     }
+
     .blue {
       color: #00bfff;
     }
+
     .black {
       color: #222;
     }
+
     .subtitle {
       color: #888;
       margin: 0 0 40px 0;
       font-size: 1.2rem;
     }
+
     .login-btn {
       background: #00bfff;
       color: #fff;
@@ -62,9 +73,11 @@
       margin-bottom: 0;
       transition: background 0.2s;
     }
+
     .login-btn:hover {
       background: #0099cc;
     }
+
     .footer {
       position: fixed;
       bottom: 30px;
@@ -73,69 +86,137 @@
       justify-content: center;
       gap: 60px;
     }
+
     .footer-link {
       color: #00bfff;
       text-decoration: none;
       font-size: 1rem;
       transition: text-decoration 0.2s;
     }
+
     .footer-link:hover {
       text-decoration: underline;
     }
+
     /* --- Modal styles --- */
     .modal {
       display: none;
       position: fixed;
       z-index: 1000;
-      left: 0; top: 0; width: 100%; height: 100%;
-      background: rgba(0,0,0,0.3);
-      justify-content: center; align-items: center;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.3);
+      justify-content: center;
+      align-items: center;
     }
+
     .modal-content {
-      background: #fff; padding: 32px 24px; border-radius: 12px; min-width: 320px;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.15);
-      position: relative; display: flex; flex-direction: column; align-items: center;
-    }
-    .close {
-      position: absolute; right: 16px; top: 12px; font-size: 2rem; cursor: pointer; color: #888;
-    }
-    .twitter-btn {
-      background: #1da1f2; color: #fff; border: none; border-radius: 6px;
-      padding: 12px 32px; font-size: 1rem; margin-bottom: 16px; cursor: pointer;
-    }
-    .divider {
-      margin: 12px 0; color: #aaa; font-size: 0.9rem;
-    }
-    #registerForm {
-      display: flex; flex-direction: column; gap: 10px; width: 100%;
-    }
-    #registerForm input {
-      padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 1rem;
-    }
-    .register-btn {
-      background: #00bfff; color: #fff; border: none; border-radius: 6px;
-      padding: 10px; font-size: 1rem; cursor: pointer;
-    }
-    /* --- Wallet styles --- */
-    .wallet-section { padding: 40px; }
-    .wallet-header { 
-      display: flex; 
-      gap: 60px; 
-      margin-bottom: 40px;
-      justify-content: center; /* Центрируем элементы по горизонтали */
-      align-items: center; /* Центрируем элементы по вертикали */
-    }
-    .wallet-header-coins {
-      text-align: center; /* Центрируем текст внутри элементов */
-    }
-    .wallet-header > div {
+      background: #fff;
+      padding: 32px 24px;
+      border-radius: 12px;
+      min-width: 320px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+      position: relative;
       display: flex;
       flex-direction: column;
-      align-items: center; /* Центрируем содержимое каждого div */
+      align-items: center;
     }
-    .wallet-label { color: #888; font-size: 1rem; }
-    .wallet-value, .wallet-post-price { font-size: 2rem; font-weight: bold; color: #222; }
-    .wallet-post-price { color: #00bfff; }
+
+    .close {
+      position: absolute;
+      right: 16px;
+      top: 12px;
+      font-size: 2rem;
+      cursor: pointer;
+      color: #888;
+    }
+
+    .twitter-btn {
+      background: #1da1f2;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      padding: 12px 32px;
+      font-size: 1rem;
+      margin-bottom: 16px;
+      cursor: pointer;
+    }
+
+    .divider {
+      margin: 12px 0;
+      color: #aaa;
+      font-size: 0.9rem;
+    }
+
+    #registerForm {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      width: 100%;
+    }
+
+    #registerForm input {
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-size: 1rem;
+    }
+
+    .register-btn {
+      background: #00bfff;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      padding: 10px;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+
+    /* --- Wallet styles --- */
+    .wallet-section {
+      padding: 40px;
+    }
+
+    .wallet-header {
+      display: flex;
+      gap: 60px;
+      margin-bottom: 40px;
+      justify-content: center;
+      /* Центрируем элементы по горизонтали */
+      align-items: center;
+      /* Центрируем элементы по вертикали */
+    }
+
+    .wallet-header-coins {
+      text-align: center;
+      /* Центрируем текст внутри элементов */
+    }
+
+    .wallet-header>div {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      /* Центрируем содержимое каждого div */
+    }
+
+    .wallet-label {
+      color: #888;
+      font-size: 1rem;
+    }
+
+    .wallet-value,
+    .wallet-post-price {
+      font-size: 2rem;
+      font-weight: bold;
+      color: #222;
+    }
+
+    .wallet-post-price {
+      color: #00bfff;
+    }
+
     .wallet-grid-3x2 {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -146,6 +227,7 @@
       max-width: 900px;
       margin: 0 auto;
     }
+
     .wallet-item {
       display: flex;
       flex-direction: column;
@@ -153,10 +235,12 @@
       min-width: 160px;
       background: none;
     }
+
     .wallet-icon {
       margin-bottom: 8px;
       display: block;
     }
+
     .wallet-item-label {
       color: #888;
       font-size: 1rem;
@@ -166,6 +250,7 @@
       padding: 2px 10px;
       margin-top: 2px;
     }
+
     .wallet-item-value {
       font-size: 1.1rem;
       font-weight: 500;
@@ -176,6 +261,7 @@
       align-items: center;
       gap: 4px;
     }
+
     .wallet-btn {
       background: #00bfff;
       color: #fff;
@@ -187,118 +273,388 @@
       margin-bottom: 8px;
       margin-top: 4px;
       font-weight: 500;
-      box-shadow: 0 2px 8px rgba(0,191,255,0.08);
+      box-shadow: 0 2px 8px rgba(0, 191, 255, 0.08);
       transition: background 0.2s;
     }
+
     .wallet-btn:hover {
       background: #0099cc;
     }
+
     @media (max-width: 1200px) {
-      .wallet-grid-3x2 { max-width: 98vw; }
+      .wallet-grid-3x2 {
+        max-width: 98vw;
+      }
     }
+
     @media (max-width: 900px) {
       .wallet-grid-3x2 {
         gap: 32px 24px;
         max-width: 100vw;
       }
-      .main-content { padding-left: 0; padding-right: 0; }
+
+      .main-content {
+        padding-left: 0;
+        padding-right: 0;
+      }
     }
+
     @media (max-width: 700px) {
       .wallet-grid-3x2 {
         grid-template-columns: 1fr 1fr;
         grid-template-rows: repeat(3, auto);
       }
-      .wallet-item { min-width: 0; }
-      .wallet-icon, .discover-avatar, .club-chat-avatar {
+
+      .wallet-item {
+        min-width: 0;
+      }
+
+      .wallet-icon,
+      .discover-avatar,
+      .club-chat-avatar {
         width: 40px !important;
         height: 40px !important;
       }
-      .sidebar { width: 60px; padding-top: 12px; }
-      .sidebar-logo { margin-bottom: 16px; }
-      .sidebar-item { padding: 12px 0 12px 10px; font-size: 1rem; }
-      .main-app { flex-direction: column; }
-      .main-content { padding: 16px 0 0 0; }
-      .club-chat-modal-content, .create-club-modal-content {
+
+      .sidebar {
+        width: 60px;
+        padding-top: 12px;
+      }
+
+      .sidebar-logo {
+        margin-bottom: 16px;
+      }
+
+      .sidebar-item {
+        padding: 12px 0 12px 10px;
+        font-size: 1rem;
+      }
+
+      .main-app {
+        flex-direction: column;
+      }
+
+      .main-content {
+        padding: 16px 0 0 0;
+      }
+
+      .club-chat-modal-content,
+      .create-club-modal-content {
         max-width: 98vw;
         min-width: 0;
         padding: 0 2vw;
       }
     }
+
     @media (max-width: 500px) {
       .wallet-grid-3x2 {
         grid-template-columns: 1fr;
         grid-template-rows: none;
         gap: 24px 0;
       }
-      .wallet-item { min-width: 0; }
-      .wallet-icon, .discover-avatar, .club-chat-avatar {
+
+      .wallet-item {
+        min-width: 0;
+      }
+
+      .wallet-icon,
+      .discover-avatar,
+      .club-chat-avatar {
         width: 32px !important;
         height: 32px !important;
       }
-      .sidebar { display: none; }
-      .main-app { flex-direction: column; }
-      .main-content { padding: 8px 0 0 0; }
-      .modal-content, .club-chat-modal-content, .create-club-modal-content {
+
+      .sidebar {
+        display: none;
+      }
+
+      .main-app {
+        flex-direction: column;
+      }
+
+      .main-content {
+        padding: 8px 0 0 0;
+      }
+
+      .modal-content,
+      .club-chat-modal-content,
+      .create-club-modal-content {
         max-width: 100vw;
         min-width: 0;
         border-radius: 0;
         padding: 0 2vw;
       }
-      .chat-header, .chat-tabs, .chat-notify, .chat-list, .wallet-header, .wallet-grid, .discover-tabs, .discover-list {
+
+      .chat-header,
+      .chat-tabs,
+      .chat-notify,
+      .chat-list,
+      .wallet-header,
+      .wallet-grid,
+      .discover-tabs,
+      .discover-list {
         padding-left: 2vw !important;
         padding-right: 2vw !important;
       }
-      .club-chat-header, .club-chat-form {
+
+      .club-chat-header,
+      .club-chat-form {
         padding-left: 2vw !important;
         padding-right: 2vw !important;
       }
+
       .club-chat-messages {
         padding-left: 2vw !important;
         padding-right: 2vw !important;
       }
-      .create-club-photo-label { width: 80px; height: 80px; }
-      .register-btn, .wallet-btn, .create-club-btn, .chat-tab, .discover-tab, .chat-notify-btn {
+
+      .create-club-photo-label {
+        width: 80px;
+        height: 80px;
+      }
+
+      .register-btn,
+      .wallet-btn,
+      .create-club-btn,
+      .chat-tab,
+      .discover-tab,
+      .chat-notify-btn {
         font-size: 1rem;
         padding: 10px 0;
       }
-      .modal { align-items: flex-end; }
+
+      .modal {
+        align-items: flex-end;
+      }
     }
+
     /* --- Main app layout styles --- */
-    .main-app { display: flex; height: 100vh; }
-    .sidebar { width: 180px; background: #fafbfc; border-right: 1px solid #eee; display: flex; flex-direction: column; align-items: center; padding-top: 32px; }
-    .sidebar-logo { margin-bottom: 40px; }
-    .sidebar-menu { width: 100%; }
-    .sidebar-item { padding: 16px 0 16px 32px; font-size: 1.1rem; color: #888; cursor: pointer; border-left: 4px solid transparent; transition: background 0.2s, color 0.2s, border-color 0.2s; }
-    .sidebar-item.active { color: #00bfff; background: #eaf7fd; border-left: 4px solid #00bfff; font-weight: 600; }
-    .main-content { flex: 1; padding: 40px 0 0 0; }
+    .main-app {
+      display: flex;
+      height: 100vh;
+    }
+
+    .sidebar {
+      width: 180px;
+      background: #fafbfc;
+      border-right: 1px solid #eee;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding-top: 32px;
+    }
+
+    .sidebar-logo {
+      margin-bottom: 40px;
+    }
+
+    .sidebar-menu {
+      width: 100%;
+    }
+
+    .sidebar-item {
+      padding: 16px 0 16px 32px;
+      font-size: 1.1rem;
+      color: #888;
+      cursor: pointer;
+      border-left: 4px solid transparent;
+      transition: background 0.2s, color 0.2s, border-color 0.2s;
+    }
+
+    .sidebar-item.active {
+      color: #00bfff;
+      background: #eaf7fd;
+      border-left: 4px solid #00bfff;
+      font-weight: 600;
+    }
+
+    .main-content {
+      flex: 1;
+      padding: 40px 0 0 0;
+    }
+
     /* --- Chat tab styles --- */
-    .chat-header { display: flex; align-items: center; gap: 16px; margin-bottom: 24px; }
-    .chat-search { flex: 1; padding: 10px 16px; border: 1px solid #eee; border-radius: 8px; font-size: 1rem; }
-    .chat-bell { font-size: 1.5rem; color: #bbb; margin-left: auto; }
-    .chat-tabs { display: flex; gap: 12px; margin-bottom: 16px; }
-    .chat-tab { background: #f5f5f5; border: none; border-radius: 8px; padding: 8px 18px; font-size: 1rem; color: #00bfff; cursor: pointer; font-weight: 500; }
-    .chat-tab.active { background: #00bfff; color: #fff; }
-    .chat-notify { background: #00bfff; color: #fff; border-radius: 8px; padding: 10px 16px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
-    .chat-notify-btn { background: #fff; color: #00bfff; border: none; border-radius: 6px; padding: 4px 16px; font-size: 1rem; cursor: pointer; font-weight: 500; }
-    .chat-list { margin-top: 12px; }
-    .chat-item { display: flex; align-items: center; gap: 16px; padding: 12px 0; border-bottom: 1px solid #f0f0f0; }
-    .chat-avatar { width: 40px; height: 40px; border-radius: 50%; }
-    .chat-info { flex: 1; }
-    .chat-name { font-weight: 600; color: #222; }
-    .chat-msg { color: #aaa; font-size: 0.95rem; }
-    .chat-price { color: #bbb; font-size: 0.95rem; }
+    .chat-header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .chat-search {
+      flex: 1;
+      padding: 10px 16px;
+      border: 1px solid #eee;
+      border-radius: 8px;
+      font-size: 1rem;
+    }
+
+    .chat-bell {
+      font-size: 1.5rem;
+      color: #bbb;
+      margin-left: auto;
+    }
+
+    .chat-tabs {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .chat-tab {
+      background: #f5f5f5;
+      border: none;
+      border-radius: 8px;
+      padding: 8px 18px;
+      font-size: 1rem;
+      color: #00bfff;
+      cursor: pointer;
+      font-weight: 500;
+    }
+
+    .chat-tab.active {
+      background: #00bfff;
+      color: #fff;
+    }
+
+    .chat-notify {
+      background: #00bfff;
+      color: #fff;
+      border-radius: 8px;
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 18px;
+    }
+
+    .chat-notify-btn {
+      background: #fff;
+      color: #00bfff;
+      border: none;
+      border-radius: 6px;
+      padding: 4px 16px;
+      font-size: 1rem;
+      cursor: pointer;
+      font-weight: 500;
+    }
+
+    .chat-list {
+      margin-top: 12px;
+    }
+
+    .chat-item {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 12px 0;
+      border-bottom: 1px solid #f0f0f0;
+    }
+
+    .chat-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+    }
+
+    .chat-info {
+      flex: 1;
+    }
+
+    .chat-name {
+      font-weight: 600;
+      color: #222;
+    }
+
+    .chat-msg {
+      color: #aaa;
+      font-size: 0.95rem;
+    }
+
+    .chat-price {
+      color: #bbb;
+      font-size: 0.95rem;
+    }
+
     /* --- Discover styles --- */
-    .discover-tabs { display: flex; gap: 12px; margin-bottom: 24px; margin-left: 8px; }
-    .discover-tab { background: #f5f5f5; border: none; border-radius: 8px; padding: 8px 18px; font-size: 1rem; color: #00bfff; cursor: pointer; font-weight: 500; }
-    .discover-tab.active { background: #00bfff; color: #fff; }
-    .discover-list { max-width: 600px; margin: 0 auto; }
-    .discover-item { display: flex; align-items: center; gap: 16px; padding: 12px 0; border-bottom: 1px solid #f0f0f0; }
-    .discover-rank { width: 28px; text-align: right; font-size: 1.1rem; color: #bbb; font-weight: 600; }
-    .discover-avatar { width: 40px; height: 40px; border-radius: 8px; object-fit: cover; }
-    .discover-info { flex: 1; min-width: 0; }
-    .discover-title { font-weight: 600; color: #222; font-size: 1.05rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .discover-desc { color: #aaa; font-size: 0.95rem; }
-    .discover-price { color: #00bfff; font-size: 0.98rem; font-weight: 500; margin-left: 8px; white-space: nowrap; }
+    .discover-tabs {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 24px;
+      margin-left: 8px;
+    }
+
+    .discover-tab {
+      background: #f5f5f5;
+      border: none;
+      border-radius: 8px;
+      padding: 8px 18px;
+      font-size: 1rem;
+      color: #00bfff;
+      cursor: pointer;
+      font-weight: 500;
+    }
+
+    .discover-tab.active {
+      background: #00bfff;
+      color: #fff;
+    }
+
+    .discover-list {
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .discover-item {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 12px 0;
+      border-bottom: 1px solid #f0f0f0;
+    }
+
+    .discover-rank {
+      width: 28px;
+      text-align: right;
+      font-size: 1.1rem;
+      color: #bbb;
+      font-weight: 600;
+    }
+
+    .discover-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      object-fit: cover;
+    }
+
+    .discover-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .discover-title {
+      font-weight: 600;
+      color: #222;
+      font-size: 1.05rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .discover-desc {
+      color: #aaa;
+      font-size: 0.95rem;
+    }
+
+    .discover-price {
+      color: #00bfff;
+      font-size: 0.98rem;
+      font-weight: 500;
+      margin-left: 8px;
+      white-space: nowrap;
+    }
+
     /* --- Create club modal styles --- */
     .create-club-modal-content {
       max-width: 600px;
@@ -307,22 +663,110 @@
       border-radius: 18px;
       position: relative;
     }
-    .create-club-form { display: flex; flex-direction: column; gap: 18px; }
-    .create-club-photo-label { display: block; width: 120px; height: 120px; margin-bottom: 8px; cursor: pointer; }
-    .create-club-photo-preview {
-      width: 100%; height: 100%; background: #f5f5f5; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #aaa; font-size: 1.1rem; text-align: center; border: 1.5px dashed #e0e0e0; cursor: pointer;
+
+    .create-club-form {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
     }
-    .create-club-row { display: flex; align-items: center; gap: 12px; margin-bottom: 0; }
-    .create-club-input { font-size: 1.1rem; padding: 10px 14px; border: 1px solid #ddd; border-radius: 8px; margin-bottom: 0; background: #fff; }
-    .create-club-input[type="text"] { flex: 1; }
-    .create-club-input[type="number"] { width: 80px; }
-    .create-club-section-label { color: #888; font-size: 1rem; margin-bottom: 6px; margin-top: 8px; }
-    .create-club-curves { display: flex; gap: 18px; margin-bottom: 0; }
-    .curve-option { border: 2px solid #eee; border-radius: 10px; padding: 8px 18px; display: flex; flex-direction: column; align-items: center; cursor: pointer; transition: border 0.2s; }
-    .curve-option.selected { border: 2px solid #00bfff; background: #eaf7fd; }
-    .curve-option svg { margin-bottom: 4px; }
-    .create-club-btn { background: #00bfff; color: #fff; border: none; border-radius: 8px; padding: 16px 0; font-size: 1.15rem; font-weight: 600; margin-top: 18px; cursor: pointer; transition: background 0.2s; }
-    .create-club-btn:hover { background: #0099cc; }
+
+    .create-club-photo-label {
+      display: block;
+      width: 120px;
+      height: 120px;
+      margin-bottom: 8px;
+      cursor: pointer;
+    }
+
+    .create-club-photo-preview {
+      width: 100%;
+      height: 100%;
+      background: #f5f5f5;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #aaa;
+      font-size: 1.1rem;
+      text-align: center;
+      border: 1.5px dashed #e0e0e0;
+      cursor: pointer;
+    }
+
+    .create-club-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 0;
+    }
+
+    .create-club-input {
+      font-size: 1.1rem;
+      padding: 10px 14px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      margin-bottom: 0;
+      background: #fff;
+    }
+
+    .create-club-input[type="text"] {
+      flex: 1;
+    }
+
+    .create-club-input[type="number"] {
+      width: 80px;
+    }
+
+    .create-club-section-label {
+      color: #888;
+      font-size: 1rem;
+      margin-bottom: 6px;
+      margin-top: 8px;
+    }
+
+    .create-club-curves {
+      display: flex;
+      gap: 18px;
+      margin-bottom: 0;
+    }
+
+    .curve-option {
+      border: 2px solid #eee;
+      border-radius: 10px;
+      padding: 8px 18px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      cursor: pointer;
+      transition: border 0.2s;
+    }
+
+    .curve-option.selected {
+      border: 2px solid #00bfff;
+      background: #eaf7fd;
+    }
+
+    .curve-option svg {
+      margin-bottom: 4px;
+    }
+
+    .create-club-btn {
+      background: #00bfff;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 16px 0;
+      font-size: 1.15rem;
+      font-weight: 600;
+      margin-top: 18px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .create-club-btn:hover {
+      background: #0099cc;
+    }
+
     /* --- Club chat modal styles --- */
     .club-chat-modal-content {
       max-width: 800px;
@@ -335,6 +779,7 @@
       flex-direction: column;
       background: #fff;
     }
+
     .club-chat-header {
       display: flex;
       align-items: center;
@@ -344,10 +789,20 @@
       font-size: 1.2rem;
       font-weight: 600;
     }
+
     .club-chat-avatar {
-      width: 40px; height: 40px; border-radius: 8px; object-fit: cover;
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      object-fit: cover;
     }
-    .club-chat-title { font-size: 1.15rem; font-weight: 600; color: #222; }
+
+    .club-chat-title {
+      font-size: 1.15rem;
+      font-weight: 600;
+      color: #222;
+    }
+
     .club-chat-messages {
       flex: 1;
       padding: 18px 28px 12px 28px;
@@ -356,13 +811,18 @@
       min-height: 200px;
       max-height: 400px;
     }
+
     .club-chat-message {
       margin-bottom: 12px;
       display: flex;
       align-items: flex-end;
       gap: 8px;
     }
-    .club-chat-message.me { flex-direction: row-reverse; }
+
+    .club-chat-message.me {
+      flex-direction: row-reverse;
+    }
+
     .club-chat-bubble {
       background: #eaf7fd;
       color: #222;
@@ -372,10 +832,12 @@
       font-size: 1.05rem;
       word-break: break-word;
     }
+
     .club-chat-message.me .club-chat-bubble {
       background: #00bfff;
       color: #fff;
     }
+
     .club-chat-form {
       display: flex;
       align-items: center;
@@ -383,6 +845,7 @@
       padding: 12px 28px;
       background: #fafbfc;
     }
+
     #clubChatInput {
       flex: 1;
       padding: 10px 14px;
@@ -391,6 +854,7 @@
       font-size: 1.05rem;
       margin-right: 10px;
     }
+
     .club-chat-send-btn {
       background: #00bfff;
       color: #fff;
@@ -402,55 +866,282 @@
       font-weight: 600;
       transition: background 0.2s;
     }
-    .club-chat-send-btn:hover { background: #0099cc; }
+
+    .club-chat-send-btn:hover {
+      background: #0099cc;
+    }
+
     /* --- Fullscreen Web3 Chat Styles --- */
     .fullscreen-chat {
-      display: none; position: fixed; z-index: 5000; left: 0; top: 0; width: 100vw; height: 100vh; background: #fff; flex-direction: column;
+      display: none;
+      position: fixed;
+      z-index: 5000;
+      left: 0;
+      top: 0;
+      width: 100vw;
+      height: 100vh;
+      background: #fff;
+      flex-direction: column;
     }
+
     .fschat-header {
-      display: flex; justify-content: space-between; align-items: center; padding: 0 24px; height: 64px; border-bottom: 1px solid #f0f0f0; background: #fff; position: sticky; top: 0; z-index: 10;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 24px;
+      height: 64px;
+      border-bottom: 1px solid #f0f0f0;
+      background: #fff;
+      position: sticky;
+      top: 0;
+      z-index: 10;
     }
-    .fschat-header-left { display: flex; align-items: center; gap: 12px; }
-    .fschat-back { background: none; border: none; font-size: 2rem; cursor: pointer; color: #00bfff; margin-right: 4px; }
-    .fschat-avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; }
-    .fschat-title { font-size: 1.15rem; font-weight: 600; color: #222; margin-left: 2px; }
-    .fschat-header-right { display: flex; align-items: center; gap: 16px; }
-    .fschat-balance { background: #00bfff; color: #fff; border: none; border-radius: 8px; padding: 8px 18px; font-size: 1rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 4px; }
-    .fschat-menu-wrap { position: relative; }
-    .fschat-menu-btn { background: none; border: none; font-size: 1.6rem; color: #888; cursor: pointer; padding: 0 8px; }
-    .fschat-menu { display: none; position: absolute; right: 0; top: 32px; background: #fff; border-radius: 10px; box-shadow: 0 2px 12px rgba(0,0,0,0.07); min-width: 180px; border: 1px solid #eee; }
-    .fschat-menu-item { padding: 12px 18px; cursor: pointer; color: #222; font-size: 1rem; }
-    .fschat-menu-item:hover { background: #f5f5f5; }
-    .fschat-menu-wrap.open .fschat-menu { display: block; }
+
+    .fschat-header-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .fschat-back {
+      background: none;
+      border: none;
+      font-size: 2rem;
+      cursor: pointer;
+      color: #00bfff;
+      margin-right: 4px;
+    }
+
+    .fschat-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+
+    .fschat-title {
+      font-size: 1.15rem;
+      font-weight: 600;
+      color: #222;
+      margin-left: 2px;
+    }
+
+    .fschat-header-right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .fschat-balance {
+      background: #00bfff;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 8px 18px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .fschat-menu-wrap {
+      position: relative;
+    }
+
+    .fschat-menu-btn {
+      background: none;
+      border: none;
+      font-size: 1.6rem;
+      color: #888;
+      cursor: pointer;
+      padding: 0 8px;
+    }
+
+    .fschat-menu {
+      display: none;
+      position: absolute;
+      right: 0;
+      top: 32px;
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.07);
+      min-width: 180px;
+      border: 1px solid #eee;
+    }
+
+    .fschat-menu-item {
+      padding: 12px 18px;
+      cursor: pointer;
+      color: #222;
+      font-size: 1rem;
+    }
+
+    .fschat-menu-item:hover {
+      background: #f5f5f5;
+    }
+
+    .fschat-menu-wrap.open .fschat-menu {
+      display: block;
+    }
+
     .fschat-messages {
-      flex: 1; overflow-y: auto; background: #fff; display: flex; flex-direction: column; align-items: center; padding: 32px 0 0 0;
+      flex: 1;
+      overflow-y: auto;
+      background: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 32px 0 0 0;
     }
-    .fschat-message-row { width: 100%; display: flex; margin-bottom: 32px; }
-    .fschat-message-row.me { justify-content: flex-end; }
-    .fschat-message { display: flex; flex-direction: column; align-items: flex-start; max-width: 420px; }
-    .fschat-message.me { align-items: flex-end; }
-    .fschat-msg-header { display: flex; align-items: center; gap: 8px; margin-bottom: 2px; }
-    .fschat-msg-avatar { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; }
-    .fschat-msg-nick { font-weight: 600; font-size: 1rem; color: #222; }
-    .fschat-msg-time { color: #aaa; font-size: 0.92rem; margin-left: 4px; }
-    .fschat-bubble { background: #eaf7fd; color: #222; border-radius: 18px; padding: 12px 18px; font-size: 1.08rem; word-break: break-word; margin-bottom: 2px; }
-    .fschat-message.me .fschat-bubble { background: #fff; color: #222; border: 1px solid #eaf7fd; }
-    .fschat-tip { color: #aaa; font-size: 0.98rem; text-align: center; margin: 0 0 8px 0; }
-    .fschat-form { display: flex; align-items: center; gap: 8px; border-top: 1px solid #f0f0f0; background: #fff; padding: 12px 24px; position: sticky; bottom: 0; }
-    .fschat-emoji { background: none; border: none; font-size: 1.4rem; cursor: pointer; color: #888; }
-    #fullscreenChatInput { flex: 1; padding: 12px 16px; border: 1px solid #ddd; border-radius: 8px; font-size: 1.08rem; }
-    .fschat-send { background: #00bfff; color: #fff; border: none; border-radius: 8px; padding: 8px 16px; font-size: 1.3rem; cursor: pointer; font-weight: 600; display: flex; align-items: center; }
-    .fschat-send:hover { background: #0099cc; }
+
+    .fschat-message-row {
+      width: 100%;
+      display: flex;
+      margin-bottom: 32px;
+    }
+
+    .fschat-message-row.me {
+      justify-content: flex-end;
+    }
+
+    .fschat-message {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      max-width: 420px;
+    }
+
+    .fschat-message.me {
+      align-items: flex-end;
+    }
+
+    .fschat-msg-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 2px;
+    }
+
+    .fschat-msg-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+
+    .fschat-msg-nick {
+      font-weight: 600;
+      font-size: 1rem;
+      color: #222;
+    }
+
+    .fschat-msg-time {
+      color: #aaa;
+      font-size: 0.92rem;
+      margin-left: 4px;
+    }
+
+    .fschat-bubble {
+      background: #eaf7fd;
+      color: #222;
+      border-radius: 18px;
+      padding: 12px 18px;
+      font-size: 1.08rem;
+      word-break: break-word;
+      margin-bottom: 2px;
+    }
+
+    .fschat-message.me .fschat-bubble {
+      background: #fff;
+      color: #222;
+      border: 1px solid #eaf7fd;
+    }
+
+    .fschat-tip {
+      color: #aaa;
+      font-size: 0.98rem;
+      text-align: center;
+      margin: 0 0 8px 0;
+    }
+
+    .fschat-form {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-top: 1px solid #f0f0f0;
+      background: #fff;
+      padding: 12px 24px;
+      position: sticky;
+      bottom: 0;
+    }
+
+    .fschat-emoji {
+      background: none;
+      border: none;
+      font-size: 1.4rem;
+      cursor: pointer;
+      color: #888;
+    }
+
+    #fullscreenChatInput {
+      flex: 1;
+      padding: 12px 16px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-size: 1.08rem;
+    }
+
+    .fschat-send {
+      background: #00bfff;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 8px 16px;
+      font-size: 1.3rem;
+      cursor: pointer;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+    }
+
+    .fschat-send:hover {
+      background: #0099cc;
+    }
+
     @media (max-width: 700px) {
-      .fschat-header, .fschat-form { padding: 0 8px; }
-      .fschat-messages { padding-top: 16px; }
-      .fschat-message { max-width: 98vw; }
+
+      .fschat-header,
+      .fschat-form {
+        padding: 0 8px;
+      }
+
+      .fschat-messages {
+        padding-top: 16px;
+      }
+
+      .fschat-message {
+        max-width: 98vw;
+      }
     }
+
     @media (max-width: 500px) {
-      .fschat-header, .fschat-form { padding: 0 2vw; }
-      .fschat-messages { padding-top: 8px; }
-      .fschat-message { max-width: 99vw; }
+
+      .fschat-header,
+      .fschat-form {
+        padding: 0 2vw;
+      }
+
+      .fschat-messages {
+        padding-top: 8px;
+      }
+
+      .fschat-message {
+        max-width: 99vw;
+      }
     }
+
     /* --- Emoji panel styles --- */
     .fschat-emoji-panel {
       position: absolute;
@@ -459,7 +1150,7 @@
       background: #fff;
       border: 1px solid #eee;
       border-radius: 12px;
-      box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.07);
       padding: 8px 10px;
       display: flex;
       flex-wrap: wrap;
@@ -467,74 +1158,317 @@
       z-index: 10000;
       min-width: 180px;
     }
+
     .fschat-emoji-btn {
-      background: none; border: none; font-size: 1.3rem; cursor: pointer; padding: 4px 6px; border-radius: 6px;
+      background: none;
+      border: none;
+      font-size: 1.3rem;
+      cursor: pointer;
+      padding: 4px 6px;
+      border-radius: 6px;
       transition: background 0.15s;
     }
-    .fschat-emoji-btn:hover { background: #eaf7fd; }
-    .fschat-img-btn { background: none; border: none; font-size: 1.3rem; cursor: pointer; color: #888; }
-    .fschat-img-btn:hover { color: #00bfff; }
-    .fschat-img-preview { max-width: 180px; max-height: 120px; border-radius: 10px; margin: 6px 0; display: block; }
+
+    .fschat-emoji-btn:hover {
+      background: #eaf7fd;
+    }
+
+    .fschat-img-btn {
+      background: none;
+      border: none;
+      font-size: 1.3rem;
+      cursor: pointer;
+      color: #888;
+    }
+
+    .fschat-img-btn:hover {
+      color: #00bfff;
+    }
+
+    .fschat-img-preview {
+      max-width: 180px;
+      max-height: 120px;
+      border-radius: 10px;
+      margin: 6px 0;
+      display: block;
+    }
+
     /* --- Wallet profile styles --- */
     .wallet-profile-block {
       background: #fff;
       border-radius: 18px;
       margin: 0 auto 32px auto;
       max-width: 700px;
-      box-shadow: 0 2px 12px rgba(0,0,0,0.03);
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.03);
       padding: 32px 32px 24px 32px;
       display: flex;
       flex-direction: column;
       gap: 18px;
     }
-    .wallet-profile-header { display: flex; align-items: center; gap: 24px; }
-    .wallet-profile-avatar { width: 64px; height: 64px; border-radius: 50%; object-fit: cover; }
-    .wallet-profile-info { flex: 1; }
-    .wallet-profile-name { font-size: 1.3rem; font-weight: 700; color: #222; }
-    .wallet-profile-handle { color: #aaa; font-size: 1.05rem; margin-left: 8px; }
-    .wallet-profile-addr { color: #888; font-size: 1.05rem; margin: 4px 0; display: flex; align-items: center; gap: 6px; }
-    .wallet-copy-btn { background: none; border: none; font-size: 1.1rem; cursor: pointer; color: #00bfff; }
-    .wallet-profile-twitter { color: #00bfff; font-size: 1.05rem; margin-bottom: 2px; }
-    .wallet-profile-actions { display: flex; flex-direction: column; gap: 8px; }
-    .wallet-profile-btn { background: #fff; color: #00bfff; border: 1px solid #00bfff; border-radius: 8px; padding: 6px 18px; font-size: 1rem; font-weight: 500; cursor: pointer; transition: background 0.2s, color 0.2s; }
-    .wallet-profile-btn:hover { background: #eaf7fd; }
-    .wallet-profile-balances { display: flex; flex-direction: column; gap: 8px; margin-top: 8px; }
-    .wallet-profile-fees { color: #888; font-size: 1.05rem; }
-    .wallet-profile-fee-val { color: #00bfff; font-weight: 600; margin-left: 6px; }
-    .wallet-profile-balance-row { display: flex; align-items: center; gap: 18px; }
-    .wallet-profile-balance { color: #00bfff; font-weight: 600; margin-left: 6px; }
-    .wallet-profile-withdraw { background: #eaf7fd; color: #00bfff; border: none; border-radius: 8px; padding: 6px 18px; font-size: 1rem; font-weight: 500; cursor: pointer; margin-left: auto; transition: background 0.2s; }
-    .wallet-profile-withdraw:hover { background: #00bfff; color: #fff; }
-    .wallet-profile-fund-label { color: #888; font-size: 1.05rem; margin-top: 12px; }
-    .wallet-profile-fund-row { display: flex; gap: 12px; margin: 8px 0 0 0; }
-    .wallet-fund-btn { flex: 1; font-size: 1.15rem; font-weight: 600; border-radius: 10px; border: none; padding: 14px 0; cursor: pointer; margin: 0; transition: background 0.2s, color 0.2s; }
-    .wallet-fund-base { background: #0052ff; color: #fff; }
-    .wallet-fund-coinbase { background: #0066ff; color: #fff; }
-    .wallet-fund-eth { background: #eee; color: #222; }
-    .wallet-fund-btn:hover { filter: brightness(0.95); }
-    .wallet-logout-btn { margin: 24px auto 0 auto; display: block; background: #fff; color: #888; border: 1.5px solid #ccc; border-radius: 8px; padding: 10px 0; width: 100%; font-size: 1.1rem; font-weight: 500; cursor: pointer; transition: background 0.2s, color 0.2s; }
-    .wallet-logout-btn:hover { background: #f5f5f5; color: #222; }
+
+    .wallet-profile-header {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+    }
+
+    .wallet-profile-avatar {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+
+    .wallet-profile-info {
+      flex: 1;
+    }
+
+    .wallet-profile-name {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: #222;
+    }
+
+    .wallet-profile-handle {
+      color: #aaa;
+      font-size: 1.05rem;
+      margin-left: 8px;
+    }
+
+    .wallet-profile-addr {
+      color: #888;
+      font-size: 1.05rem;
+      margin: 4px 0;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .wallet-copy-btn {
+      background: none;
+      border: none;
+      font-size: 1.1rem;
+      cursor: pointer;
+      color: #00bfff;
+    }
+
+    .wallet-profile-twitter {
+      color: #00bfff;
+      font-size: 1.05rem;
+      margin-bottom: 2px;
+    }
+
+    .wallet-profile-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .wallet-profile-btn {
+      background: #fff;
+      color: #00bfff;
+      border: 1px solid #00bfff;
+      border-radius: 8px;
+      padding: 6px 18px;
+      font-size: 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+    }
+
+    .wallet-profile-btn:hover {
+      background: #eaf7fd;
+    }
+
+    .wallet-profile-balances {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .wallet-profile-fees {
+      color: #888;
+      font-size: 1.05rem;
+    }
+
+    .wallet-profile-fee-val {
+      color: #00bfff;
+      font-weight: 600;
+      margin-left: 6px;
+    }
+
+    .wallet-profile-balance-row {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+    }
+
+    .wallet-profile-balance {
+      color: #00bfff;
+      font-weight: 600;
+      margin-left: 6px;
+    }
+
+    .wallet-profile-withdraw {
+      background: #eaf7fd;
+      color: #00bfff;
+      border: none;
+      border-radius: 8px;
+      padding: 6px 18px;
+      font-size: 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      margin-left: auto;
+      transition: background 0.2s;
+    }
+
+    .wallet-profile-withdraw:hover {
+      background: #00bfff;
+      color: #fff;
+    }
+
+    .wallet-profile-fund-label {
+      color: #888;
+      font-size: 1.05rem;
+      margin-top: 12px;
+    }
+
+    .wallet-profile-fund-row {
+      display: flex;
+      gap: 12px;
+      margin: 8px 0 0 0;
+    }
+
+    .wallet-fund-btn {
+      flex: 1;
+      font-size: 1.15rem;
+      font-weight: 600;
+      border-radius: 10px;
+      border: none;
+      padding: 14px 0;
+      cursor: pointer;
+      margin: 0;
+      transition: background 0.2s, color 0.2s;
+    }
+
+    .wallet-fund-base {
+      background: #0052ff;
+      color: #fff;
+    }
+
+    .wallet-fund-coinbase {
+      background: #0066ff;
+      color: #fff;
+    }
+
+    .wallet-fund-eth {
+      background: #eee;
+      color: #222;
+    }
+
+    .wallet-fund-btn:hover {
+      filter: brightness(0.95);
+    }
+
+    .wallet-logout-btn {
+      margin: 24px auto 0 auto;
+      display: block;
+      background: #fff;
+      color: #888;
+      border: 1.5px solid #ccc;
+      border-radius: 8px;
+      padding: 10px 0;
+      width: 100%;
+      font-size: 1.1rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+    }
+
+    .wallet-logout-btn:hover {
+      background: #f5f5f5;
+      color: #222;
+    }
+
     @media (max-width: 900px) {
-      .wallet-profile-block { max-width: 99vw; padding: 18px 4vw 12px 4vw; }
-      .wallet-profile-header { flex-direction: column; align-items: flex-start; gap: 12px; }
-      .wallet-profile-actions { flex-direction: row; gap: 8px; }
-      .wallet-profile-avatar { width: 48px; height: 48px; }
+      .wallet-profile-block {
+        max-width: 99vw;
+        padding: 18px 4vw 12px 4vw;
+      }
+
+      .wallet-profile-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+      }
+
+      .wallet-profile-actions {
+        flex-direction: row;
+        gap: 8px;
+      }
+
+      .wallet-profile-avatar {
+        width: 48px;
+        height: 48px;
+      }
     }
+
     @media (max-width: 600px) {
-      .wallet-profile-block { padding: 10px 2vw 8px 2vw; }
-      .wallet-profile-header { gap: 8px; }
-      .wallet-profile-avatar { width: 36px; height: 36px; }
-      .wallet-profile-btn, .wallet-profile-withdraw, .wallet-fund-btn, .wallet-logout-btn { font-size: 0.98rem; padding: 8px 0; }
-      .wallet-profile-fund-row { flex-direction: column; gap: 8px; }
+      .wallet-profile-block {
+        padding: 10px 2vw 8px 2vw;
+      }
+
+      .wallet-profile-header {
+        gap: 8px;
+      }
+
+      .wallet-profile-avatar {
+        width: 36px;
+        height: 36px;
+      }
+
+      .wallet-profile-btn,
+      .wallet-profile-withdraw,
+      .wallet-fund-btn,
+      .wallet-logout-btn {
+        font-size: 0.98rem;
+        padding: 8px 0;
+      }
+
+      .wallet-profile-fund-row {
+        flex-direction: column;
+        gap: 8px;
+      }
     }
+
     /* --- Login/Register switch styles --- */
-    .login-switch-row { display: flex; gap: 18px; justify-content: center; margin-top: 10px; }
-    .login-switch-link { color: #00bfff; font-size: 0.98rem; text-decoration: none; cursor: pointer; transition: text-decoration 0.2s; }
-    .login-switch-link:hover { text-decoration: underline; }
+    .login-switch-row {
+      display: flex;
+      gap: 18px;
+      justify-content: center;
+      margin-top: 10px;
+    }
+
+    .login-switch-link {
+      color: #00bfff;
+      font-size: 0.98rem;
+      text-decoration: none;
+      cursor: pointer;
+      transition: text-decoration 0.2s;
+    }
+
+    .login-switch-link:hover {
+      text-decoration: underline;
+    }
+
     /* Добавляем стили для hover эффекта */
-    .fschat-emoji img:hover, .fschat-img-btn img:hover, .fschat-send img:hover {
+    .fschat-emoji img:hover,
+    .fschat-img-btn img:hover,
+    .fschat-send img:hover {
       opacity: 1 !important;
     }
+
     /* Стили для панели эмодзи */
     .emoji-panel {
       position: absolute;
@@ -543,13 +1477,14 @@
       background: white;
       border: 1px solid #eee;
       border-radius: 8px;
-      box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
       padding: 8px;
       display: none;
       grid-template-columns: repeat(8, 1fr);
       gap: 8px;
       z-index: 1000;
     }
+
     .emoji-btn {
       background: none;
       border: none;
@@ -558,14 +1493,17 @@
       border-radius: 4px;
       transition: background-color 0.2s;
     }
+
     .emoji-btn:hover {
       background-color: #f0f0f0;
     }
+
     .emoji-btn img {
       width: 20px;
       height: 20px;
       display: block;
     }
+
     /* --- Edit Profile Modal Styles --- */
     .edit-profile-modal {
       display: none;
@@ -577,12 +1515,14 @@
       background: #fff;
       z-index: 1000;
     }
+
     .edit-profile-header {
       display: flex;
       align-items: center;
       padding: 16px;
       border-bottom: 1px solid #eee;
     }
+
     .edit-profile-back {
       background: none;
       border: none;
@@ -591,35 +1531,40 @@
       cursor: pointer;
       color: #000;
     }
+
     .edit-profile-title {
       font-size: 20px;
       font-weight: 600;
       margin-left: 16px;
     }
+
     .edit-profile-content {
       padding: 24px;
       max-width: 600px;
       margin: 0 auto;
     }
+
     .edit-profile-avatar-wrap {
       position: relative;
       width: 120px;
       height: 120px;
       margin: 0 auto 32px;
     }
+
     .edit-profile-avatar {
       width: 100%;
       height: 100%;
       border-radius: 50%;
       object-fit: cover;
     }
+
     .edit-profile-avatar-overlay {
       position: absolute;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(0,0,0,0.3);
+      background: rgba(0, 0, 0, 0.3);
       border-radius: 50%;
       display: flex;
       align-items: center;
@@ -628,22 +1573,27 @@
       opacity: 0;
       transition: opacity 0.2s;
     }
+
     .edit-profile-avatar-wrap:hover .edit-profile-avatar-overlay {
       opacity: 1;
     }
+
     .edit-profile-camera-icon {
       width: 32px;
       height: 32px;
       filter: invert(1);
     }
+
     .edit-profile-form-group {
       margin-bottom: 24px;
     }
+
     .edit-profile-label {
       display: block;
       margin-bottom: 8px;
       color: #666;
     }
+
     .edit-profile-input {
       width: 100%;
       padding: 12px;
@@ -651,6 +1601,7 @@
       border-radius: 8px;
       font-size: 16px;
     }
+
     .edit-profile-save {
       width: 100%;
       padding: 14px;
@@ -663,9 +1614,11 @@
       cursor: pointer;
       transition: background 0.2s;
     }
+
     .edit-profile-save:hover {
       background: #0099ff;
     }
+
     /* Modal styles */
     .modal {
       display: none;
@@ -675,7 +1628,7 @@
       top: 0;
       width: 100%;
       height: 100%;
-      background-color: rgba(0,0,0,0.5);
+      background-color: rgba(0, 0, 0, 0.5);
     }
 
     .modal-content {
@@ -723,7 +1676,7 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(0,0,0,0.5);
+      background: rgba(0, 0, 0, 0.5);
       border-radius: 50%;
       display: flex;
       align-items: center;
@@ -801,6 +1754,7 @@
     }
   </style>
 </head>
+
 <body>
   <div class="container">
     <div class="content">
@@ -896,7 +1850,8 @@
                   <img src="images/copy-icon.png" style="width:14px;height:14px;vertical-align:middle;">
                 </button>
               </div>
-              <div class="wallet-profile-twitter"><a href="#" style="color:#00bfff;">@Smirnoff_ETH</a> <span style="color:#00bfff;">✔️</span></div>
+              <div class="wallet-profile-twitter"><a href="#" style="color:#00bfff;">@Smirnoff_ETH</a> <span
+                  style="color:#00bfff;">✔️</span></div>
             </div>
             <div class="wallet-profile-actions">
               <button class="wallet-profile-btn edit-profile-trigger">Edit profile</button>
@@ -905,9 +1860,12 @@
             </div>
           </div>
           <div class="wallet-profile-balances">
-            <div class="wallet-profile-fees">Trading fees earned <span class="wallet-profile-fee-val"><img src="images/logo2.png" style="width:14px;height:14px;vertical-align:middle;margin-right:2px;"> 0.002</span></div>
+            <div class="wallet-profile-fees">Trading fees earned <span class="wallet-profile-fee-val"><img
+                  src="images/logo2.png" style="width:14px;height:14px;vertical-align:middle;margin-right:2px;">
+                0.002</span></div>
             <div class="wallet-profile-balance-row">
-              <div>Wallet balance <span class="wallet-profile-balance"><img src="images/logo2.png" style="width:14px;height:14px;vertical-align:middle;margin-right:2px;"> 0.001</span></div>
+              <div>Wallet balance <span class="wallet-profile-balance"><img src="images/logo2.png"
+                    style="width:14px;height:14px;vertical-align:middle;margin-right:2px;"> 0.001</span></div>
               <button class="wallet-profile-withdraw"><span style="color:#00bfff;">▶</span> Withdraw ETH</button>
             </div>
           </div>
@@ -1036,7 +1994,8 @@
           <!-- ... ещё элементы ... -->
         </div>
         <div id="discover-recent" class="discover-list" style="display:none;">
-          <div style="color:#888; font-size:1.1rem; margin:40px auto; text-align:center;">Recent clubs coming soon...</div>
+          <div style="color:#888; font-size:1.1rem; margin:40px auto; text-align:center;">Recent clubs coming soon...
+          </div>
         </div>
       </div>
     </div>
@@ -1053,28 +2012,38 @@
         </label>
         <div class="create-club-row">
           <input type="text" id="clubNameInput" class="create-club-input" placeholder="Name">
-          <input type="text" id="clubTickerInput" class="create-club-input" placeholder="$TICKER" maxlength="8" style="text-transform:uppercase;">
+          <input type="text" id="clubTickerInput" class="create-club-input" placeholder="$TICKER" maxlength="8"
+            style="text-transform:uppercase;">
         </div>
-        <textarea id="clubDescInput" class="create-club-input" placeholder="Add a description for your club (optional)" style="resize:none;"></textarea>
+        <textarea id="clubDescInput" class="create-club-input" placeholder="Add a description for your club (optional)"
+          style="resize:none;"></textarea>
         <div class="create-club-section-label">Select price curve</div>
         <div class="create-club-curves">
           <div class="curve-option selected" data-curve="casual">
-            <svg width="48" height="32"><polyline points="0,28 16,24 32,20 48,8" fill="none" stroke="#22c55e" stroke-width="3"/></svg>
+            <svg width="48" height="32">
+              <polyline points="0,28 16,24 32,20 48,8" fill="none" stroke="#22c55e" stroke-width="3" />
+            </svg>
             <div>Casual</div>
           </div>
           <div class="curve-option" data-curve="standard">
-            <svg width="48" height="32"><polyline points="0,28 12,24 24,16 36,8 48,4" fill="none" stroke="#a855f7" stroke-width="3"/></svg>
+            <svg width="48" height="32">
+              <polyline points="0,28 12,24 24,16 36,8 48,4" fill="none" stroke="#a855f7" stroke-width="3" />
+            </svg>
             <div>Standard</div>
           </div>
           <div class="curve-option" data-curve="exclusive">
-            <svg width="48" height="32"><polyline points="0,28 8,24 16,20 32,16 40,8 48,0" fill="none" stroke="#fbbf24" stroke-width="3"/></svg>
+            <svg width="48" height="32">
+              <polyline points="0,28 8,24 16,20 32,16 40,8 48,0" fill="none" stroke="#fbbf24" stroke-width="3" />
+            </svg>
             <div>Exclusive</div>
           </div>
         </div>
         <div class="create-club-section-label" style="margin-top:18px;">Buy club keys</div>
         <div class="create-club-row">
-          <input type="number" id="clubKeysInput" class="create-club-input" value="1" min="1" max="10" style="width:80px;">
-          <div style="margin-left:12px; color:#888; font-size:0.98rem;">Be the first holder of your club key. The first key is free.</div>
+          <input type="number" id="clubKeysInput" class="create-club-input" value="1" min="1" max="10"
+            style="width:80px;">
+          <div style="margin-left:12px; color:#888; font-size:0.98rem;">Be the first holder of your club key. The first
+            key is free.</div>
         </div>
         <div class="create-club-row" style="margin-top:8px; align-items:center;">
           <div style="color:#888; font-size:0.98rem;">You will spend:</div>
@@ -1083,7 +2052,8 @@
           <div style="margin-left:8px; color:#00bfff; font-weight:600; font-size:1.1rem;">0.9000</div>
         </div>
         <button class="create-club-btn" id="createClubBtn">Approve spending $POST</button>
-        <div style="color:#aaa; font-size:0.95rem; margin-top:10px; text-align:center;">Once you create your club, you cannot change these details</div>
+        <div style="color:#aaa; font-size:0.95rem; margin-top:10px; text-align:center;">Once you create your club, you
+          cannot change these details</div>
       </div>
     </div>
   </div>
@@ -1107,7 +2077,8 @@
     <div class="modal-content" style="max-width:340px;">
       <span class="close" id="closeDiscoverCodeModal">&times;</span>
       <h2>Enter access code</h2>
-      <input type="text" id="discoverCodeInput" placeholder="Access code" style="padding:10px; border-radius:6px; border:1px solid #ddd; width:100%; margin-bottom:12px; font-size:1rem;">
+      <input type="text" id="discoverCodeInput" placeholder="Access code"
+        style="padding:10px; border-radius:6px; border:1px solid #ddd; width:100%; margin-bottom:12px; font-size:1rem;">
       <div id="discoverCodeError" style="color:#e00; font-size:0.98rem; min-height:22px; margin-bottom:8px;"></div>
       <button id="discoverCodeSubmit" class="wallet-btn" style="width:100%;">Enter</button>
     </div>
@@ -1121,7 +2092,8 @@
         <span id="fullscreenChatTitle" class="fschat-title"></span>
       </div>
       <div class="fschat-header-right">
-        <button class="fschat-balance"><img src="images/logo2.png" style="width:18px;vertical-align:middle;margin-right:4px;">0.0000</button>
+        <button class="fschat-balance"><img src="images/logo2.png"
+            style="width:18px;vertical-align:middle;margin-right:4px;">0.0000</button>
         <div class="fschat-menu-wrap">
           <button class="fschat-menu-btn">⋮</button>
           <div class="fschat-menu">
@@ -1133,36 +2105,61 @@
       </div>
     </div>
     <div id="fullscreenChatMessages" class="fschat-messages"></div>
-    <div class="fschat-tip">Tip: Chat with your key holders here. They can see your messages and only you can see their messages, unless you reply</div>
+    <div class="fschat-tip">Tip: Chat with your key holders here. They can see your messages and only you can see their
+      messages, unless you reply</div>
     <form id="fullscreenChatForm" class="fschat-form" style="position:relative;">
       <button type="button" class="fschat-emoji" style="background: none; border: none; padding: 0; cursor: pointer;">
-        <img src="https://toppng.com/uploads/preview/font-emoji-svg-png-icon-free-download-389350-onlinewebfonts-play-button-image-11563230644rbzu7hlann.png" alt="emoji" style="width: 24px; height: 24px; opacity: 0.7;">
+        <img
+          src="https://toppng.com/uploads/preview/font-emoji-svg-png-icon-free-download-389350-onlinewebfonts-play-button-image-11563230644rbzu7hlann.png"
+          alt="emoji" style="width: 24px; height: 24px; opacity: 0.7;">
       </button>
       <div class="emoji-panel">
-        <button type="button" class="emoji-btn" data-emoji="👍"><img src="https://em-content.zobj.net/thumbs/120/apple/325/thumbs-up_1f44d.png" alt="👍"></button>
-        <button type="button" class="emoji-btn" data-emoji="❤️"><img src="https://em-content.zobj.net/thumbs/120/apple/325/red-heart_2764-fe0f.png" alt="❤️"></button>
-        <button type="button" class="emoji-btn" data-emoji="😊"><img src="https://em-content.zobj.net/thumbs/120/apple/325/smiling-face-with-smiling-eyes_1f60a.png" alt="😊"></button>
-        <button type="button" class="emoji-btn" data-emoji="🎉"><img src="https://em-content.zobj.net/thumbs/120/apple/325/party-popper_1f389.png" alt="🎉"></button>
-        <button type="button" class="emoji-btn" data-emoji="👋"><img src="https://em-content.zobj.net/thumbs/120/apple/325/waving-hand_1f44b.png" alt="👋"></button>
-        <button type="button" class="emoji-btn" data-emoji="🔥"><img src="https://em-content.zobj.net/thumbs/120/apple/325/fire_1f525.png" alt="🔥"></button>
-        <button type="button" class="emoji-btn" data-emoji="😂"><img src="https://em-content.zobj.net/thumbs/120/apple/325/face-with-tears-of-joy_1f602.png" alt="😂"></button>
-        <button type="button" class="emoji-btn" data-emoji="🤔"><img src="https://em-content.zobj.net/thumbs/120/apple/325/thinking-face_1f914.png" alt="🤔"></button>
-        <button type="button" class="emoji-btn" data-emoji="✨"><img src="https://em-content.zobj.net/thumbs/120/apple/325/sparkles_2728.png" alt="✨"></button>
-        <button type="button" class="emoji-btn" data-emoji="😍"><img src="https://em-content.zobj.net/thumbs/120/apple/325/smiling-face-with-heart-eyes_1f60d.png" alt="😍"></button>
-        <button type="button" class="emoji-btn" data-emoji="🙌"><img src="https://em-content.zobj.net/thumbs/120/apple/325/raising-hands_1f64c.png" alt="🙌"></button>
-        <button type="button" class="emoji-btn" data-emoji="💪"><img src="https://em-content.zobj.net/thumbs/120/apple/325/flexed-biceps_1f4aa.png" alt="💪"></button>
-        <button type="button" class="emoji-btn" data-emoji="🎯"><img src="https://em-content.zobj.net/thumbs/120/apple/325/direct-hit_1f3af.png" alt="🎯"></button>
-        <button type="button" class="emoji-btn" data-emoji="💯"><img src="https://em-content.zobj.net/thumbs/120/apple/325/hundred-points_1f4af.png" alt="💯"></button>
-        <button type="button" class="emoji-btn" data-emoji="⭐"><img src="https://em-content.zobj.net/thumbs/120/apple/325/star_2b50.png" alt="⭐"></button>
-        <button type="button" class="emoji-btn" data-emoji="💡"><img src="https://em-content.zobj.net/thumbs/120/apple/325/light-bulb_1f4a1.png" alt="💡"></button>
+        <button type="button" class="emoji-btn" data-emoji="👍"><img
+            src="https://em-content.zobj.net/thumbs/120/apple/325/thumbs-up_1f44d.png" alt="👍"></button>
+        <button type="button" class="emoji-btn" data-emoji="❤️"><img
+            src="https://em-content.zobj.net/thumbs/120/apple/325/red-heart_2764-fe0f.png" alt="❤️"></button>
+        <button type="button" class="emoji-btn" data-emoji="😊"><img
+            src="https://em-content.zobj.net/thumbs/120/apple/325/smiling-face-with-smiling-eyes_1f60a.png"
+            alt="😊"></button>
+        <button type="button" class="emoji-btn" data-emoji="🎉"><img
+            src="https://em-content.zobj.net/thumbs/120/apple/325/party-popper_1f389.png" alt="🎉"></button>
+        <button type="button" class="emoji-btn" data-emoji="👋"><img
+            src="https://em-content.zobj.net/thumbs/120/apple/325/waving-hand_1f44b.png" alt="👋"></button>
+        <button type="button" class="emoji-btn" data-emoji="🔥"><img
+            src="https://em-content.zobj.net/thumbs/120/apple/325/fire_1f525.png" alt="🔥"></button>
+        <button type="button" class="emoji-btn" data-emoji="😂"><img
+            src="https://em-content.zobj.net/thumbs/120/apple/325/face-with-tears-of-joy_1f602.png" alt="😂"></button>
+        <button type="button" class="emoji-btn" data-emoji="🤔"><img
+            src="https://em-content.zobj.net/thumbs/120/apple/325/thinking-face_1f914.png" alt="🤔"></button>
+        <button type="button" class="emoji-btn" data-emoji="✨"><img
+            src="https://em-content.zobj.net/thumbs/120/apple/325/sparkles_2728.png" alt="✨"></button>
+        <button type="button" class="emoji-btn" data-emoji="😍"><img
+            src="https://em-content.zobj.net/thumbs/120/apple/325/smiling-face-with-heart-eyes_1f60d.png"
+            alt="😍"></button>
+        <button type="button" class="emoji-btn" data-emoji="🙌"><img
+            src="https://em-content.zobj.net/thumbs/120/apple/325/raising-hands_1f64c.png" alt="🙌"></button>
+        <button type="button" class="emoji-btn" data-emoji="💪"><img
+            src="https://em-content.zobj.net/thumbs/120/apple/325/flexed-biceps_1f4aa.png" alt="💪"></button>
+        <button type="button" class="emoji-btn" data-emoji="🎯"><img
+            src="https://em-content.zobj.net/thumbs/120/apple/325/direct-hit_1f3af.png" alt="🎯"></button>
+        <button type="button" class="emoji-btn" data-emoji="💯"><img
+            src="https://em-content.zobj.net/thumbs/120/apple/325/hundred-points_1f4af.png" alt="💯"></button>
+        <button type="button" class="emoji-btn" data-emoji="⭐"><img
+            src="https://em-content.zobj.net/thumbs/120/apple/325/star_2b50.png" alt="⭐"></button>
+        <button type="button" class="emoji-btn" data-emoji="💡"><img
+            src="https://em-content.zobj.net/thumbs/120/apple/325/light-bulb_1f4a1.png" alt="💡"></button>
       </div>
-      <button type="button" class="fschat-img-btn" id="fschatImgBtn" style="background: none; border: none; padding: 0; cursor: pointer;">
-        <img src="https://static.thenounproject.com/png/1034957-200.png" alt="add image" style="width: 24px; height: 24px; opacity: 0.7;">
+      <button type="button" class="fschat-img-btn" id="fschatImgBtn"
+        style="background: none; border: none; padding: 0; cursor: pointer;">
+        <img src="https://static.thenounproject.com/png/1034957-200.png" alt="add image"
+          style="width: 24px; height: 24px; opacity: 0.7;">
       </button>
       <input type="file" id="fschatImgInput" accept="image/*" style="display:none;">
-      <input id="fullscreenChatInput" type="text" placeholder="Write something..." autocomplete="off" style="margin-left:8px;">
+      <input id="fullscreenChatInput" type="text" placeholder="Write something..." autocomplete="off"
+        style="margin-left:8px;">
       <button type="submit" class="fschat-send" style="background: none; border: none; padding: 0; cursor: pointer;">
-        <img src="https://static-00.iconduck.com/assets.00/send-icon-2048x2048-h9h456ci.png" alt="send" style="width: 24px; height: 24px; opacity: 0.7;">
+        <img src="https://static-00.iconduck.com/assets.00/send-icon-2048x2048-h9h456ci.png" alt="send"
+          style="width: 24px; height: 24px; opacity: 0.7;">
       </button>
     </form>
   </div>
@@ -1208,14 +2205,23 @@
 
     // --- Firebase config (замените на свои значения) ---
     const firebaseConfig = {
-      apiKey: "AIzaSyBvcUP3TD0ZUjYQvWUhVgE2Tt9Xivi3m7s",
-      authDomain: "testtest-c94df.firebaseapp.com",
-      projectId: "testtest-c94df",
-      storageBucket: "testtest-c94df.appspot.com",
-      messagingSenderId: "112669024582",
-      appId: "1:112669024582:web:9cfa5fcd8c6325085fc547",
-      measurementId: "G-1QQTFLJ7WG"
+
+      apiKey: "AIzaSyCuL4tpaSsw1ylXf2VZrQ1b_2t_Kxd97cI",
+
+      authDomain: "post-ad037.firebaseapp.com",
+
+      projectId: "post-ad037",
+
+      storageBucket: "post-ad037.firebasestorage.app",
+
+      messagingSenderId: "377312187432",
+
+      appId: "1:377312187432:web:565f47c145e0e73ac0911d",
+
+      measurementId: "G-T48NR3B9VW"
+
     };
+
     firebase.initializeApp(firebaseConfig);
     const provider = new firebase.auth.TwitterAuthProvider();
 
@@ -1235,7 +2241,7 @@
         });
     };
 
-    registerForm.onsubmit = function(e) {
+    registerForm.onsubmit = function (e) {
       e.preventDefault();
       const email = registerForm.querySelector('input[type="email"]').value;
       const password = registerForm.querySelector('input[type="password"]').value;
@@ -1272,7 +2278,7 @@
       document.querySelector('.sidebar-item[data-tab="' + tab + '"]').classList.add('active');
     }
     document.querySelectorAll('.sidebar-item').forEach(item => {
-      item.onclick = function() {
+      item.onclick = function () {
         showTab(this.getAttribute('data-tab'));
       };
     });
@@ -1307,7 +2313,7 @@
     const accessCodeSubmit = document.getElementById('accessCodeSubmit');
 
     if (newClubBtn) {
-      newClubBtn.onclick = function() {
+      newClubBtn.onclick = function () {
         // Показываем сначала окно для ввода кода
         codeModal.style.display = 'flex';
         accessCodeInput.value = '';
@@ -1317,13 +2323,13 @@
     }
 
     if (closeCodeModal) {
-      closeCodeModal.onclick = function() {
+      closeCodeModal.onclick = function () {
         codeModal.style.display = 'none';
       };
     }
 
     // Закрытие по клику вне модального окна
-    window.addEventListener('click', function(e) {
+    window.addEventListener('click', function (e) {
       if (e.target === codeModal) {
         codeModal.style.display = 'none';
       }
@@ -1333,7 +2339,7 @@
     });
 
     if (accessCodeSubmit) {
-      accessCodeSubmit.onclick = function() {
+      accessCodeSubmit.onclick = function () {
         const code = accessCodeInput.value.trim();
         if (code === 'oldcode') {
           accessCodeError.style.color = '#0a0';
@@ -1352,7 +2358,7 @@
     }
 
     if (closeClubModal) {
-      closeClubModal.onclick = function() {
+      closeClubModal.onclick = function () {
         clubModal.style.display = 'none';
       };
     }
@@ -1363,13 +2369,13 @@
     const discoverRankings = document.getElementById('discover-rankings');
     const discoverRecent = document.getElementById('discover-recent');
     if (discoverRankingsBtn && discoverRecentBtn) {
-      discoverRankingsBtn.onclick = function() {
+      discoverRankingsBtn.onclick = function () {
         discoverRankingsBtn.classList.add('active');
         discoverRecentBtn.classList.remove('active');
         discoverRankings.style.display = '';
         discoverRecent.style.display = 'none';
       };
-      discoverRecentBtn.onclick = function() {
+      discoverRecentBtn.onclick = function () {
         discoverRecentBtn.classList.add('active');
         discoverRankingsBtn.classList.remove('active');
         discoverRankings.style.display = 'none';
@@ -1378,7 +2384,7 @@
     }
 
     // --- Firebase auto-login ---
-    firebase.auth().onAuthStateChanged(function(user) {
+    firebase.auth().onAuthStateChanged(function (user) {
       if (user) {
         document.querySelector('.container').style.display = 'none';
         document.getElementById('wallet').style.display = 'none';
@@ -1432,7 +2438,7 @@
     // --- Обработчик выхода из аккаунта ---
     const logoutBtn = document.querySelector('.wallet-logout-btn');
     if (logoutBtn) {
-      logoutBtn.onclick = function() {
+      logoutBtn.onclick = function () {
         firebase.auth().signOut()
           .then(() => {
             // Возвращаем на главный экран
@@ -1457,7 +2463,7 @@
     // --- Логика переключения между регистрацией и входом ---
     // Повторные объявления переменных удалены, используем уже объявленные выше
     if (showLoginForm && showRegisterForm && registerForm && loginForm) {
-      showLoginForm.onclick = function(e) {
+      showLoginForm.onclick = function (e) {
         e.preventDefault();
         // Показываем модальное окно
         modal.style.display = 'flex';
@@ -1473,7 +2479,7 @@
         }
         loginForm.querySelector('input[type="password"]').focus();
       };
-      showRegisterForm.onclick = function(e) {
+      showRegisterForm.onclick = function (e) {
         e.preventDefault();
         registerForm.style.display = '';
         loginForm.style.display = 'none';
@@ -1484,7 +2490,7 @@
       };
     }
     // --- Вход через email/password ---
-    loginForm.onsubmit = function(e) {
+    loginForm.onsubmit = function (e) {
       e.preventDefault();
       const email = loginForm.querySelector('input[type="email"]').value;
       const password = loginForm.querySelector('input[type="password"]').value;
@@ -1508,21 +2514,21 @@
     // Закрытие модалки Create club
     const closeCreateClubModal = document.getElementById('closeCreateClubModal');
     if (closeCreateClubModal) {
-      closeCreateClubModal.onclick = function() {
+      closeCreateClubModal.onclick = function () {
         document.getElementById('createClubModal').style.display = 'none';
       };
     }
 
     // Загрузка и предпросмотр фото
-    document.getElementById('clubPhotoPreview').onclick = function() {
+    document.getElementById('clubPhotoPreview').onclick = function () {
       document.getElementById('clubPhotoInput').click();
     };
 
-    document.getElementById('clubPhotoInput').onchange = function(e) {
+    document.getElementById('clubPhotoInput').onchange = function (e) {
       const file = e.target.files[0];
       if (file) {
         const reader = new FileReader();
-        reader.onload = function(ev) {
+        reader.onload = function (ev) {
           document.getElementById('clubPhotoPreview').innerHTML = '<img src="' + ev.target.result + '" style="width:100%;height:100%;object-fit:cover;border-radius:12px;">';
         };
         reader.readAsDataURL(file);
@@ -1531,7 +2537,7 @@
 
     // Выбор кривой цены
     document.querySelectorAll('.curve-option').forEach(opt => {
-      opt.onclick = function() {
+      opt.onclick = function () {
         document.querySelectorAll('.curve-option').forEach(o => o.classList.remove('selected'));
         this.classList.add('selected');
       };
@@ -1572,7 +2578,7 @@
     renderClubs();
 
     // --- Обработка создания клуба ---
-    document.getElementById('createClubBtn').onclick = function() {
+    document.getElementById('createClubBtn').onclick = function () {
       const name = document.getElementById('clubNameInput').value.trim();
       const ticker = document.getElementById('clubTickerInput').value.trim().toUpperCase();
       const desc = document.getElementById('clubDescInput').value.trim();
@@ -1599,7 +2605,7 @@
 
     // --- Открытие чата клуба ---
     let currentClubKey = null;
-    document.querySelector('.chat-list').addEventListener('click', function(e) {
+    document.querySelector('.chat-list').addEventListener('click', function (e) {
       let item = e.target;
       while (item && !item.classList.contains('chat-item')) item = item.parentElement;
       if (!item) return;
@@ -1619,7 +2625,7 @@
 
     // --- Открытие чата из Discover с кодом ---
     let discoverChatData = null;
-    document.getElementById('discover-rankings').addEventListener('click', function(e) {
+    document.getElementById('discover-rankings').addEventListener('click', function (e) {
       let item = e.target;
       while (item && !item.classList.contains('discover-item')) item = item.parentElement;
       if (!item) return;
@@ -1637,7 +2643,7 @@
       if (currentUser) {
         const clubAccessKey = `club_access_${currentUser.uid}_${name.trim()}`;
         const hasAccess = localStorage.getItem(clubAccessKey) === 'true';
-        
+
         if (hasAccess) {
           // Если доступ к этому клубу уже есть, сразу открываем чат
           openFullscreenChat(discoverChatData);
@@ -1657,16 +2663,16 @@
       }
     });
 
-    document.getElementById('closeDiscoverCodeModal').onclick = function() {
+    document.getElementById('closeDiscoverCodeModal').onclick = function () {
       document.getElementById('discoverCodeModal').style.display = 'none';
     };
 
-    document.getElementById('discoverCodeSubmit').onclick = function() {
+    document.getElementById('discoverCodeSubmit').onclick = function () {
       const code = document.getElementById('discoverCodeInput').value.trim();
       if (code === 'oldcode') {
         document.getElementById('discoverCodeError').style.color = '#0a0';
         document.getElementById('discoverCodeError').textContent = 'Access granted!';
-        
+
         // Сохраняем информацию о доступе для текущего пользователя к конкретному клубу
         const currentUser = firebase.auth().currentUser;
         if (currentUser && discoverChatData) {
@@ -1674,7 +2680,7 @@
           const clubAccessKey = `club_access_${currentUser.uid}_${clubName}`;
           localStorage.setItem(clubAccessKey, 'true');
         }
-        
+
         setTimeout(() => {
           document.getElementById('discoverCodeModal').style.display = 'none';
           if (discoverChatData) openFullscreenChat(discoverChatData);
@@ -1686,22 +2692,22 @@
     };
 
     // --- Web3 Chat: меню ---
-    (function(){
+    (function () {
       const menuBtn = document.querySelector('.fschat-menu-btn');
       const menuWrap = document.querySelector('.fschat-menu-wrap');
-      if(menuBtn && menuWrap) {
-        menuBtn.onclick = function(e) {
+      if (menuBtn && menuWrap) {
+        menuBtn.onclick = function (e) {
           e.stopPropagation();
           menuWrap.classList.toggle('open');
         };
-        document.body.addEventListener('click', function(){
+        document.body.addEventListener('click', function () {
           menuWrap.classList.remove('open');
         });
       }
     })();
 
     // --- Web3 Chat: открытие ---
-    function openFullscreenChat({avatar, title, key}) {
+    function openFullscreenChat({ avatar, title, key }) {
       document.getElementById('fullscreenChatAvatar').src = avatar;
       document.getElementById('fullscreenChatTitle').textContent = title;
       currentClubKey = key;
@@ -1713,7 +2719,7 @@
         msgBox.scrollTop = msgBox.scrollHeight;
       }, 100);
     }
-    document.getElementById('closeFullscreenChat').onclick = function() {
+    document.getElementById('closeFullscreenChat').onclick = function () {
       document.getElementById('fullscreenChat').style.display = 'none';
       document.querySelector('.main-app').style.display = 'flex';
     };
@@ -1753,7 +2759,7 @@
         const currentUser = firebase.auth().currentUser;
         const isMe = (m.user === 3) || (!m.user && m.nick === 'Smiroff') || (m.uid === currentUser?.uid);
         let userAvatar, userNick;
-        
+
         if (isMe) {
           userAvatar = currentUser?.photoURL || 'https://e7.pngegg.com/pngimages/178/595/png-clipart-user-profile-computer-icons-login-user-avatars-monochrome-black-thumbnail.png';
           userNick = currentUser?.displayName || 'User';
@@ -1779,17 +2785,17 @@
       });
       setTimeout(() => { box.scrollTop = box.scrollHeight; }, 50);
     }
-    document.getElementById('fullscreenChatForm').onsubmit = function(e) {
+    document.getElementById('fullscreenChatForm').onsubmit = function (e) {
       e.preventDefault();
       const input = document.getElementById('fullscreenChatInput');
       const text = input.value.trim();
       if ((!text && !imgToSend) || !currentClubKey) return;
-      
+
       const currentUser = firebase.auth().currentUser;
       const msgs = getClubMessages(currentClubKey);
       const now = new Date();
-      const time = now.toLocaleDateString() + ' ' + now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) + (now.getHours() >= 12 ? 'PM' : 'AM');
-      
+      const time = now.toLocaleDateString() + ' ' + now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + (now.getHours() >= 12 ? 'PM' : 'AM');
+
       const newMessage = {
         uid: currentUser?.uid,
         nick: currentUser?.displayName || 'User',
@@ -1797,11 +2803,11 @@
         text,
         time
       };
-      
+
       if (imgToSend) {
         newMessage.img = imgToSend;
       }
-      
+
       msgs.push(newMessage);
       saveClubMessages(currentClubKey, msgs);
       input.value = '';
@@ -1814,9 +2820,9 @@
     const emojiBtn = document.querySelector('.fschat-emoji');
     const chatInput = document.getElementById('fullscreenChatInput');
     const emojiList = [
-      '☺','☻','♡','♥','☀','☁','★','☆','☮','☯','☎','⌨','✉','☑','✓','✔','×','≠','∞','♪','♫','⌘','⌥','⌦','↵','⇧','⇪','○','◎','●','◐','◑','◒','◓','◌','◍','◉','◊','☘','♣','♠','♦','⚡','☕','✎','✏','✐','✑','✒','✍','✌','⭐'
+      '☺', '☻', '♡', '♥', '☀', '☁', '★', '☆', '☮', '☯', '☎', '⌨', '✉', '☑', '✓', '✔', '×', '≠', '∞', '♪', '♫', '⌘', '⌥', '⌦', '↵', '⇧', '⇪', '○', '◎', '●', '◐', '◑', '◒', '◓', '◌', '◍', '◉', '◊', '☘', '♣', '♠', '♦', '⚡', '☕', '✎', '✏', '✐', '✑', '✒', '✍', '✌', '⭐'
     ];
-    emojiBtn.onclick = function(e) {
+    emojiBtn.onclick = function (e) {
       e.preventDefault();
       chatEmojiPanel.innerHTML = '';
       emojiList.forEach(em => {
@@ -1824,7 +2830,7 @@
         btn.type = 'button';
         btn.className = 'fschat-emoji-btn';
         btn.textContent = em;
-        btn.onclick = function(ev) {
+        btn.onclick = function (ev) {
           ev.preventDefault();
           chatInput.value += em;
           chatEmojiPanel.style.display = 'none';
@@ -1834,7 +2840,7 @@
       });
       chatEmojiPanel.style.display = chatEmojiPanel.style.display === 'none' ? 'flex' : 'none';
     };
-    document.body.addEventListener('click', function(e) {
+    document.body.addEventListener('click', function (e) {
       if (!chatEmojiPanel.contains(e.target) && e.target !== emojiBtn) chatEmojiPanel.style.display = 'none';
     });
 
@@ -1842,15 +2848,15 @@
     const imgBtn = document.getElementById('fschatImgBtn');
     const imgInput = document.getElementById('fschatImgInput');
     let imgToSend = null;
-    imgBtn.onclick = function(e) {
+    imgBtn.onclick = function (e) {
       e.preventDefault();
       imgInput.click();
     };
-    imgInput.onchange = function(e) {
+    imgInput.onchange = function (e) {
       const file = e.target.files[0];
       if (file) {
         const reader = new FileReader();
-        reader.onload = function(ev) {
+        reader.onload = function (ev) {
           imgToSend = ev.target.result;
           // Показываем превью
           if (!document.getElementById('fschatImgPreview')) {
@@ -1874,13 +2880,13 @@
       imgInput.value = '';
     }
     // --- Переключение между регистрацией и входом (как на friends-sand.vercel.app) ---
-    (function(){
+    (function () {
       const showLoginForm = document.getElementById('showLoginForm');
       const showRegisterForm = document.getElementById('showRegisterForm');
       const registerForm = document.getElementById('registerForm');
       const loginForm = document.getElementById('loginForm');
       if (showLoginForm && showRegisterForm && registerForm && loginForm) {
-        showLoginForm.onclick = function(e) {
+        showLoginForm.onclick = function (e) {
           e.preventDefault();
           registerForm.style.display = 'none';
           loginForm.style.display = '';
@@ -1888,7 +2894,7 @@
           showRegisterForm.style.display = '';
           loginForm.querySelector('input[type="email"]').focus();
         };
-        showRegisterForm.onclick = function(e) {
+        showRegisterForm.onclick = function (e) {
           e.preventDefault();
           registerForm.style.display = '';
           loginForm.style.display = 'none';
@@ -1901,20 +2907,20 @@
     // --- Конец блока переключения ---
 
     // Добавляем JavaScript для работы с эмодзи
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
       const emojiButton = document.querySelector('.fschat-emoji');
       const emojiPanel = document.querySelector('.emoji-panel');
       const chatInput = document.getElementById('fullscreenChatInput');
 
       // Показать/скрыть панель эмодзи при клике на кнопку
-      emojiButton.addEventListener('click', function(e) {
+      emojiButton.addEventListener('click', function (e) {
         e.stopPropagation();
         emojiPanel.style.display = emojiPanel.style.display === 'grid' ? 'none' : 'grid';
       });
 
       // Добавить эмодзи в поле ввода при клике
       document.querySelectorAll('.emoji-btn').forEach(btn => {
-        btn.addEventListener('click', function(e) {
+        btn.addEventListener('click', function (e) {
           e.stopPropagation();
           const emoji = this.getAttribute('data-emoji');
           const start = chatInput.selectionStart;
@@ -1927,7 +2933,7 @@
       });
 
       // Закрыть панель при клике вне её
-      document.addEventListener('click', function(e) {
+      document.addEventListener('click', function (e) {
         if (!emojiPanel.contains(e.target) && e.target !== emojiButton) {
           emojiPanel.style.display = 'none';
         }
@@ -1935,7 +2941,7 @@
     });
 
     // Копирование адреса кошелька
-    document.querySelector('.wallet-copy-btn').addEventListener('click', function() {
+    document.querySelector('.wallet-copy-btn').addEventListener('click', function () {
       const address = this.getAttribute('data-address');
       navigator.clipboard.writeText(address).then(() => {
         // Временно меняем title кнопки для обратной связи
@@ -1980,10 +2986,10 @@
       // Обновляем отображение
       const shortenedAddress = shortenAddress(walletAddress);
       addressElement.innerHTML = `${shortenedAddress} <button class="wallet-copy-btn" data-address="${walletAddress}" title="Copy address"><img src="https://png.pngtree.com/png-vector/20190223/ourmid/pngtree-vector-copy-icon-png-image_695355.jpg" style="width:14px;height:14px;vertical-align:middle;"></button>`;
-      
+
       // Добавляем обработчик копирования
       const copyBtn = addressElement.querySelector('.wallet-copy-btn');
-      copyBtn.addEventListener('click', function() {
+      copyBtn.addEventListener('click', function () {
         const address = this.getAttribute('data-address');
         navigator.clipboard.writeText(address).then(() => {
           const originalTitle = this.title;
@@ -1998,7 +3004,7 @@
     }
 
     // Обновляем обработчик авторизации
-    firebase.auth().onAuthStateChanged(function(user) {
+    firebase.auth().onAuthStateChanged(function (user) {
       if (user) {
         document.querySelector('.container').style.display = 'none';
         document.getElementById('wallet').style.display = 'none';
@@ -2065,10 +3071,10 @@
     // Setup emoji panel
     if (profileEmojiPanel && editProfileBio && emojiTrigger) {
       const emojis = ['😊', '😂', '🤣', '❤️', '😍', '🙌', '👍', '👋', '🎉', '✨', '🔥', '💯', '🤔', '👀', '🎈', '🌟', '💪', '🙏', '👏', '🌈'];
-      
+
       // Clear existing content
       profileEmojiPanel.innerHTML = '';
-      
+
       emojis.forEach(emoji => {
         const span = document.createElement('span');
         span.textContent = emoji;
@@ -2101,9 +3107,9 @@
 
     // Save profile handler
     if (saveProfile && editProfileModal) {
-      saveProfile.onclick = function(e) {
+      saveProfile.onclick = function (e) {
         e.preventDefault();
-        
+
         // Validate inputs
         const name = editProfileName?.value?.trim() || '';
         const username = editProfileUsername?.value?.trim() || '';
@@ -2138,7 +3144,7 @@
           twitterElement.textContent = `@${username}`;
           twitterElement.href = `https://twitter.com/${username}`;
         }
-        
+
         // Close modal
         editProfileModal.style.display = 'none';
       };
@@ -2146,13 +3152,13 @@
 
     // Modal close handlers
     if (closeEditProfile && editProfileModal) {
-      closeEditProfile.onclick = function(e) {
+      closeEditProfile.onclick = function (e) {
         e.preventDefault();
         editProfileModal.style.display = 'none';
       };
 
       // Close on outside click
-      window.onclick = function(e) {
+      window.onclick = function (e) {
         if (e.target === editProfileModal) {
           editProfileModal.style.display = 'none';
         }
@@ -2161,11 +3167,11 @@
 
     // Avatar upload handling
     if (editProfileAvatarInput && editProfileAvatar) {
-      editProfileAvatarInput.onchange = function(e) {
+      editProfileAvatarInput.onchange = function (e) {
         const file = e.target.files[0];
         if (file) {
           const reader = new FileReader();
-          reader.onload = function(ev) {
+          reader.onload = function (ev) {
             editProfileAvatar.src = ev.target.result;
           };
           reader.readAsDataURL(file);
@@ -2228,11 +3234,11 @@
         // Подключаемся к кошельку
         const resp = await window.solana.connect();
         const address = resp.publicKey.toString();
-        
+
         // Обновляем UI
         const walletAddressEl = document.getElementById('walletAddress');
         const copyBtn = document.querySelector('.wallet-copy-btn');
-        
+
         if (walletAddressEl && copyBtn) {
           walletAddressEl.textContent = formatAddress(address);
           copyBtn.dataset.address = address;
@@ -2248,7 +3254,7 @@
       }
     }
 
-    document.addEventListener("DOMContentLoaded", function() {
+    document.addEventListener("DOMContentLoaded", function () {
       // Initialize UI elements
       const editProfileBtn = document.querySelector('.wallet-profile-btn.edit-profile-trigger');
       const editProfileModal = document.getElementById('editProfileModal');
@@ -2300,10 +3306,10 @@
         if (addressElement) {
           const shortenedAddress = savedAddress.substring(0, 6) + '...' + savedAddress.substring(savedAddress.length - 4);
           addressElement.innerHTML = `${shortenedAddress} <button class="wallet-copy-btn" data-address="${savedAddress}" title="Copy address"><img src="images/copy-icon.png" style="width:14px;height:14px;vertical-align:middle;"></button>`;
-          
+
           const newCopyBtn = addressElement.querySelector('.wallet-copy-btn');
           if (newCopyBtn) {
-            newCopyBtn.addEventListener('click', function() {
+            newCopyBtn.addEventListener('click', function () {
               const addr = this.dataset.address;
               if (addr) {
                 navigator.clipboard.writeText(addr)
@@ -2332,7 +3338,7 @@
 
       // Setup Phantom wallet
       if (connectBtn) {
-        connectBtn.addEventListener('click', async function() {
+        connectBtn.addEventListener('click', async function () {
           try {
             if (!window.solana || !window.solana.isPhantom) {
               alert('Please install Phantom wallet');
@@ -2342,19 +3348,19 @@
 
             const resp = await window.solana.connect();
             const address = resp.publicKey.toString();
-            
+
             // Save address
             localStorage.setItem('wallet_address', address);
-            
+
             // Update UI
             const addressElement = document.querySelector('.wallet-profile-addr');
             if (addressElement) {
               const shortenedAddress = address.substring(0, 6) + '...' + address.substring(address.length - 4);
               addressElement.innerHTML = `${shortenedAddress} <button class="wallet-copy-btn" data-address="${address}" title="Copy address"><img src="images/copy-icon.png" style="width:14px;height:14px;vertical-align:middle;"></button>`;
-              
+
               const newCopyBtn = addressElement.querySelector('.wallet-copy-btn');
               if (newCopyBtn) {
-                newCopyBtn.addEventListener('click', function() {
+                newCopyBtn.addEventListener('click', function () {
                   const addr = this.dataset.address;
                   if (addr) {
                     navigator.clipboard.writeText(addr)
@@ -2389,10 +3395,10 @@
       // Setup emoji panel
       if (profileEmojiPanel && editProfileBio && emojiTrigger) {
         const emojis = ['😊', '😂', '🤣', '❤️', '😍', '🙌', '👍', '👋', '🎉', '✨', '🔥', '💯', '🤔', '👀', '🎈', '🌟', '💪', '🙏', '👏', '🌈'];
-        
+
         // Clear existing content
         profileEmojiPanel.innerHTML = '';
-        
+
         emojis.forEach(emoji => {
           const span = document.createElement('span');
           span.textContent = emoji;
@@ -2426,4 +3432,4 @@
   </script>
 </body>
 
-</html> 
+</html>
