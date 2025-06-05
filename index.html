@@ -766,7 +766,7 @@
               <div class="wallet-profile-twitter"><a href="#" style="color:#00bfff;">@Smirnoff_ETH</a> <span style="color:#00bfff;">✔️</span></div>
             </div>
             <div class="wallet-profile-actions">
-              <button class="wallet-profile-btn">Edit profile</button>
+              <button class="wallet-profile-btn edit-profile-trigger">Edit profile</button>
               <button class="wallet-profile-btn">Sync Twitter</button>
               <button class="wallet-profile-btn">Unlink Twitter</button>
             </div>
@@ -1886,7 +1886,7 @@
     });
 
     // Edit Profile Logic
-    const editProfileBtn = document.querySelector('.wallet-profile-btn');
+    const editProfileBtn = document.querySelector('.wallet-profile-btn.edit-profile-trigger');
     const editProfileModal = document.getElementById('editProfileModal');
     const closeEditProfile = document.getElementById('closeEditProfile');
     const editProfileAvatar = document.getElementById('editProfileAvatar');
