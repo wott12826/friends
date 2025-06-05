@@ -1680,6 +1680,103 @@
         console.error('Failed to copy:', err);
       });
     });
+
+    // Функция для генерации адреса кошелька
+    function generateWalletAddress() {
+      const chars = '0123456789abcdef';
+      let address = '0x';
+      // Генерируем 40 символов (20 байт) для адреса Ethereum
+      for (let i = 0; i < 40; i++) {
+        address += chars[Math.floor(Math.random() * chars.length)];
+      }
+      return address;
+    }
+
+    // Функция для сокращения адреса (показывает первые 6 и последние 4 символа)
+    function shortenAddress(address) {
+      return address.slice(0, 6) + '...' + address.slice(-4);
+    }
+
+    // Функция обновления адреса в профиле
+    function updateProfileAddress(user) {
+      const addressElement = document.querySelector('.wallet-profile-addr');
+      if (!addressElement) return;
+
+      // Получаем сохраненный адрес или генерируем новый
+      let walletAddress = localStorage.getItem(`wallet_address_${user.uid}`);
+      if (!walletAddress) {
+        walletAddress = generateWalletAddress();
+        localStorage.setItem(`wallet_address_${user.uid}`, walletAddress);
+      }
+
+      // Обновляем отображение
+      const shortenedAddress = shortenAddress(walletAddress);
+      addressElement.innerHTML = `${shortenedAddress} <button class="wallet-copy-btn" data-address="${walletAddress}" title="Copy address"><img src="https://png.pngtree.com/png-vector/20190223/ourmid/pngtree-vector-copy-icon-png-image_695355.jpg" style="width:14px;height:14px;vertical-align:middle;"></button>`;
+      
+      // Добавляем обработчик копирования
+      const copyBtn = addressElement.querySelector('.wallet-copy-btn');
+      copyBtn.addEventListener('click', function() {
+        const address = this.getAttribute('data-address');
+        navigator.clipboard.writeText(address).then(() => {
+          const originalTitle = this.title;
+          this.title = 'Copied!';
+          setTimeout(() => {
+            this.title = originalTitle;
+          }, 2000);
+        }).catch(err => {
+          console.error('Failed to copy:', err);
+        });
+      });
+    }
+
+    // Обновляем обработчик авторизации
+    firebase.auth().onAuthStateChanged(function(user) {
+      if (user) {
+        document.querySelector('.container').style.display = 'none';
+        document.getElementById('wallet').style.display = 'none';
+        document.getElementById('main-app').style.display = 'flex';
+        showTab('chat');
+
+        // Обновляем аватар пользователя
+        const profileAvatar = document.querySelector('.wallet-profile-avatar');
+        if (profileAvatar) {
+          profileAvatar.src = user.photoURL || 'https://e7.pngegg.com/pngimages/178/595/png-clipart-user-profile-computer-icons-login-user-avatars-monochrome-black-thumbnail.png';
+        }
+
+        // Обновляем имя пользователя
+        const profileName = document.querySelector('.wallet-profile-name');
+        if (profileName) {
+          const randomId = Math.floor(Math.random() * 10000);
+          if (user.providerData && user.providerData[0]?.providerId === 'twitter.com') {
+            profileName.innerHTML = `${user.displayName}<span class="wallet-profile-handle">@${user.providerData[0].username || user.displayName}_ETH</span>`;
+          } else {
+            profileName.innerHTML = `User<span class="wallet-profile-handle">@user_${randomId}</span>`;
+          }
+        }
+
+        // Обновляем адрес кошелька
+        updateProfileAddress(user);
+
+        // Обновляем информацию о Twitter
+        const twitterInfo = document.querySelector('.wallet-profile-twitter');
+        if (twitterInfo) {
+          if (user.providerData && user.providerData[0]?.providerId === 'twitter.com') {
+            const username = user.providerData[0].username || user.displayName;
+            twitterInfo.innerHTML = `<a href="https://twitter.com/${username}" style="color:#00bfff;">@${username}</a> <span style="color:#00bfff;">✔️</span>`;
+          } else {
+            twitterInfo.style.display = 'none';
+          }
+        }
+      } else {
+        document.querySelector('.container').style.display = '';
+        document.getElementById('wallet').style.display = 'none';
+        document.getElementById('main-app').style.display = 'none';
+        document.getElementById('registerForm').style.display = '';
+        document.getElementById('loginForm').style.display = 'none';
+        document.getElementById('showLoginForm').style.display = '';
+        document.getElementById('showRegisterForm').style.display = 'none';
+      }
+    });
   </script>
 </body>
 </html> 
