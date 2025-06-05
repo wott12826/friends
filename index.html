@@ -3306,6 +3306,36 @@
       }
     });
     // ... existing code ...
+
+    // Function to update wallet value
+    function updateWalletValue() {
+      const priceElements = document.querySelectorAll('.wallet-post-price');
+      const balanceElements = document.querySelectorAll('.wallet-item-value');
+      
+      if (priceElements.length > 0 && balanceElements.length > 0) {
+        const price = parseFloat(priceElements[0].textContent.replace('$', ''));
+        const balance = parseFloat(balanceElements[0].textContent);
+        
+        const totalValue = price * balance;
+        
+        const valueElements = document.querySelectorAll('.wallet-value');
+        valueElements.forEach(element => {
+          element.textContent = `$${totalValue.toFixed(2)}`;
+        });
+      }
+    }
+
+    // Initial price and balance fetch
+    document.addEventListener('DOMContentLoaded', function() {
+      fetchPrice();
+      fetchPostBalance();
+
+      // Update price and balance every 10 seconds
+      setInterval(() => {
+        fetchPrice();
+        fetchPostBalance();
+      }, 10000);
+    });
   </script>
   <!-- Edit Profile Modal -->
   <div id="editProfileModal" class="modal">
