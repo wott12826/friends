@@ -3336,6 +3336,31 @@ document.addEventListener('DOMContentLoaded', renderWalletAddress);
       const profileEmojiPanel = document.getElementById('emojiPanel');
       const syncTwitterBtn = document.querySelector('.wallet-profile-btn:nth-child(2)'); // Sync Twitter button
       const unlinkTwitterBtn = document.querySelector('.wallet-profile-btn:nth-child(3)'); // Unlink Twitter button
+      const twitterInfo = document.querySelector('.wallet-profile-twitter');
+
+      // Initialize button states based on Twitter connection
+      const user = firebase.auth().currentUser;
+      
+      // Check if user has previously linked Twitter
+      const hasLinkedTwitter = user && user.providerData && user.providerData.some(provider => provider.providerId === 'twitter.com');
+      
+      if (hasLinkedTwitter) {
+        // Show Sync and Unlink buttons if Twitter is linked
+        syncTwitterBtn.textContent = 'Sync Twitter';
+        unlinkTwitterBtn.style.display = '';
+        if (twitterInfo) {
+          const username = user.providerData.find(p => p.providerId === 'twitter.com').username || user.displayName;
+          twitterInfo.innerHTML = `<a href="https://twitter.com/${username}" style="color:#00bfff;">@${username}</a> <span style="color:#00bfff;">✔️</span>`;
+          twitterInfo.style.display = '';
+        }
+      } else {
+        // Show only Link button if Twitter is not linked
+        syncTwitterBtn.textContent = 'Link Twitter';
+        unlinkTwitterBtn.style.display = 'none';
+        if (twitterInfo) {
+          twitterInfo.style.display = 'none';
+        }
+      }
 
       // Add Twitter sync functionality
       if (syncTwitterBtn) {
@@ -3414,16 +3439,6 @@ document.addEventListener('DOMContentLoaded', renderWalletAddress);
             alert('Error unlinking Twitter: ' + error.message);
           }
         });
-      }
-
-      // Initialize button states based on Twitter connection
-      const user = firebase.auth().currentUser;
-      if (user && user.providerData && user.providerData[0]?.providerId === 'twitter.com') {
-        syncTwitterBtn.textContent = 'Sync Twitter';
-        unlinkTwitterBtn.style.display = '';
-      } else {
-        syncTwitterBtn.textContent = 'Link Twitter';
-        unlinkTwitterBtn.style.display = 'none';
       }
 
       // Load saved profile data
