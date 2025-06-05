@@ -1408,17 +1408,17 @@
         key: 'discover|' + name + '|' + ticker
       };
 
-      // Проверяем, есть ли доступ у текущего пользователя
+      // Проверяем, есть ли доступ у текущего пользователя к конкретному клубу
       const currentUser = firebase.auth().currentUser;
       if (currentUser) {
-        const userAccessKey = 'discover_access_' + currentUser.uid;
-        const hasAccess = localStorage.getItem(userAccessKey) === 'true';
+        const clubAccessKey = `club_access_${currentUser.uid}_${name.trim()}`;
+        const hasAccess = localStorage.getItem(clubAccessKey) === 'true';
         
         if (hasAccess) {
-          // Если доступ уже есть, сразу открываем чат
+          // Если доступ к этому клубу уже есть, сразу открываем чат
           openFullscreenChat(discoverChatData);
         } else {
-          // Если доступа нет, показываем окно для ввода кода
+          // Если доступа к этому клубу нет, показываем окно для ввода кода
           document.getElementById('discoverCodeModal').style.display = 'flex';
           document.getElementById('discoverCodeInput').value = '';
           document.getElementById('discoverCodeError').textContent = '';
@@ -1443,11 +1443,12 @@
         document.getElementById('discoverCodeError').style.color = '#0a0';
         document.getElementById('discoverCodeError').textContent = 'Access granted!';
         
-        // Сохраняем информацию о доступе для текущего пользователя
+        // Сохраняем информацию о доступе для текущего пользователя к конкретному клубу
         const currentUser = firebase.auth().currentUser;
-        if (currentUser) {
-          const userAccessKey = 'discover_access_' + currentUser.uid;
-          localStorage.setItem(userAccessKey, 'true');
+        if (currentUser && discoverChatData) {
+          const clubName = discoverChatData.title.split('(')[0].trim();
+          const clubAccessKey = `club_access_${currentUser.uid}_${clubName}`;
+          localStorage.setItem(clubAccessKey, 'true');
         }
         
         setTimeout(() => {
