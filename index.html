@@ -3303,6 +3303,36 @@ document.addEventListener('DOMContentLoaded', renderWalletAddress);
       });
     });
   </script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // ... existing code ...
+
+      // Function to fetch price from dexscreener
+      async function fetchPrice() {
+        try {
+          const response = await fetch('https://api.dexscreener.com/latest/dex/pairs/solana/apjqvcapkjkzdkzketwl615pevr6nuecchqzgz1noxk3');
+          const data = await response.json();
+          
+          if (data && data.pairs && data.pairs[0]) {
+            const price = data.pairs[0].priceUsd;
+            const priceElements = document.querySelectorAll('.wallet-post-price');
+            priceElements.forEach(element => {
+              element.textContent = `$${parseFloat(price).toFixed(4)}`;
+            });
+          }
+        } catch (error) {
+          console.error('Error fetching price:', error);
+        }
+      }
+
+      // Initial price fetch
+      fetchPrice();
+
+      // Update price every 10 seconds
+      setInterval(fetchPrice, 10000);
+    });
+    // ... existing code ...
+  </script>
 </body>
 
 </html>
