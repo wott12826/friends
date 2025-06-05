@@ -1967,20 +1967,29 @@
             // Сохраняем username в localStorage
             localStorage.setItem(`username_${updatedUser.uid}`, newUsername);
 
-            // Обновляем весь блок wallet-profile-info
-            const profileInfo = document.querySelector('.wallet-profile-info');
-            if (profileInfo) {
-              profileInfo.innerHTML = `
-                <img class="wallet-profile-avatar" src="${updatedUser.photoURL}" alt="Profile Avatar" />
-                <div class="wallet-profile-name">
-                  ${updatedUser.displayName} <span class="wallet-profile-handle">@${newUsername}</span>
-                </div>
-              `;
+            // Обновляем содержимое wallet-profile-block
+            const profileBlock = document.querySelector('.wallet-profile-block');
+            if (profileBlock) {
+              // Обновляем аватар
+              const profileAvatar = profileBlock.querySelector('.wallet-profile-avatar');
+              if (profileAvatar) {
+                profileAvatar.src = updatedUser.photoURL || 'https://e7.pngegg.com/pngimages/178/595/png-clipart-user-profile-computer-icons-login-user-avatars-monochrome-black-thumbnail.png';
+              }
 
-              // Если есть Twitter блок, обновляем его внутри wallet-profile-info
-              const twitterInfo = document.querySelector('.wallet-profile-twitter');
-              if (twitterInfo && updatedUser.providerData[0]?.providerId === 'twitter.com') {
-                twitterInfo.innerHTML = `<a href="https://twitter.com/${newUsername}" style="color:#00bfff;">@${newUsername}</a> <span style="color:#00bfff;">✔️</span>`;
+              // Обновляем имя и username
+              const profileInfo = profileBlock.querySelector('.wallet-profile-info');
+              if (profileInfo) {
+                const nameElement = profileInfo.querySelector('.wallet-profile-name');
+                if (nameElement) {
+                  nameElement.innerHTML = `${updatedUser.displayName}<span class="wallet-profile-handle">@${newUsername}</span>`;
+                }
+
+                // Обновляем Twitter блок если он есть
+                const twitterInfo = profileInfo.querySelector('.wallet-profile-twitter');
+                if (twitterInfo && updatedUser.providerData[0]?.providerId === 'twitter.com') {
+                  twitterInfo.style.display = 'block';
+                  twitterInfo.innerHTML = `<a href="https://twitter.com/${newUsername}" style="color:#00bfff;">@${newUsername}</a> <span style="color:#00bfff;">✔️</span>`;
+                }
               }
             }
 
