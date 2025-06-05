@@ -3181,15 +3181,17 @@
             window.open('https://phantom.app/', '_blank');
             return;
           }
-          
+          console.log('Attempting to connect to Phantom...', window.solana);
+
           const resp = await window.solana.connect({ onlyIfTrusted: false });
           const address = resp.publicKey.toString();
           localStorage.setItem('wallet_address', address);
           renderWalletAddress(); // Re-render to show connected state
         } catch (err) {
-          console.error('Error connecting to wallet:', err);
-          alert('Error connecting to wallet: ' + err.message);
-        }
+  console.error('Error connecting to wallet:', err);
+  alert('Error connecting to wallet: ' + (err?.message || JSON.stringify(err)));
+}
+
       });
     }
   } else {
