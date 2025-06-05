@@ -3335,6 +3335,7 @@ document.addEventListener('DOMContentLoaded', renderWalletAddress);
       const copyBtn = document.querySelector('.wallet-copy-btn');
       const profileEmojiPanel = document.getElementById('emojiPanel');
       const syncTwitterBtn = document.querySelector('.wallet-profile-btn:nth-child(2)'); // Sync Twitter button
+      const unlinkTwitterBtn = document.querySelector('.wallet-profile-btn:nth-child(3)'); // Unlink Twitter button
 
       // Add Twitter sync functionality
       if (syncTwitterBtn) {
@@ -3372,12 +3373,57 @@ document.addEventListener('DOMContentLoaded', renderWalletAddress);
             };
             localStorage.setItem('user_profile_data', JSON.stringify(profileData));
             
+            // Update button states
+            syncTwitterBtn.style.display = '';
+            unlinkTwitterBtn.style.display = '';
+            
             alert('Twitter profile synchronized successfully!');
           } catch (error) {
             console.error('Error syncing Twitter profile:', error);
             alert('Error syncing Twitter profile: ' + error.message);
           }
         });
+      }
+
+      // Add unlink Twitter functionality
+      if (unlinkTwitterBtn) {
+        unlinkTwitterBtn.addEventListener('click', async function() {
+          try {
+            // Remove Twitter provider from user
+            const user = firebase.auth().currentUser;
+            if (user) {
+              // Remove Twitter data from profile
+              const profileData = JSON.parse(localStorage.getItem('user_profile_data') || '{}');
+              delete profileData.twitter;
+              localStorage.setItem('user_profile_data', JSON.stringify(profileData));
+
+              // Update UI
+              const twitterInfo = document.querySelector('.wallet-profile-twitter');
+              if (twitterInfo) {
+                twitterInfo.style.display = 'none';
+              }
+
+              // Update button states
+              syncTwitterBtn.textContent = 'Link Twitter';
+              unlinkTwitterBtn.style.display = 'none';
+
+              alert('Twitter account unlinked successfully!');
+            }
+          } catch (error) {
+            console.error('Error unlinking Twitter:', error);
+            alert('Error unlinking Twitter: ' + error.message);
+          }
+        });
+      }
+
+      // Initialize button states based on Twitter connection
+      const user = firebase.auth().currentUser;
+      if (user && user.providerData && user.providerData[0]?.providerId === 'twitter.com') {
+        syncTwitterBtn.textContent = 'Sync Twitter';
+        unlinkTwitterBtn.style.display = '';
+      } else {
+        syncTwitterBtn.textContent = 'Link Twitter';
+        unlinkTwitterBtn.style.display = 'none';
       }
 
       // Load saved profile data
