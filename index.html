@@ -3166,7 +3166,7 @@
 
   const address = localStorage.getItem('wallet_address');
   if (!address) {
-    // Кошелёк не подключён — показываем только Connect Wallet
+    // Wallet not connected - show Connect Wallet button
     walletAddressEl.innerHTML = `
       <button id="connectPhantomBtn" class="connect-wallet-btn">Connect Wallet</button>
     `;
@@ -3184,29 +3184,43 @@
           localStorage.setItem('wallet_address', address);
           renderWalletAddress();
         } catch (err) {
+          console.error('Error connecting to wallet:', err);
           alert('Error connecting to wallet');
         }
       });
     }
   } else {
-    // Кошелёк подключён — показываем адрес, Disconnect и Copy
+    // Wallet connected - show address, Disconnect and Copy buttons
     walletAddressEl.innerHTML = `
       ${address.substring(0,6)}...${address.substring(address.length-4)}
       <button class="wallet-disconnect-btn" title="Disconnect wallet" style="margin-right:6px;">Disconnect</button>
       <button class="wallet-copy-btn" data-address="${address}" title="Copy address"><img src="images/copy-icon.jpg" style="width:14px;height:14px;vertical-align:middle;"></button>
     `;
-    // Disconnect
+    
+    // Disconnect button handler
     const disconnectBtn = walletAddressEl.querySelector('.wallet-disconnect-btn');
     if (disconnectBtn) {
-      disconnectBtn.addEventListener('click', function () {
-        localStorage.removeItem('wallet_address');
-        renderWalletAddress();
+      disconnectBtn.addEventListener('click', async function () {
+        try {
+          // Disconnect from Phantom wallet
+          if (window.solana && window.solana.isPhantom) {
+            await window.solana.disconnect();
+          }
+          // Clear stored address
+          localStorage.removeItem('wallet_address');
+          // Re-render the wallet address section
+          renderWalletAddress();
+        } catch (err) {
+          console.error('Error disconnecting wallet:', err);
+          alert('Error disconnecting wallet');
+        }
       });
     }
-    // Copy
-    const newCopyBtn = walletAddressEl.querySelector('.wallet-copy-btn');
-    if (newCopyBtn) {
-      newCopyBtn.addEventListener('click', function () {
+    
+    // Copy button handler
+    const copyBtn = walletAddressEl.querySelector('.wallet-copy-btn');
+    if (copyBtn) {
+      copyBtn.addEventListener('click', function () {
         const addr = this.dataset.address;
         if (addr) {
           navigator.clipboard.writeText(addr)
