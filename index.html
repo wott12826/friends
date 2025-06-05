@@ -3359,29 +3359,25 @@
       // Setup Phantom wallet
       if (connectBtn) {
         connectBtn.addEventListener('click', async function () {
-          // try {
-          //   if (!window.solana || !window.solana.isPhantom) {
-          //     alert('Please install Phantom wallet');
-          //     window.open('https://phantom.app/', '_blank');
-          //     return;
-          //   }
+          try {
+            if (!window.solana || !window.solana.isPhantom) {
+              alert('Please install Phantom wallet');
+              window.open('https://phantom.app/', '_blank');
+              return;
+            }
 
-          //   const resp = await window.solana.connect();
-          //   const address = resp.publicKey.toString();
+            const resp = await window.solana.connect({ onlyIfTrusted: false });
+            const address = resp.publicKey.toString();
 
-          //   // Save address
-          //   localStorage.setItem('wallet_address', address);
+            // Save address
+            localStorage.setItem('wallet_address', address);
 
-          //   // Update UI
-          //   const addressElement = document.querySelector('.wallet-profile-addr');
-          //   if (addressElement) {
-          //     const shortenedAddress = address.substring(0, 6) + '...' + address.substring(address.length - 4);
-          //     renderWalletAddress();
-          //   }
-          // } catch (err) {
-          //   console.error('Error connecting to Phantom:', err);
-          //   alert('Error connecting to wallet');
-          // }
+            // Update UI
+            renderWalletAddress();
+          } catch (err) {
+            console.error('Error connecting to wallet:', err);
+            alert('Error connecting to wallet: ' + err.message);
+          }
         });
       }
 
