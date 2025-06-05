@@ -3374,7 +3374,7 @@ document.addEventListener('DOMContentLoaded', renderWalletAddress);
             localStorage.setItem('user_profile_data', JSON.stringify(profileData));
             
             // Update button states
-            syncTwitterBtn.style.display = '';
+            syncTwitterBtn.textContent = 'Sync Twitter';
             unlinkTwitterBtn.style.display = '';
             
             alert('Twitter profile synchronized successfully!');
