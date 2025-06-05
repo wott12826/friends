@@ -566,6 +566,113 @@
       height: 20px;
       display: block;
     }
+    /* --- Edit Profile Modal Styles --- */
+    .edit-profile-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #fff;
+      z-index: 2000;
+    }
+    .edit-profile-header {
+      display: flex;
+      align-items: center;
+      padding: 16px 20px;
+      border-bottom: 1px solid #eee;
+    }
+    .edit-profile-back {
+      background: none;
+      border: none;
+      font-size: 24px;
+      color: #000;
+      cursor: pointer;
+      padding: 0;
+      margin-right: 20px;
+    }
+    .edit-profile-title {
+      font-size: 20px;
+      font-weight: 600;
+      color: #000;
+    }
+    .edit-profile-content {
+      padding: 24px 20px;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    .edit-profile-avatar-wrap {
+      position: relative;
+      width: 120px;
+      height: 120px;
+      margin: 0 auto 32px auto;
+    }
+    .edit-profile-avatar {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+    .edit-profile-avatar-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background: rgba(0,0,0,0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+    .edit-profile-avatar-wrap:hover .edit-profile-avatar-overlay {
+      opacity: 1;
+    }
+    .edit-profile-camera-icon {
+      width: 32px;
+      height: 32px;
+      filter: invert(1);
+    }
+    .edit-profile-form-group {
+      margin-bottom: 24px;
+    }
+    .edit-profile-label {
+      display: block;
+      color: #666;
+      font-size: 14px;
+      margin-bottom: 8px;
+    }
+    .edit-profile-input {
+      width: 100%;
+      padding: 12px;
+      font-size: 16px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      transition: border-color 0.2s;
+    }
+    .edit-profile-input:focus {
+      outline: none;
+      border-color: #00bfff;
+    }
+    .edit-profile-save {
+      width: 100%;
+      padding: 14px;
+      background: #00bfff;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .edit-profile-save:hover {
+      background: #0099cc;
+    }
   </style>
 </head>
 <body>
@@ -1777,6 +1884,112 @@
         document.getElementById('showRegisterForm').style.display = 'none';
       }
     });
+
+    // Edit Profile Logic
+    const editProfileBtn = document.querySelector('.wallet-profile-btn');
+    const editProfileModal = document.getElementById('editProfileModal');
+    const closeEditProfile = document.getElementById('closeEditProfile');
+    const editProfileAvatar = document.getElementById('editProfileAvatar');
+    const editProfileAvatarInput = document.getElementById('editProfileAvatarInput');
+    const editProfileName = document.getElementById('editProfileName');
+    const editProfileUsername = document.getElementById('editProfileUsername');
+    const saveProfile = document.getElementById('saveProfile');
+
+    // Открытие модального окна редактирования профиля
+    editProfileBtn.onclick = function() {
+      const user = firebase.auth().currentUser;
+      if (user) {
+        editProfileModal.style.display = 'block';
+        // Заполняем текущими данными
+        editProfileAvatar.src = user.photoURL || 'https://e7.pngegg.com/pngimages/178/595/png-clipart-user-profile-computer-icons-login-user-avatars-monochrome-black-thumbnail.png';
+        editProfileName.value = user.displayName || '';
+        const storedUsername = localStorage.getItem(`username_${user.uid}`);
+        editProfileUsername.value = storedUsername || (user.providerData[0]?.username + '_ETH') || '';
+      }
+    };
+
+    // Закрытие модального окна
+    closeEditProfile.onclick = function() {
+      editProfileModal.style.display = 'none';
+    };
+
+    // Обработка загрузки новой аватарки
+    editProfileAvatarInput.onchange = function(e) {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(ev) {
+          editProfileAvatar.src = ev.target.result;
+        };
+        reader.readAsDataURL(file);
+      }
+    };
+
+    // Сохранение изменений профиля
+    saveProfile.onclick = function() {
+      const user = firebase.auth().currentUser;
+      if (user) {
+        const newName = editProfileName.value.trim();
+        const newUsername = editProfileUsername.value.trim();
+        
+        // Обновляем имя в Firebase
+        user.updateProfile({
+          displayName: newName
+        }).then(() => {
+          // Сохраняем username в localStorage
+          localStorage.setItem(`username_${user.uid}`, newUsername);
+          
+          // Обновляем отображение в профиле
+          const profileName = document.querySelector('.wallet-profile-name');
+          if (profileName) {
+            profileName.innerHTML = `${newName}<span class="wallet-profile-handle">@${newUsername}</span>`;
+          }
+          
+          // Если есть Twitter блок, обновляем его
+          const twitterInfo = document.querySelector('.wallet-profile-twitter');
+          if (twitterInfo && user.providerData[0]?.providerId === 'twitter.com') {
+            twitterInfo.innerHTML = `<a href="https://twitter.com/${newUsername}" style="color:#00bfff;">@${newUsername}</a> <span style="color:#00bfff;">✔️</span>`;
+          }
+
+          // Если загружена новая аватарка
+          if (editProfileAvatar.src !== user.photoURL) {
+            // В реальном приложении здесь был бы код загрузки изображения в storage
+            // и обновления photoURL пользователя
+            document.querySelector('.wallet-profile-avatar').src = editProfileAvatar.src;
+          }
+
+          editProfileModal.style.display = 'none';
+        }).catch(error => {
+          console.error('Error updating profile:', error);
+          alert('Failed to update profile');
+        });
+      }
+    };
   </script>
+  <!-- Edit Profile Modal -->
+  <div id="editProfileModal" class="edit-profile-modal">
+    <div class="edit-profile-header">
+      <button class="edit-profile-back" id="closeEditProfile">←</button>
+      <div class="edit-profile-title">Edit profile</div>
+    </div>
+    <div class="edit-profile-content">
+      <div class="edit-profile-avatar-wrap">
+        <img id="editProfileAvatar" class="edit-profile-avatar" src="" alt="avatar">
+        <label class="edit-profile-avatar-overlay" for="editProfileAvatarInput">
+          <img src="https://www.svgrepo.com/show/495939/camera.svg" class="edit-profile-camera-icon" alt="camera">
+        </label>
+        <input type="file" id="editProfileAvatarInput" accept="image/*" style="display:none;">
+      </div>
+      <div class="edit-profile-form-group">
+        <label class="edit-profile-label">Name</label>
+        <input type="text" id="editProfileName" class="edit-profile-input" placeholder="Enter your name">
+      </div>
+      <div class="edit-profile-form-group">
+        <label class="edit-profile-label">Username</label>
+        <input type="text" id="editProfileUsername" class="edit-profile-input" placeholder="Enter your username">
+      </div>
+      <button class="edit-profile-save" id="saveProfile">Save</button>
+    </div>
+  </div>
 </body>
 </html> 
