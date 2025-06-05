@@ -2937,20 +2937,7 @@
       });
     });
 
-    // Копирование адреса кошелька
-    document.querySelector('.wallet-copy-btn').addEventListener('click', function () {
-      const address = this.getAttribute('data-address');
-      navigator.clipboard.writeText(address).then(() => {
-        // Временно меняем title кнопки для обратной связи
-        const originalTitle = this.title;
-        this.title = 'Copied!';
-        setTimeout(() => {
-          this.title = originalTitle;
-        }, 2000);
-      }).catch(err => {
-        console.error('Failed to copy:', err);
-      });
-    });
+ 
 
     // Функция для генерации адреса кошелька
     function generateWalletAddress() {
