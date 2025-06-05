@@ -3249,10 +3249,24 @@ document.addEventListener('DOMContentLoaded', renderWalletAddress);
               const response = await fetch(newAvatar);
               const blob = await response.blob();
               
+              // Create a unique filename
+              const timestamp = Date.now();
+              const filename = `profile_photos/${user.uid}/${timestamp}`;
+              
               // Upload to Firebase Storage
               const storageRef = firebase.storage().ref();
-              const imageRef = storageRef.child(`profile_photos/${user.uid}/${Date.now()}`);
-              await imageRef.put(blob);
+              const imageRef = storageRef.child(filename);
+              
+              // Upload with metadata
+              const metadata = {
+                contentType: blob.type,
+                customMetadata: {
+                  'uploadedBy': user.uid,
+                  'uploadedAt': timestamp.toString()
+                }
+              };
+              
+              await imageRef.put(blob, metadata);
               
               // Get download URL
               photoURL = await imageRef.getDownloadURL();
@@ -3272,12 +3286,14 @@ document.addEventListener('DOMContentLoaded', renderWalletAddress);
             const profileData = {
               name: newName,
               username: newUsername,
-              avatar: photoURL
+              photoURL: photoURL
             };
             localStorage.setItem('user_profile_data', JSON.stringify(profileData));
 
             // Close modal
             editProfileModal.style.display = 'none';
+            
+            // Show success message
             alert('Profile updated successfully!');
           } catch (error) {
             console.error('Error updating profile:', error);
