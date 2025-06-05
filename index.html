@@ -3334,6 +3334,51 @@ document.addEventListener('DOMContentLoaded', renderWalletAddress);
       const walletAddressEl = document.getElementById('walletAddress');
       const copyBtn = document.querySelector('.wallet-copy-btn');
       const profileEmojiPanel = document.getElementById('emojiPanel');
+      const syncTwitterBtn = document.querySelector('.wallet-profile-btn:nth-child(2)'); // Sync Twitter button
+
+      // Add Twitter sync functionality
+      if (syncTwitterBtn) {
+        syncTwitterBtn.addEventListener('click', async function() {
+          try {
+            const provider = new firebase.auth.TwitterAuthProvider();
+            const result = await firebase.auth().signInWithPopup(provider);
+            const user = result.user;
+            
+            // Update profile information
+            const profileAvatar = document.querySelector('.wallet-profile-avatar');
+            const profileName = document.querySelector('.wallet-profile-name');
+            const twitterInfo = document.querySelector('.wallet-profile-twitter');
+            
+            if (profileAvatar) {
+              profileAvatar.src = user.photoURL || 'https://e7.pngegg.com/pngimages/178/595/png-clipart-user-profile-computer-icons-login-user-avatars-monochrome-black-thumbnail.png';
+            }
+            
+            if (profileName) {
+              profileName.innerHTML = `${user.displayName}<span class="wallet-profile-handle">@${user.providerData[0].username || user.displayName}</span>`;
+            }
+            
+            if (twitterInfo) {
+              const username = user.providerData[0].username || user.displayName;
+              twitterInfo.innerHTML = `<a href="https://twitter.com/${username}" style="color:#00bfff;">@${username}</a> <span style="color:#00bfff;">✔️</span>`;
+              twitterInfo.style.display = '';
+            }
+            
+            // Save updated profile data
+            const profileData = {
+              name: user.displayName,
+              username: user.providerData[0].username || user.displayName,
+              avatar: user.photoURL,
+              bio: user.providerData[0].bio || ''
+            };
+            localStorage.setItem('user_profile_data', JSON.stringify(profileData));
+            
+            alert('Twitter profile synchronized successfully!');
+          } catch (error) {
+            console.error('Error syncing Twitter profile:', error);
+            alert('Error syncing Twitter profile: ' + error.message);
+          }
+        });
+      }
 
       // Load saved profile data
       const storedData = localStorage.getItem('user_profile_data');
