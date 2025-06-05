@@ -1049,6 +1049,20 @@
         document.getElementById('wallet').style.display = 'none';
         document.getElementById('main-app').style.display = 'flex';
         showTab('chat');
+
+        // Обновляем аватар пользователя
+        const profileAvatar = document.querySelector('.wallet-profile-avatar');
+        if (profileAvatar) {
+          // Если есть photoURL (например, из Twitter) используем его, иначе дефолтную иконку
+          profileAvatar.src = user.photoURL || 'https://e7.pngegg.com/pngimages/178/595/png-clipart-user-profile-computer-icons-login-user-avatars-monochrome-black-thumbnail.png';
+        }
+
+        // Обновляем имя пользователя если оно есть
+        const profileName = document.querySelector('.wallet-profile-name');
+        if (profileName) {
+          profileName.innerHTML = (user.displayName || 'User') + 
+            '<span class="wallet-profile-handle">@' + (user.displayName || 'user') + '_ETH</span>';
+        }
       } else {
         document.querySelector('.container').style.display = '';
         document.getElementById('wallet').style.display = 'none';
