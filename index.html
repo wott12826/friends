@@ -531,6 +531,10 @@
     .login-switch-row { display: flex; gap: 18px; justify-content: center; margin-top: 10px; }
     .login-switch-link { color: #00bfff; font-size: 0.98rem; text-decoration: none; cursor: pointer; transition: text-decoration 0.2s; }
     .login-switch-link:hover { text-decoration: underline; }
+    /* Добавляем стили для hover эффекта */
+    .fschat-emoji img:hover, .fschat-img-btn img:hover, .fschat-send img:hover {
+      opacity: 1 !important;
+    }
   </style>
 </head>
 <body>
@@ -898,11 +902,17 @@
     <div id="fullscreenChatMessages" class="fschat-messages"></div>
     <div class="fschat-tip">Tip: Chat with your key holders here. They can see your messages and only you can see their messages, unless you reply</div>
     <form id="fullscreenChatForm" class="fschat-form" style="position:relative;">
-      <button type="button" class="fschat-emoji">😊</button>
-      <button type="button" class="fschat-img-btn" id="fschatImgBtn">🖼️</button>
+      <button type="button" class="fschat-emoji" style="background: none; border: none; padding: 0; cursor: pointer;">
+        <img src="https://static.thenounproject.com/png/1034957-200.png" alt="emoji" style="width: 24px; height: 24px; opacity: 0.7;">
+      </button>
+      <button type="button" class="fschat-img-btn" id="fschatImgBtn" style="background: none; border: none; padding: 0; cursor: pointer;">
+        <img src="https://toppng.com/uploads/preview/font-emoji-svg-png-icon-free-download-389350-onlinewebfonts-play-button-image-11563230644rbzu7hlann.png" alt="add image" style="width: 24px; height: 24px; opacity: 0.7;">
+      </button>
       <input type="file" id="fschatImgInput" accept="image/*" style="display:none;">
-      <input id="fullscreenChatInput" type="text" placeholder="Write something..." autocomplete="off" style="margin-left:0;">
-      <button type="submit" class="fschat-send"><span style="font-size:1.3em;">&#128073;</span></button>
+      <input id="fullscreenChatInput" type="text" placeholder="Write something..." autocomplete="off" style="margin-left:8px;">
+      <button type="submit" class="fschat-send" style="background: none; border: none; padding: 0; cursor: pointer;">
+        <img src="https://static-00.iconduck.com/assets.00/send-icon-2048x2048-h9h456ci.png" alt="send" style="width: 24px; height: 24px; opacity: 0.7;">
+      </button>
       <div id="fschatEmojiPanel" class="fschat-emoji-panel" style="display:none;"></div>
     </form>
   </div>
@@ -1479,7 +1489,7 @@
     const emojiBtn = document.querySelector('.fschat-emoji');
     const chatInput = document.getElementById('fullscreenChatInput');
     const emojiList = [
-      '😀','😁','😂','🤣','😅','😊','😍','😘','😎','🤩','😏','😜','🤔','😇','🥳','😱','😡','😭','😴','👍','👀','💬','🔥','💎','🚀','🎉','❤️','💰','🤑','🤝','🙌','🙏','👋','🤖','🦄','🌈','⚡','☀️','🌙','⭐','🍀','🍕','🍔','🍟','🍣','🍺','🥇','🏆','🎲','🎮','🎧','📈','🖼️'
+      '☺','☻','♡','♥','☀','☁','★','☆','☮','☯','☎','⌨','✉','☑','✓','✔','×','≠','∞','♪','♫','⌘','⌥','⌦','↵','⇧','⇪','○','◎','●','◐','◑','◒','◓','◌','◍','◉','◊','☘','♣','♠','♦','⚡','☕','✎','✏','✐','✑','✒','✍','✌','⭐'
     ];
     emojiBtn.onclick = function(e) {
       e.preventDefault();
