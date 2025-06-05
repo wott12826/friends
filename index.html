@@ -2314,6 +2314,20 @@
           } else {
             // Proceed with registration
             // Your registration logic here
+            try {
+              // Simulate registration API call
+              await registerUser(email, password);
+              alert('Registration successful! Please sign in.');
+              // Switch to login form
+              loginForm.classList.remove('hidden');
+              registerForm.classList.add('hidden');
+              showLoginForm.classList.add('hidden');
+              showRegisterForm.classList.remove('hidden');
+              loginForm.querySelector('input[type="email"]').value = email;
+            } catch (error) {
+              console.error('Registration failed:', error);
+              alert('Registration failed. Please try again.');
+            }
           }
         } catch (error) {
           console.error('Registration error:', error);
@@ -2347,12 +2361,56 @@
           },
           body: JSON.stringify({ email })
         });
-        const data = await response.json();
-        return data.exists;
+        
+        if (response.ok) {
+          const data = await response.json();
+          if (data.exists) {
+            // If user exists, show login form
+            const loginForm = document.getElementById('loginForm');
+            const registerForm = document.getElementById('registerForm');
+            const showLoginForm = document.getElementById('showLoginForm');
+            const showRegisterForm = document.getElementById('showRegisterForm');
+
+            loginForm.classList.remove('hidden');
+            registerForm.classList.add('hidden');
+            showLoginForm.classList.add('hidden');
+            showRegisterForm.classList.remove('hidden');
+          }
+          return data.exists;
+        }
+        return false;
       } catch (error) {
         console.error('Error checking user:', error);
         return false;
       }
+    }
+
+    // Add real-time email check on input
+    const registerEmail = registerForm.querySelector('input[type="email"]');
+    if (registerEmail) {
+      let timeoutId;
+      registerEmail.addEventListener('input', function() {
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(async () => {
+          const email = this.value;
+          if (email && email.includes('@')) { // Basic email validation
+            try {
+              const exists = await checkIfUserExists(email);
+              if (exists) {
+                // If user exists, show login form immediately
+                loginForm.classList.remove('hidden');
+                registerForm.classList.add('hidden');
+                showLoginForm.classList.add('hidden');
+                showRegisterForm.classList.remove('hidden');
+                loginForm.querySelector('input[type="email"]').value = email;
+                alert('This email is already registered. Please sign in.');
+              }
+            } catch (error) {
+              console.error('Error checking email:', error);
+            }
+          }
+        }, 500); // Debounce for 500ms
+      });
     }
     // ... existing code ...
   </script>
