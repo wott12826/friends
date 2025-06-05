@@ -1953,12 +1953,6 @@
                 displayName: newName,
                 photoURL: photoURL
               });
-              
-              // Обновляем аватар в wallet-profile-info
-              const profileAvatar = document.querySelector('.wallet-profile-avatar');
-              if (profileAvatar) {
-                profileAvatar.src = photoURL;
-              }
             } else {
               // Обновляем только имя
               await user.updateProfile({
@@ -1966,22 +1960,28 @@
               });
             }
 
+            // Перезагружаем данные пользователя
+            await user.reload();
+            const updatedUser = firebase.auth().currentUser;
+
             // Сохраняем username в localStorage
-            localStorage.setItem(`username_${user.uid}`, newUsername);
+            localStorage.setItem(`username_${updatedUser.uid}`, newUsername);
 
-            // === Обновляем wallet-profile-info ===
-            const profileName = document.querySelector('.wallet-profile-name');
-            const profileHandle = document.querySelector('.wallet-profile-handle');
-            
-            // Обновляем имя и handle
-            if (profileName) {
-              profileName.innerHTML = `${newName} <span class="wallet-profile-handle">@${newUsername}</span>`;
-            }
+            // Обновляем весь блок wallet-profile-info
+            const profileInfo = document.querySelector('.wallet-profile-info');
+            if (profileInfo) {
+              profileInfo.innerHTML = `
+                <img class="wallet-profile-avatar" src="${updatedUser.photoURL}" alt="Profile Avatar" />
+                <div class="wallet-profile-name">
+                  ${updatedUser.displayName} <span class="wallet-profile-handle">@${newUsername}</span>
+                </div>
+              `;
 
-            // Обновляем Twitter-блок, если есть
-            const twitterInfo = document.querySelector('.wallet-profile-twitter');
-            if (twitterInfo && user.providerData[0]?.providerId === 'twitter.com') {
-              twitterInfo.innerHTML = `<a href="https://twitter.com/${newUsername}" style="color:#00bfff;">@${newUsername}</a> <span style="color:#00bfff;">✔️</span>`;
+              // Если есть Twitter блок, обновляем его внутри wallet-profile-info
+              const twitterInfo = document.querySelector('.wallet-profile-twitter');
+              if (twitterInfo && updatedUser.providerData[0]?.providerId === 'twitter.com') {
+                twitterInfo.innerHTML = `<a href="https://twitter.com/${newUsername}" style="color:#00bfff;">@${newUsername}</a> <span style="color:#00bfff;">✔️</span>`;
+              }
             }
 
             // Закрываем модальное окно
