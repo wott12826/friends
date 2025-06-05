@@ -800,21 +800,21 @@
       padding: 5px;
     }
 
-    .login-form {
+    .login-form, .register-form {
       display: flex;
       flex-direction: column;
       gap: 10px;
       margin-top: 8px;
     }
 
-    .login-form input {
+    .login-form input, .register-form input {
       padding: 8px;
       border: 1px solid #ddd;
       border-radius: 4px;
       font-size: 14px;
     }
 
-    .login-form button {
+    .login-form button, .register-form button {
       padding: 10px;
       background: #1da1f2;
       color: white;
@@ -825,7 +825,18 @@
     }
 
     .hidden {
-      display: flex !important;
+      display: none !important;
+    }
+
+    .login-switch-link {
+      color: #1da1f2;
+      text-decoration: none;
+      margin-top: 10px;
+      display: inline-block;
+    }
+
+    .login-switch-link:hover {
+      text-decoration: underline;
     }
   </style>
 </head>
@@ -850,19 +861,19 @@
       <h2>Log in / Register</h2>
       <button class="twitter-btn" id="twitterLogin">Log in with Twitter</button>
       <div class="divider">or</div>
-      <form id="registerForm">
+      <form id="registerForm" class="register-form">
         <input type="email" placeholder="Email" required>
         <input type="password" placeholder="Password" required>
         <button type="submit" class="register-btn">Register</button>
       </form>
-      <form id="loginForm" class="login-form" wfd-invisible="true">
+      <form id="loginForm" class="login-form hidden">
         <input type="email" placeholder="Email" required>
         <input type="password" placeholder="Password" required>
         <button type="submit" class="register-btn">Sign In</button>
       </form>
       <div class="login-switch-row">
         <a href="#" id="showLoginForm" class="login-switch-link">Already have an account? Sign in</a>
-        <a href="#" id="showRegisterForm" class="login-switch-link" style="display:none;">No account? Register</a>
+        <a href="#" id="showRegisterForm" class="login-switch-link hidden">Don't have an account? Register</a>
       </div>
     </div>
   </div>
@@ -2259,6 +2270,91 @@
       if (loginForm) loginForm.classList.add('hidden');
       if (showLoginForm) showLoginForm.classList.remove('hidden');
     });
+
+    // ... existing code ...
+    document.addEventListener('DOMContentLoaded', function() {
+      const loginForm = document.getElementById('loginForm');
+      const registerForm = document.getElementById('registerForm');
+      const showLoginForm = document.getElementById('showLoginForm');
+      const showRegisterForm = document.getElementById('showRegisterForm');
+
+      // Switch to login form
+      showLoginForm.onclick = function(e) {
+        e.preventDefault();
+        loginForm.classList.remove('hidden');
+        registerForm.classList.add('hidden');
+        showLoginForm.classList.add('hidden');
+        showRegisterForm.classList.remove('hidden');
+      };
+
+      // Switch to register form
+      showRegisterForm.onclick = function(e) {
+        e.preventDefault();
+        registerForm.classList.remove('hidden');
+        loginForm.classList.add('hidden');
+        showRegisterForm.classList.add('hidden');
+        showLoginForm.classList.remove('hidden');
+      };
+
+      // Handle register form submission
+      registerForm.onsubmit = async function(e) {
+        e.preventDefault();
+        const email = this.querySelector('input[type="email"]').value;
+        const password = this.querySelector('input[type="password"]').value;
+
+        try {
+          // Check if user exists (you'll need to implement this check with your backend)
+          const userExists = await checkIfUserExists(email);
+          
+          if (userExists) {
+            // If user exists, switch to login form and show message
+            alert('This email is already registered. Please sign in.');
+            showLoginForm.click();
+            loginForm.querySelector('input[type="email"]').value = email;
+          } else {
+            // Proceed with registration
+            // Your registration logic here
+          }
+        } catch (error) {
+          console.error('Registration error:', error);
+          alert('Error during registration. Please try again.');
+        }
+      };
+
+      // Handle login form submission
+      loginForm.onsubmit = async function(e) {
+        e.preventDefault();
+        const email = this.querySelector('input[type="email"]').value;
+        const password = this.querySelector('input[type="password"]').value;
+
+        try {
+          // Your login logic here
+        } catch (error) {
+          console.error('Login error:', error);
+          alert('Error during login. Please try again.');
+        }
+      };
+    });
+
+    // Function to check if user exists (implement this according to your backend)
+    async function checkIfUserExists(email) {
+      // This is a placeholder - implement your actual check here
+      try {
+        const response = await fetch('/api/check-user', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ email })
+        });
+        const data = await response.json();
+        return data.exists;
+      } catch (error) {
+        console.error('Error checking user:', error);
+        return false;
+      }
+    }
+    // ... existing code ...
   </script>
   <!-- Edit Profile Modal -->
   <div id="editProfileModal" class="edit-profile-modal">
