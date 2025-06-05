@@ -3186,14 +3186,29 @@
           balance = tokenAccounts.value[0].account.data.parsed.info.tokenAmount.uiAmount;
         }
 
-        // Update all wallet-item-value elements with the balance
+        // Update wallet-item-value elements
         const balanceElements = document.querySelectorAll('.wallet-item-value');
         balanceElements.forEach(element => {
           element.textContent = balance.toFixed(4);
         });
 
+        // Update wallet-profile-balance elements
+        const profileBalanceElements = document.querySelectorAll('.wallet-profile-balance');
+        profileBalanceElements.forEach(element => {
+          element.innerHTML = `<img src="images/logo2.png" style="width:14px;height:14px;vertical-align:middle;margin-right:2px;"> ${balance.toFixed(4)}`;
+        });
+
       } catch (error) {
         console.error('Error fetching POST balance:', error);
+        // Set balance to 0 on error
+        const balanceElements = document.querySelectorAll('.wallet-item-value, .wallet-profile-balance');
+        balanceElements.forEach(element => {
+          if (element.classList.contains('wallet-profile-balance')) {
+            element.innerHTML = `<img src="images/logo2.png" style="width:14px;height:14px;vertical-align:middle;margin-right:2px;"> 0.0000`;
+          } else {
+            element.textContent = '0.0000';
+          }
+        });
       }
     }
 
@@ -3223,6 +3238,10 @@
           // Fetch POST balance after connecting wallet
           await fetchPostBalance();
 
+          // Set up periodic balance updates
+          const balanceUpdateInterval = setInterval(fetchPostBalance, 10000); // Update every 10 seconds
+          localStorage.setItem('balance_update_interval', balanceUpdateInterval);
+
         } catch (err) {
           console.error('Error connecting to wallet:', err);
           alert('Error connecting to wallet: ' + (err?.message || JSON.stringify(err)));
@@ -3230,6 +3249,28 @@
       });
     }
 
+    // Clear interval when disconnecting wallet
+    const disconnectBtn = document.querySelector('.wallet-disconnect-btn');
+    if (disconnectBtn) {
+      disconnectBtn.addEventListener('click', function() {
+        const intervalId = localStorage.getItem('balance_update_interval');
+        if (intervalId) {
+          clearInterval(parseInt(intervalId));
+          localStorage.removeItem('balance_update_interval');
+        }
+      });
+    }
+
+    // Initial balance fetch if wallet is connected
+    document.addEventListener('DOMContentLoaded', function() {
+      const walletAddress = localStorage.getItem('wallet_address');
+      if (walletAddress) {
+        fetchPostBalance();
+        // Set up periodic updates
+        const balanceUpdateInterval = setInterval(fetchPostBalance, 10000);
+        localStorage.setItem('balance_update_interval', balanceUpdateInterval);
+      }
+    });
     // ... existing code ...
   </script>
   <!-- Edit Profile Modal -->
