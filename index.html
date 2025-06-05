@@ -2053,17 +2053,9 @@
     const closeEditProfile = document.getElementById('closeEditProfile');
     const editProfileAvatar = document.getElementById('editProfileAvatar');
     const editProfileAvatarInput = document.getElementById('editProfileAvatarInput');
-    const emojiPanel = document.getElementById('emojiPanel'); // Добавляем получение emojiPanel
 
     // Проверяем наличие элементов
     console.log("Edit Profile Modal:", editProfileModal);
-    console.log("Emoji Panel:", emojiPanel);
-
-    // Обработка emoji panel, только если элемент существует
-    if (emojiPanel) {
-      // Ваш код для работы с emoji panel
-      // ...
-    }
 
     // Обработка загрузки новой аватарки
     if (editProfileAvatarInput && editProfileAvatar) {
@@ -2087,6 +2079,7 @@
         console.log("Found avatar overlay element");
         overlay.onclick = (e) => {
           e.preventDefault(); // Предотвращаем всплытие события
+          e.stopPropagation(); // Останавливаем всплытие события
           console.log("Overlay clicked, triggering file input");
           editProfileAvatarInput.click();
         };
@@ -2100,14 +2093,18 @@
         if (user) {
           editProfileModal.style.display = 'block';
           // Set current user avatar
-          editProfileAvatar.src = user.photoURL || 'https://e7.pngegg.com/pngimages/178/595/png-clipart-user-profile-computer-icons-login-user-avatars-monochrome-black-thumbnail.png';
+          if (editProfileAvatar) {
+            editProfileAvatar.src = user.photoURL || 'https://e7.pngegg.com/pngimages/178/595/png-clipart-user-profile-computer-icons-login-user-avatars-monochrome-black-thumbnail.png';
+          }
         }
       };
     }
 
     // Закрытие модального окна
     if (closeEditProfile && editProfileModal) {
-      closeEditProfile.onclick = function() {
+      closeEditProfile.onclick = function(e) {
+        e.preventDefault();
+        e.stopPropagation();
         editProfileModal.style.display = 'none';
       };
 
