@@ -3165,27 +3165,30 @@
   if (!walletAddressEl) return;
 
   const address = localStorage.getItem('wallet_address');
+  
   if (!address) {
     // Wallet not connected - show Connect Wallet button
     walletAddressEl.innerHTML = `
       <button id="connectPhantomBtn" class="connect-wallet-btn">Connect Wallet</button>
     `;
+    
     const connectBtn = document.getElementById('connectPhantomBtn');
     if (connectBtn) {
-      connectBtn.addEventListener('click', async function () {
+      connectBtn.addEventListener('click', async function() {
         try {
           if (!window.solana || !window.solana.isPhantom) {
             alert('Please install Phantom wallet');
             window.open('https://phantom.app/', '_blank');
             return;
           }
+          
           const resp = await window.solana.connect({ onlyIfTrusted: false });
           const address = resp.publicKey.toString();
           localStorage.setItem('wallet_address', address);
-          renderWalletAddress();
+          renderWalletAddress(); // Re-render to show connected state
         } catch (err) {
           console.error('Error connecting to wallet:', err);
-          alert('Error connecting to wallet');
+          alert('Error connecting to wallet: ' + err.message);
         }
       });
     }
@@ -3200,7 +3203,7 @@
     // Disconnect button handler
     const disconnectBtn = walletAddressEl.querySelector('.wallet-disconnect-btn');
     if (disconnectBtn) {
-      disconnectBtn.addEventListener('click', async function () {
+      disconnectBtn.addEventListener('click', async function() {
         try {
           // Disconnect from Phantom wallet
           if (window.solana && window.solana.isPhantom) {
@@ -3212,7 +3215,7 @@
           renderWalletAddress();
         } catch (err) {
           console.error('Error disconnecting wallet:', err);
-          alert('Error disconnecting wallet');
+          alert('Error disconnecting wallet: ' + err.message);
         }
       });
     }
@@ -3220,7 +3223,7 @@
     // Copy button handler
     const copyBtn = walletAddressEl.querySelector('.wallet-copy-btn');
     if (copyBtn) {
-      copyBtn.addEventListener('click', function () {
+      copyBtn.addEventListener('click', function() {
         const addr = this.dataset.address;
         if (addr) {
           navigator.clipboard.writeText(addr)
