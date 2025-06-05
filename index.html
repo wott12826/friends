@@ -2985,22 +2985,9 @@
 
       // Обновляем отображение
       const shortenedAddress = shortenAddress(walletAddress);
-      addressElement.innerHTML = `${shortenedAddress} <button class="wallet-copy-btn" data-address="${walletAddress}" title="Copy address"><img src="https://png.pngtree.com/png-vector/20190223/ourmid/pngtree-vector-copy-icon-png-image_695355.jpg" style="width:14px;height:14px;vertical-align:middle;"></button>`;
+      renderWalletAddress();
 
-      // Добавляем обработчик копирования
-      const copyBtn = addressElement.querySelector('.wallet-copy-btn');
-      copyBtn.addEventListener('click', function () {
-        const address = this.getAttribute('data-address');
-        navigator.clipboard.writeText(address).then(() => {
-          const originalTitle = this.title;
-          this.title = 'Copied!';
-          setTimeout(() => {
-            this.title = originalTitle;
-          }, 2000);
-        }).catch(err => {
-          console.error('Failed to copy:', err);
-        });
-      });
+
     }
 
     // Обновляем обработчик авторизации
@@ -3417,34 +3404,7 @@
             const addressElement = document.querySelector('.wallet-profile-addr');
             if (addressElement) {
               const shortenedAddress = address.substring(0, 6) + '...' + address.substring(address.length - 4);
-              addressElement.innerHTML = `${shortenedAddress} <button class="wallet-copy-btn" data-address="${address}" title="Copy address"><img src="images/copy-icon.jpg" style="width:14px;height:14px;vertical-align:middle;"></button>`;
-
-              const newCopyBtn = addressElement.querySelector('.wallet-copy-btn');
-              if (newCopyBtn) {
-                newCopyBtn.addEventListener('click', function () {
-                  const addr = this.dataset.address;
-                  if (addr) {
-                    navigator.clipboard.writeText(addr)
-                      .then(() => alert('Address copied'))
-                      .catch(err => {
-                        console.error('Copy error:', err);
-                        // Fallback for non-HTTPS
-                        const textarea = document.createElement('textarea');
-                        textarea.value = addr;
-                        document.body.appendChild(textarea);
-                        textarea.select();
-                        try {
-                          document.execCommand('copy');
-                          alert('Address copied');
-                        } catch (e) {
-                          console.error('Fallback copy failed:', e);
-                          alert('Copy failed. Please copy manually.');
-                        }
-                        document.body.removeChild(textarea);
-                      });
-                  }
-                });
-              }
+              renderWalletAddress();
             }
           } catch (err) {
             console.error('Error connecting to Phantom:', err);
