@@ -1053,15 +1053,34 @@
         // Обновляем аватар пользователя
         const profileAvatar = document.querySelector('.wallet-profile-avatar');
         if (profileAvatar) {
-          // Если есть photoURL (например, из Twitter) используем его, иначе дефолтную иконку
           profileAvatar.src = user.photoURL || 'https://e7.pngegg.com/pngimages/178/595/png-clipart-user-profile-computer-icons-login-user-avatars-monochrome-black-thumbnail.png';
         }
 
-        // Обновляем имя пользователя если оно есть
+        // Обновляем имя пользователя
         const profileName = document.querySelector('.wallet-profile-name');
         if (profileName) {
-          profileName.innerHTML = (user.displayName || 'User') + 
-            '<span class="wallet-profile-handle">@' + (user.displayName || 'user') + '_ETH</span>';
+          // Генерируем случайное число для ID пользователя
+          const randomId = Math.floor(Math.random() * 10000);
+          if (user.providerData && user.providerData[0]?.providerId === 'twitter.com') {
+            // Если пользователь вошел через Twitter
+            profileName.innerHTML = `${user.displayName}<span class="wallet-profile-handle">@${user.providerData[0].username || user.displayName}_ETH</span>`;
+          } else {
+            // Если пользователь вошел через email/password
+            profileName.innerHTML = `User<span class="wallet-profile-handle">@user_${randomId}</span>`;
+          }
+        }
+
+        // Обновляем информацию о Twitter
+        const twitterInfo = document.querySelector('.wallet-profile-twitter');
+        if (twitterInfo) {
+          if (user.providerData && user.providerData[0]?.providerId === 'twitter.com') {
+            // Если пользователь вошел через Twitter, показываем ссылку
+            const username = user.providerData[0].username || user.displayName;
+            twitterInfo.innerHTML = `<a href="https://twitter.com/${username}" style="color:#00bfff;">@${username}</a> <span style="color:#00bfff;">✔️</span>`;
+          } else {
+            // Если не через Twitter - скрываем блок
+            twitterInfo.style.display = 'none';
+          }
         }
       } else {
         document.querySelector('.container').style.display = '';
