@@ -3175,32 +3175,31 @@
     const connectBtn = document.getElementById('connectPhantomBtn');
     if (connectBtn) {
       connectBtn.addEventListener('click', async function() {
-  try {
-    if (!window.solana || !window.solana.isPhantom) {
-      alert('Please install Phantom wallet');
-      window.open('https://phantom.app/', '_blank');
-      return;
-    }
+        try {
+          if (!window.solana || !window.solana.isPhantom) {
+            alert('Please install Phantom wallet');
+            window.open('https://phantom.app/', '_blank');
+            return;
+          }
 
-    console.log('Attempting to connect to Phantom...', window.solana);
+          console.log('Attempting to connect to Phantom...', window.solana);
 
-    const resp = await window.solana.connect({ onlyIfTrusted: false });
-console.log('Phantom response:', resp);
+          const resp = await window.solana.connect({ onlyIfTrusted: false });
+          console.log('Phantom response:', resp);
 
-if (!resp || !resp.publicKey) {
-  alert('Phantom did not return a publicKey. Did you cancel the connection?');
-  return;
-}
+          if (!resp || !resp.publicKey) {
+            alert('Phantom did not return a publicKey. Did you cancel the connection?');
+            return;
+          }
 
-    
-    localStorage.setItem('wallet_address', address);
-    renderWalletAddress(); // Re-render to show connected state
-
-  } catch (err) {
-    console.error('Error connecting to wallet:', err);
-    alert('Error connecting to wallet: ' + (err?.message || JSON.stringify(err)));
-  }
-});
+          const address = resp.publicKey.toString(); // <-- правильное место
+          localStorage.setItem('wallet_address', address);
+          renderWalletAddress(); // Re-render to show connected state
+        } catch (err) {
+          console.error('Error connecting to wallet:', err);
+          alert('Error connecting to wallet: ' + (err?.message || JSON.stringify(err)));
+        }
+      });
     }
   } else {
     // Wallet connected - show address, Disconnect and Copy buttons
@@ -3219,8 +3218,10 @@ if (!resp || !resp.publicKey) {
           if (window.solana && window.solana.isPhantom) {
             await window.solana.disconnect();
           }
-          // Clear stored address
+
+          // Clear stored address and any related localStorage if needed
           localStorage.removeItem('wallet_address');
+
           // Re-render the wallet address section
           renderWalletAddress();
         } catch (err) {
@@ -3247,8 +3248,10 @@ if (!resp || !resp.publicKey) {
     }
   }
 }
-    // Вызовем при загрузке страницы
-    document.addEventListener('DOMContentLoaded', renderWalletAddress);
+
+// Вызовем при загрузке страницы
+document.addEventListener('DOMContentLoaded', renderWalletAddress);
+
   </script>
   <!-- Edit Profile Modal -->
   <div id="editProfileModal" class="edit-profile-modal">
