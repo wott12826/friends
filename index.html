@@ -3335,38 +3335,7 @@
       // Load saved wallet address
       const savedAddress = localStorage.getItem('wallet_address');
       if (savedAddress) {
-        const addressElement = document.querySelector('.wallet-profile-addr');
-        if (addressElement) {
-          const shortenedAddress = savedAddress.substring(0, 6) + '...' + savedAddress.substring(savedAddress.length - 4);
-          addressElement.innerHTML = `${shortenedAddress} <button class="wallet-copy-btn" data-address="${savedAddress}" title="Copy address"><img src="images/copy-icon.jpg" style="width:14px;height:14px;vertical-align:middle;"></button>`;
-
-          const newCopyBtn = addressElement.querySelector('.wallet-copy-btn');
-          if (newCopyBtn) {
-            newCopyBtn.addEventListener('click', function () {
-              const addr = this.dataset.address;
-              if (addr) {
-                navigator.clipboard.writeText(addr)
-                  .then(() => alert('Address copied'))
-                  .catch(err => {
-                    console.error('Copy error:', err);
-                    // Fallback for non-HTTPS
-                    const textarea = document.createElement('textarea');
-                    textarea.value = addr;
-                    document.body.appendChild(textarea);
-                    textarea.select();
-                    try {
-                      document.execCommand('copy');
-                      alert('Address copied');
-                    } catch (e) {
-                      console.error('Fallback copy failed:', e);
-                      alert('Copy failed. Please copy manually.');
-                    }
-                    document.body.removeChild(textarea);
-                  });
-              }
-            });
-          }
-        }
+        renderWalletAddress();
       }
 
       // Setup Phantom wallet
