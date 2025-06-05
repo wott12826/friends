@@ -1993,4 +1993,37 @@
     </div>
   </div>
 </body>
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    // Edit Profile Logic
+    const editProfileBtn = document.querySelector('.wallet-profile-btn.edit-profile-trigger');
+    const editProfileModal = document.getElementById('editProfileModal');
+    const closeEditProfile = document.getElementById('closeEditProfile');
+    const editProfileAvatar = document.getElementById('editProfileAvatar');
+    const editProfileAvatarInput = document.getElementById('editProfileAvatarInput');
+
+    // Показываем модалку по нажатию на кнопку "Edit profile"
+    document.querySelectorAll('.edit-profile-trigger').forEach(btn => {
+      btn.addEventListener('click', () => {
+        editProfileModal.style.display = 'block';
+      });
+    });
+
+    // Кнопка "←" для закрытия
+    const backBtn = document.querySelector('.edit-profile-back');
+    if (backBtn) {
+      backBtn.addEventListener('click', () => {
+        editProfileModal.style.display = 'none';
+      });
+    }
+
+    // Клик вне окна — закрытие
+    window.addEventListener('click', (e) => {
+      if (e.target === editProfileModal) {
+        editProfileModal.style.display = 'none';
+      }
+    });
+  });
+</script>
+
 </html> 
