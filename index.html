@@ -3194,10 +3194,13 @@
       const walletAddressEl = document.getElementById('walletAddress');
       const address = localStorage.getItem('wallet_address');
       if (address) {
-        // Показываем адрес и кнопку копирования
-        walletAddressEl.innerHTML = `${address.substring(0,6)}...${address.substring(address.length-4)} ` +
-          `<button class="wallet-copy-btn" data-address="${address}" title="Copy address"><img src="images/copy-icon.png" style="width:14px;height:14px;vertical-align:middle;"></button>`;
-        // Добавляем обработчик копирования
+        // Показываем адрес, кнопку отключения и копирования
+        walletAddressEl.innerHTML = `
+          ${address.substring(0,6)}...${address.substring(address.length-4)} 
+          <button class="wallet-disconnect-btn" title="Disconnect wallet" style="margin-right:6px;">Disconnect</button>
+          <button class="wallet-copy-btn" data-address="${address}" title="Copy address"><img src="images/copy-icon.png" style="width:14px;height:14px;vertical-align:middle;"></button>
+        `;
+        // Обработчик копирования
         const newCopyBtn = walletAddressEl.querySelector('.wallet-copy-btn');
         if (newCopyBtn) {
           newCopyBtn.addEventListener('click', function () {
@@ -3210,6 +3213,14 @@
                 })
                 .catch(() => alert('Copy failed. Please copy manually.'));
             }
+          });
+        }
+        // Обработчик отключения
+        const disconnectBtn = walletAddressEl.querySelector('.wallet-disconnect-btn');
+        if (disconnectBtn) {
+          disconnectBtn.addEventListener('click', function () {
+            localStorage.removeItem('wallet_address');
+            renderWalletAddress();
           });
         }
       } else {
