@@ -3166,13 +3166,14 @@
 
   const address = localStorage.getItem('wallet_address');
   if (address) {
-    // Показываем адрес, Disconnect и Copy
+    // Показываем адрес, Disconnect, Copy и Switch Wallet
     walletAddressEl.innerHTML = `
       ${address.substring(0,6)}...${address.substring(address.length-4)} 
+      <button class="wallet-switch-btn" title="Switch wallet" style="margin-right:6px;">Switch Wallet</button>
       <button class="wallet-disconnect-btn" title="Disconnect wallet" style="margin-right:6px;">Disconnect</button>
       <button class="wallet-copy-btn" data-address="${address}" title="Copy address"><img src="images/copy-icon.jpg" style="width:14px;height:14px;vertical-align:middle;"></button>
     `;
-    // ... обработчики для Disconnect и Copy ...
+    // Обработчик копирования
     const newCopyBtn = walletAddressEl.querySelector('.wallet-copy-btn');
     if (newCopyBtn) {
       newCopyBtn.addEventListener('click', function () {
@@ -3187,6 +3188,7 @@
         }
       });
     }
+    // Обработчик отключения
     const disconnectBtn = walletAddressEl.querySelector('.wallet-disconnect-btn');
     if (disconnectBtn) {
       disconnectBtn.addEventListener('click', function () {
@@ -3194,8 +3196,28 @@
         renderWalletAddress();
       });
     }
+    // Обработчик смены кошелька
+    const switchBtn = walletAddressEl.querySelector('.wallet-switch-btn');
+    if (switchBtn) {
+      switchBtn.addEventListener('click', async function () {
+        try {
+          if (!window.solana || !window.solana.isPhantom) {
+            alert('Please install Phantom wallet');
+            window.open('https://phantom.app/', '_blank');
+            return;
+          }
+          // Открываем Phantom для выбора кошелька
+          const resp = await window.solana.connect({ onlyIfTrusted: false });
+          const address = resp.publicKey.toString();
+          localStorage.setItem('wallet_address', address);
+          renderWalletAddress();
+        } catch (err) {
+          alert('Error connecting to wallet');
+        }
+      });
+    }
   } else {
-    // ВСЕГДА открывать Phantom при каждом нажатии
+    // Показываем кнопку Connect Wallet
     walletAddressEl.innerHTML = `<button id="connectPhantomBtn" class="connect-wallet-btn">Connect Wallet</button>`;
     const connectBtn = document.getElementById('connectPhantomBtn');
     if (connectBtn) {
@@ -3206,7 +3228,7 @@
             window.open('https://phantom.app/', '_blank');
             return;
           }
-          // ВСЕГДА открываем Phantom для выбора кошелька
+          // Открываем Phantom для выбора кошелька
           const resp = await window.solana.connect({ onlyIfTrusted: false });
           const address = resp.publicKey.toString();
           localStorage.setItem('wallet_address', address);
