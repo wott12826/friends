@@ -655,7 +655,7 @@
             <img class="wallet-profile-avatar" src="https://randomuser.me/api/portraits/men/35.jpg" alt="avatar">
             <div class="wallet-profile-info">
               <div class="wallet-profile-name">Smirnoff <span class="wallet-profile-handle">@Smirnoff_ETH</span></div>
-              <div class="wallet-profile-addr">0x3430...0043 <button class="wallet-copy-btn" title="Copy address"><img src="https://png.pngtree.com/png-vector/20190223/ourmid/pngtree-vector-copy-icon-png-image_695355.jpg" style="width:14px;height:14px;vertical-align:middle;"></button></div>
+              <div class="wallet-profile-addr">0x3430...0043 <button class="wallet-copy-btn" data-address="0x3430000000000000000000000000000000000043" title="Copy address"><img src="https://png.pngtree.com/png-vector/20190223/ourmid/pngtree-vector-copy-icon-png-image_695355.jpg" style="width:14px;height:14px;vertical-align:middle;"></button></div>
               <div class="wallet-profile-twitter"><a href="#" style="color:#00bfff;">@Smirnoff_ETH</a> <span style="color:#00bfff;">✔️</span></div>
             </div>
             <div class="wallet-profile-actions">
@@ -1663,6 +1663,21 @@
         if (!emojiPanel.contains(e.target) && e.target !== emojiButton) {
           emojiPanel.style.display = 'none';
         }
+      });
+    });
+
+    // Копирование адреса кошелька
+    document.querySelector('.wallet-copy-btn').addEventListener('click', function() {
+      const address = this.getAttribute('data-address');
+      navigator.clipboard.writeText(address).then(() => {
+        // Временно меняем title кнопки для обратной связи
+        const originalTitle = this.title;
+        this.title = 'Copied!';
+        setTimeout(() => {
+          this.title = originalTitle;
+        }, 2000);
+      }).catch(err => {
+        console.error('Failed to copy:', err);
       });
     });
   </script>
