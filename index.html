@@ -962,7 +962,6 @@
       <button type="submit" class="fschat-send" style="background: none; border: none; padding: 0; cursor: pointer;">
         <img src="https://static-00.iconduck.com/assets.00/send-icon-2048x2048-h9h456ci.png" alt="send" style="width: 24px; height: 24px; opacity: 0.7;">
       </button>
-      <div id="fschatEmojiPanel" class="fschat-emoji-panel" style="display:none;"></div>
     </form>
   </div>
   <!-- Firebase App (core) -->
@@ -1408,19 +1407,49 @@
         title: name + (ticker ? ' (' + ticker + ')' : ''),
         key: 'discover|' + name + '|' + ticker
       };
-      document.getElementById('discoverCodeModal').style.display = 'flex';
-      document.getElementById('discoverCodeInput').value = '';
-      document.getElementById('discoverCodeError').textContent = '';
-      document.getElementById('discoverCodeInput').focus();
+
+      // Проверяем, есть ли доступ у текущего пользователя
+      const currentUser = firebase.auth().currentUser;
+      if (currentUser) {
+        const userAccessKey = 'discover_access_' + currentUser.uid;
+        const hasAccess = localStorage.getItem(userAccessKey) === 'true';
+        
+        if (hasAccess) {
+          // Если доступ уже есть, сразу открываем чат
+          openFullscreenChat(discoverChatData);
+        } else {
+          // Если доступа нет, показываем окно для ввода кода
+          document.getElementById('discoverCodeModal').style.display = 'flex';
+          document.getElementById('discoverCodeInput').value = '';
+          document.getElementById('discoverCodeError').textContent = '';
+          document.getElementById('discoverCodeInput').focus();
+        }
+      } else {
+        // Если пользователь не авторизован, показываем окно для ввода кода
+        document.getElementById('discoverCodeModal').style.display = 'flex';
+        document.getElementById('discoverCodeInput').value = '';
+        document.getElementById('discoverCodeError').textContent = '';
+        document.getElementById('discoverCodeInput').focus();
+      }
     });
+
     document.getElementById('closeDiscoverCodeModal').onclick = function() {
       document.getElementById('discoverCodeModal').style.display = 'none';
     };
+
     document.getElementById('discoverCodeSubmit').onclick = function() {
       const code = document.getElementById('discoverCodeInput').value.trim();
       if (code === 'oldcode') {
         document.getElementById('discoverCodeError').style.color = '#0a0';
         document.getElementById('discoverCodeError').textContent = 'Access granted!';
+        
+        // Сохраняем информацию о доступе для текущего пользователя
+        const currentUser = firebase.auth().currentUser;
+        if (currentUser) {
+          const userAccessKey = 'discover_access_' + currentUser.uid;
+          localStorage.setItem(userAccessKey, 'true');
+        }
+        
         setTimeout(() => {
           document.getElementById('discoverCodeModal').style.display = 'none';
           if (discoverChatData) openFullscreenChat(discoverChatData);
