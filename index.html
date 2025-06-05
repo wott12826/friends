@@ -3184,17 +3184,15 @@
 
     console.log('Attempting to connect to Phantom...', window.solana);
 
-    // Попробуем явно вызвать request, если обычный connect не сработает
     const resp = await window.solana.connect({ onlyIfTrusted: false });
+console.log('Phantom response:', resp);
 
-    console.log('Phantom response:', resp); // 👈 логируем ответ
+if (!resp || !resp.publicKey) {
+  alert('Phantom did not return a publicKey. Did you cancel the connection?');
+  return;
+}
 
-    const address = resp?.publicKey?.toString();
-
-    if (!address) {
-      throw new Error('No publicKey returned from Phantom');
-    }
-
+    
     localStorage.setItem('wallet_address', address);
     renderWalletAddress(); // Re-render to show connected state
 
