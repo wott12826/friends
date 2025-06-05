@@ -3366,7 +3366,7 @@
         const addressElement = document.querySelector('.wallet-profile-addr');
         if (addressElement) {
           const shortenedAddress = savedAddress.substring(0, 6) + '...' + savedAddress.substring(savedAddress.length - 4);
-          addressElement.innerHTML = `${shortenedAddress} <button class="wallet-copy-btn" data-address="${savedAddress}" title="Copy address"><img src="images/copy-icon.png" style="width:14px;height:14px;vertical-align:middle;"></button>`;
+          addressElement.innerHTML = `${shortenedAddress} <button class="wallet-copy-btn" data-address="${savedAddress}" title="Copy address"><img src="images/copy-icon.jpg" style="width:14px;height:14px;vertical-align:middle;"></button>`;
 
           const newCopyBtn = addressElement.querySelector('.wallet-copy-btn');
           if (newCopyBtn) {
@@ -3417,7 +3417,7 @@
             const addressElement = document.querySelector('.wallet-profile-addr');
             if (addressElement) {
               const shortenedAddress = address.substring(0, 6) + '...' + address.substring(address.length - 4);
-              addressElement.innerHTML = `${shortenedAddress} <button class="wallet-copy-btn" data-address="${address}" title="Copy address"><img src="images/copy-icon.png" style="width:14px;height:14px;vertical-align:middle;"></button>`;
+              addressElement.innerHTML = `${shortenedAddress} <button class="wallet-copy-btn" data-address="${address}" title="Copy address"><img src="images/copy-icon.jpg" style="width:14px;height:14px;vertical-align:middle;"></button>`;
 
               const newCopyBtn = addressElement.querySelector('.wallet-copy-btn');
               if (newCopyBtn) {
