@@ -1926,75 +1926,52 @@
 
     // Сохранение изменений профиля
     if (saveProfile) {
-      saveProfile.onclick = async function() {
+      saveProfile.onclick = function() {
         const user = firebase.auth().currentUser;
-        if (!user) return;
-
-        try {
-          // Get the values
+        if (user) {
           const newName = editProfileName.value.trim();
           const newUsername = editProfileUsername.value.trim();
-          const avatarFile = editProfileAvatarInput.files[0];
+          
+          // Обновляем имя в Firebase
+          user.updateProfile({
+            displayName: newName
+          }).then(() => {
+            // Сохраняем username в localStorage
+            localStorage.setItem(`username_${user.uid}`, newUsername);
+            
+            // Обновляем отображение в профиле
+            const profileName = document.querySelector('.wallet-profile-name');
+            if (profileName) {
+              profileName.innerHTML = `${newName}<span class="wallet-profile-handle">@${newUsername}</span>`;
+            }
+            
+            // Если есть Twitter блок, обновляем его
+            const twitterInfo = document.querySelector('.wallet-profile-twitter');
+            if (twitterInfo && user.providerData[0]?.providerId === 'twitter.com') {
+              twitterInfo.innerHTML = `<a href="https://twitter.com/${newUsername}" style="color:#00bfff;">@${newUsername}</a> <span style="color:#00bfff;">✔️</span>`;
+            }
 
-          // Update profile in Firebase
-          if (avatarFile) {
-            // Upload avatar to storage
-            const storageRef = firebase.storage().ref();
-            const avatarRef = storageRef.child(`avatars/${user.uid}`);
-            await avatarRef.put(avatarFile);
-            const avatarURL = await avatarRef.getDownloadURL();
+            // Если загружена новая аватарка
+            if (editProfileAvatar.src !== user.photoURL) {
+              // В реальном приложении здесь был бы код загрузки изображения в storage
+              // и обновления photoURL пользователя
+              document.querySelector('.wallet-profile-avatar').src = editProfileAvatar.src;
+            }
 
-            // Update profile with new avatar
-            await user.updateProfile({
-              displayName: newName,
-              photoURL: avatarURL
-            });
-
-            // Update avatar in UI
-            document.querySelector('.wallet-profile-avatar').src = avatarURL;
-          } else {
-            // Update profile without avatar
-            await user.updateProfile({
-              displayName: newName
-            });
-          }
-
-          // Save username to localStorage
-          localStorage.setItem(`username_${user.uid}`, newUsername);
-
-          // Update UI elements
-          const profileName = document.querySelector('.wallet-profile-name');
-          if (profileName) {
-            profileName.innerHTML = `${newName}<span class="wallet-profile-handle">@${newUsername}</span>`;
-          }
-
-          // Update Twitter info if exists
-          const twitterInfo = document.querySelector('.wallet-profile-twitter');
-          if (twitterInfo && user.providerData[0]?.providerId === 'twitter.com') {
-            twitterInfo.innerHTML = `<a href="https://twitter.com/${newUsername}" style="color:#00bfff;">@${newUsername}</a> <span style="color:#00bfff;">✔️</span>`;
-          }
-
-          // Close modal
-          editProfileModal.style.display = 'none';
-        } catch (error) {
-          console.error('Error updating profile:', error);
-          alert('Failed to update profile. Please try again.');
+            editProfileModal.style.display = 'none';
+          }).catch(error => {
+            console.error('Error updating profile:', error);
+            alert('Failed to update profile');
+          });
         }
       };
     }
-
-    // Клик вне окна — закрытие
-    window.addEventListener('click', (e) => {
-      if (e.target === editProfileModal) {
-        editProfileModal.style.display = 'none';
-      }
-    });
   </script>
   <!-- Edit Profile Modal -->
   <div id="editProfileModal" class="edit-profile-modal">
     <div class="edit-profile-header">
       <button class="edit-profile-back" id="closeEditProfile">←</button>
-      <span class="edit-profile-title">Edit profile</span>
+      <div class="edit-profile-title">Edit profile</div>
     </div>
     <div class="edit-profile-content">
       <div class="edit-profile-avatar-wrap">
@@ -2002,7 +1979,7 @@
         <label class="edit-profile-avatar-overlay" for="editProfileAvatarInput">
           <img src="https://www.svgrepo.com/show/495939/camera.svg" class="edit-profile-camera-icon" alt="camera">
         </label>
-        <input type="file" id="editProfileAvatarInput" accept="image/*" style="display:none;" wfd-invisible="true">
+        <input type="file" id="editProfileAvatarInput" accept="image/*" style="display:none;">
       </div>
       <div class="edit-profile-form-group">
         <label class="edit-profile-label">Name</label>
@@ -2016,5 +1993,37 @@
     </div>
   </div>
 </body>
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    // Edit Profile Logic
+    const editProfileBtn = document.querySelector('.wallet-profile-btn.edit-profile-trigger');
+    const editProfileModal = document.getElementById('editProfileModal');
+    const closeEditProfile = document.getElementById('closeEditProfile');
+    const editProfileAvatar = document.getElementById('editProfileAvatar');
+    const editProfileAvatarInput = document.getElementById('editProfileAvatarInput');
+
+    // Показываем модалку по нажатию на кнопку "Edit profile"
+    document.querySelectorAll('.edit-profile-trigger').forEach(btn => {
+      btn.addEventListener('click', () => {
+        editProfileModal.style.display = 'block';
+      });
+    });
+
+    // Кнопка "←" для закрытия
+    const backBtn = document.querySelector('.edit-profile-back');
+    if (backBtn) {
+      backBtn.addEventListener('click', () => {
+        editProfileModal.style.display = 'none';
+      });
+    }
+
+    // Клик вне окна — закрытие
+    window.addEventListener('click', (e) => {
+      if (e.target === editProfileModal) {
+        editProfileModal.style.display = 'none';
+      }
+    });
+  });
+</script>
 
 </html> 
