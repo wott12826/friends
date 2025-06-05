@@ -773,9 +773,15 @@
           </div>
           <div class="wallet-profile-fund-label">Fund your wallet from</div>
           <div class="wallet-profile-fund-row">
-            <button class="wallet-fund-btn wallet-fund-base"><img src="https://cryptologos.cc/logos/base-base-logo.png" style="height:20px;vertical-align:middle;margin-right:8px;">BASE</button>
-            <button class="wallet-fund-btn wallet-fund-coinbase">coinbase <span style="font-size:0.9em;">PAY</span></button>
-            <button class="wallet-fund-btn wallet-fund-eth"><img src="https://cryptologos.cc/logos/ethereum-eth-logo.png" style="height:20px;vertical-align:middle;margin-right:8px;">ethereum</button>
+            <button class="wallet-fund-btn wallet-fund-base">
+              <img src="images/base-logo.png" style="height:20px;vertical-align:middle;margin-right:8px;">BASE
+            </button>
+            <button class="wallet-fund-btn wallet-fund-coinbase">
+              coinbase <span style="font-size:0.9em;">PAY</span>
+            </button>
+            <button class="wallet-fund-btn wallet-fund-eth">
+              <img src="images/ethereum-logo.png" style="height:20px;vertical-align:middle;margin-right:8px;">ethereum
+            </button>
           </div>
           <button class="wallet-logout-btn">Log out</button>
         </div>
@@ -1024,7 +1030,29 @@
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <!-- Firebase Auth -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <!-- Firebase Firestore -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+  <!-- Firebase Storage -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
+
   <script>
+    // Проверяем, не инициализирован ли уже Firebase
+    if (!firebase.apps.length) {
+      const firebaseConfig = {
+        apiKey: "AIzaSyBvcUP3TD0ZUjYQvWUhVgE2Tt9Xivi3m7s",
+        authDomain: "testtest-c94df.firebaseapp.com",
+        projectId: "testtest-c94df",
+        storageBucket: "testtest-c94df.appspot.com",
+        messagingSenderId: "112669024582",
+        appId: "1:112669024582:web:9cfa5fcd8c6325085fc547",
+        measurementId: "G-1QQTFLJ7WG"
+      };
+      firebase.initializeApp(firebaseConfig);
+    }
+
+    // Initialize Storage
+    const storage = firebase.storage();
+
     const modal = document.getElementById('modal');
     const loginBtn = document.querySelector('.login-btn');
     const closeModal = document.getElementById('closeModal');
@@ -1926,95 +1954,95 @@
 
     // Сохранение изменений профиля
     if (saveProfile) {
-      saveProfile.onclick = async function() {
+      saveProfile.onclick = async function(e) {
+        e.preventDefault();
         const user = firebase.auth().currentUser;
-        if (user) {
-          try {
-            const newName = editProfileName.value.trim();
-            const newUsername = editProfileUsername.value.trim();
-            const newPhotoURL = editProfileAvatar.src;
+        if (!user) {
+          alert('Пожалуйста, войдите в систему');
+          return;
+        }
 
-            // Если аватарка была изменена и это base64
-            if (newPhotoURL !== user.photoURL && newPhotoURL.startsWith('data:image')) {
+        try {
+          // Валидация полей
+          const newName = editProfileName?.value?.trim();
+          const newUsername = editProfileUsername?.value?.trim();
+          
+          if (!newName || !newUsername) {
+            alert('Пожалуйста, заполните все поля');
+            return;
+          }
+
+          // Получаем новый URL аватарки, если она была изменена
+          const newPhotoURL = editProfileAvatar.src;
+          let photoURL = user.photoURL;
+
+          if (newPhotoURL !== user.photoURL && newPhotoURL.startsWith('data:image')) {
+            try {
               // Конвертируем base64 в blob
               const response = await fetch(newPhotoURL);
               const blob = await response.blob();
               
+              // Создаем уникальное имя файла
+              const fileName = `avatar_${user.uid}_${Date.now()}.jpg`;
+              
               // Загружаем в Firebase Storage
-              const storageRef = firebase.storage().ref();
-              const avatarRef = storageRef.child(`avatars/${user.uid}`);
-              await avatarRef.put(blob);
+              const storageRef = storage.ref(`avatars/${fileName}`);
+              const uploadTask = await storageRef.put(blob);
               
               // Получаем URL загруженного файла
-              const photoURL = await avatarRef.getDownloadURL();
-              
-              // Обновляем профиль с новой аватаркой
-              await user.updateProfile({
-                displayName: newName,
-                photoURL: photoURL
-              });
-            } else {
-              // Обновляем только имя
-              await user.updateProfile({
-                displayName: newName
-              });
+              photoURL = await uploadTask.ref.getDownloadURL();
+            } catch (error) {
+              console.error('Ошибка загрузки аватара:', error);
+              alert('Ошибка при загрузке аватара. Попробуйте другое изображение.');
+              return;
             }
-
-            // Перезагружаем данные пользователя
-            await user.reload();
-            const updatedUser = firebase.auth().currentUser;
-
-            // Сохраняем username в localStorage
-            localStorage.setItem(`username_${updatedUser.uid}`, newUsername);
-
-            // Обновляем содержимое wallet-profile-block
-            const profileBlock = document.querySelector('.wallet-profile-block');
-            if (profileBlock) {
-              // Обновляем аватар
-              const profileAvatar = profileBlock.querySelector('.wallet-profile-avatar');
-              if (profileAvatar) {
-                profileAvatar.src = updatedUser.photoURL || 'https://e7.pngegg.com/pngimages/178/595/png-clipart-user-profile-computer-icons-login-user-avatars-monochrome-black-thumbnail.png';
-              }
-
-              // Обновляем имя и username
-              const profileInfo = profileBlock.querySelector('.wallet-profile-info');
-              if (profileInfo) {
-                const nameElement = profileInfo.querySelector('.wallet-profile-name');
-                if (nameElement) {
-                  nameElement.innerHTML = `${updatedUser.displayName}<span class="wallet-profile-handle">@${newUsername}</span>`;
-                }
-
-                // Обновляем Twitter блок если он есть
-                const twitterInfo = profileInfo.querySelector('.wallet-profile-twitter');
-                if (twitterInfo && updatedUser.providerData[0]?.providerId === 'twitter.com') {
-                  twitterInfo.style.display = 'block';
-                  twitterInfo.innerHTML = `<a href="https://twitter.com/${newUsername}" style="color:#00bfff;">@${newUsername}</a> <span style="color:#00bfff;">✔️</span>`;
-                }
-              }
-            }
-
-            // Закрываем модальное окно
-            editProfileModal.style.display = 'none';
-
-            // Переключаемся на вкладку Wallet
-            const walletTab = document.querySelector('.wallet-tab');
-            if (walletTab) {
-              walletTab.click();
-            } else {
-              // Если нет кнопки, то просто показываем контент вкладки
-              document.querySelectorAll('.tab-content').forEach(content => {
-                content.style.display = 'none';
-              });
-              const walletContent = document.querySelector('.wallet-content');
-              if (walletContent) {
-                walletContent.style.display = 'block';
-              }
-            }
-
-          } catch (error) {
-            console.error('Ошибка обновления профиля:', error);
-            alert('Ошибка обновления профиля');
           }
+
+          // Обновляем профиль
+          await user.updateProfile({
+            displayName: newName,
+            photoURL: photoURL
+          });
+
+          // Перезагружаем данные пользователя
+          await user.reload();
+          const updatedUser = firebase.auth().currentUser;
+
+          // Сохраняем username в localStorage
+          localStorage.setItem(`username_${updatedUser.uid}`, newUsername);
+
+          // Обновляем UI в wallet-profile-block
+          const profileBlock = document.querySelector('.wallet-profile-block');
+          if (profileBlock) {
+            // Обновляем аватар
+            const profileAvatar = profileBlock.querySelector('.wallet-profile-avatar');
+            if (profileAvatar) {
+              profileAvatar.src = updatedUser.photoURL;
+            }
+
+            // Обновляем информацию профиля
+            const profileInfo = profileBlock.querySelector('.wallet-profile-info');
+            if (profileInfo) {
+              const nameElement = profileInfo.querySelector('.wallet-profile-name');
+              if (nameElement) {
+                nameElement.innerHTML = `${updatedUser.displayName}<span class="wallet-profile-handle">@${newUsername}</span>`;
+              }
+
+              // Обновляем Twitter блок
+              const twitterInfo = profileInfo.querySelector('.wallet-profile-twitter');
+              if (twitterInfo && updatedUser.providerData[0]?.providerId === 'twitter.com') {
+                twitterInfo.style.display = 'block';
+                twitterInfo.innerHTML = `<a href="https://twitter.com/${newUsername}" style="color:#00bfff;">@${newUsername}</a> <span style="color:#00bfff;">✔️</span>`;
+              }
+            }
+          }
+
+          // Закрываем модальное окно
+          editProfileModal.style.display = 'none';
+
+        } catch (error) {
+          console.error('Ошибка обновления профиля:', error);
+          alert('Ошибка при сохранении профиля. Пожалуйста, попробуйте еще раз.');
         }
       };
     }
