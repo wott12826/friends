@@ -1002,37 +1002,76 @@
     const clubCodeInput = document.getElementById('clubCodeInput');
     const clubCodeSubmit = document.getElementById('clubCodeSubmit');
     const clubCodeError = document.getElementById('clubCodeError');
+
+    // Добавляем модальное окно для ввода кода
+    const codeModal = document.createElement('div');
+    codeModal.id = 'codeModal';
+    codeModal.className = 'modal';
+    codeModal.innerHTML = `
+      <div class="modal-content" style="max-width:340px;">
+        <span class="close" id="closeCodeModal">&times;</span>
+        <h2>Enter access code</h2>
+        <input type="text" id="accessCodeInput" placeholder="Access code" style="padding:10px; border-radius:6px; border:1px solid #ddd; width:100%; margin-bottom:12px; font-size:1rem;">
+        <div id="accessCodeError" style="color:#e00; font-size:0.98rem; min-height:22px; margin-bottom:8px;"></div>
+        <button id="accessCodeSubmit" class="wallet-btn" style="width:100%;">Enter</button>
+      </div>
+    `;
+    document.body.appendChild(codeModal);
+
+    // Обработчики для модального окна с кодом
+    const closeCodeModal = document.getElementById('closeCodeModal');
+    const accessCodeInput = document.getElementById('accessCodeInput');
+    const accessCodeError = document.getElementById('accessCodeError');
+    const accessCodeSubmit = document.getElementById('accessCodeSubmit');
+
     if (newClubBtn) {
       newClubBtn.onclick = function() {
-        clubModal.style.display = 'flex';
-        clubCodeInput.value = '';
-        clubCodeError.textContent = '';
-        clubCodeInput.focus();
+        // Показываем сначала окно для ввода кода
+        codeModal.style.display = 'flex';
+        accessCodeInput.value = '';
+        accessCodeError.textContent = '';
+        accessCodeInput.focus();
       };
     }
+
+    if (closeCodeModal) {
+      closeCodeModal.onclick = function() {
+        codeModal.style.display = 'none';
+      };
+    }
+
+    // Закрытие по клику вне модального окна
+    window.addEventListener('click', function(e) {
+      if (e.target === codeModal) {
+        codeModal.style.display = 'none';
+      }
+      if (e.target === clubModal) {
+        clubModal.style.display = 'none';
+      }
+    });
+
+    if (accessCodeSubmit) {
+      accessCodeSubmit.onclick = function() {
+        const code = accessCodeInput.value.trim();
+        if (code === 'oldcode') {
+          accessCodeError.style.color = '#0a0';
+          accessCodeError.textContent = 'Access granted!';
+          setTimeout(() => {
+            codeModal.style.display = 'none';
+            accessCodeError.textContent = '';
+            // Показываем модальное окно создания клуба
+            clubModal.style.display = 'flex';
+          }, 1000);
+        } else {
+          accessCodeError.style.color = '#e00';
+          accessCodeError.textContent = 'Invalid code!';
+        }
+      };
+    }
+
     if (closeClubModal) {
       closeClubModal.onclick = function() {
         clubModal.style.display = 'none';
-      };
-    }
-    window.addEventListener('click', function(e) {
-      if (e.target === clubModal) clubModal.style.display = 'none';
-    });
-    if (clubCodeSubmit) {
-      clubCodeSubmit.onclick = function() {
-        if (clubCodeInput.value.trim() === 'oldcode') {
-          clubCodeError.style.color = '#0a0';
-          clubCodeError.textContent = 'Access granted!';
-          setTimeout(() => {
-            clubModal.style.display = 'none';
-            clubCodeError.textContent = '';
-            clubCodeError.style.color = '#e00';
-            document.getElementById('createClubModal').style.display = 'flex';
-          }, 1000);
-        } else {
-          clubCodeError.style.color = '#e00';
-          clubCodeError.textContent = 'Invalid code!';
-        }
       };
     }
 
