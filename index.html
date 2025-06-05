@@ -3198,6 +3198,9 @@
           element.innerHTML = `<img src="images/logo2.png" style="width:14px;height:14px;vertical-align:middle;margin-right:2px;"> ${balance.toFixed(4)}`;
         });
 
+        // Update wallet value after balance update
+        updateWalletValue();
+
       } catch (error) {
         console.error('Error fetching POST balance:', error);
         // Set balance to 0 on error
@@ -3209,8 +3212,39 @@
             element.textContent = '0.0000';
           }
         });
+        // Update wallet value with zero balance
+        updateWalletValue();
       }
     }
+
+    // Function to fetch POST price
+    async function fetchPrice() {
+      try {
+        // Replace with actual API call to get POST price
+        const price = 0.04; // Example price
+        const priceElements = document.querySelectorAll('.wallet-post-price');
+        priceElements.forEach(element => {
+          element.textContent = `$${price.toFixed(2)}`;
+        });
+        
+        // Update wallet value after price update
+        updateWalletValue();
+      } catch (error) {
+        console.error('Error fetching POST price:', error);
+      }
+    }
+
+    // Initial price and balance fetch
+    document.addEventListener('DOMContentLoaded', function() {
+      fetchPrice();
+      fetchPostBalance();
+
+      // Update price and balance every 10 seconds
+      setInterval(() => {
+        fetchPrice();
+        fetchPostBalance();
+      }, 10000);
+    });
 
     // ... existing code ...
 
