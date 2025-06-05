@@ -1020,37 +1020,6 @@
       </button>
     </form>
   </div>
-  <!-- Edit Profile Modal -->
-  <div id="editProfileModal" class="edit-profile-modal">
-    <div class="edit-profile-header">
-      <button class="edit-profile-back" id="closeEditProfile">←</button>
-      <div class="edit-profile-title">Edit profile</div>
-    </div>
-    <div class="edit-profile-content">
-      <div class="edit-profile-avatar-wrap">
-        <img id="editProfileAvatar" class="edit-profile-avatar" src="" alt="avatar">
-        <label class="edit-profile-avatar-overlay" for="editProfileAvatarInput">
-          <img src="https://www.svgrepo.com/show/495939/camera.svg" class="edit-profile-camera-icon" alt="camera">
-        </label>
-        <input type="file" id="editProfileAvatarInput" accept="image/*" style="display:none;">
-      </div>
-      <div class="edit-profile-form-group">
-        <label class="edit-profile-label">Name</label>
-        <input type="text" id="editProfileName" class="edit-profile-input" placeholder="Enter your name">
-      </div>
-      <div class="edit-profile-form-group">
-        <label class="edit-profile-label">Username</label>
-        <input type="text" id="editProfileUsername" class="edit-profile-input" placeholder="Enter your username">
-      </div>
-      <button class="edit-profile-save" id="saveProfile">Save</button>
-    </div>
-  </div>
-
-  <!-- Emoji Panel -->
-  <div id="fschatEmojiPanel" class="emoji-panel" style="display: none;">
-    <!-- Emoji buttons will be added dynamically -->
-  </div>
-
   <!-- Firebase App (core) -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <!-- Firebase Auth -->
@@ -1081,6 +1050,833 @@
     };
     firebase.initializeApp(firebaseConfig);
     const provider = new firebase.auth.TwitterAuthProvider();
+
+    twitterLogin.onclick = () => {
+      firebase.auth().signInWithPopup(provider)
+        .then((result) => {
+          const user = result.user;
+          alert('Добро пожаловать, ' + user.displayName + '!');
+          modal.style.display = 'none';
+          document.querySelector('.container').style.display = 'none';
+          document.getElementById('wallet').style.display = 'none';
+          document.getElementById('main-app').style.display = 'flex';
+          showTab('chat');
+        })
+        .catch((error) => {
+          alert('Ошибка авторизации: ' + error.message);
+        });
+    };
+
+    registerForm.onsubmit = function(e) {
+      e.preventDefault();
+      const email = registerForm.querySelector('input[type="email"]').value;
+      const password = registerForm.querySelector('input[type="password"]').value;
+      firebase.auth().createUserWithEmailAndPassword(email, password)
+        .then((userCredential) => {
+          // Пользователь зарегистрирован и автоматически залогинен
+          modal.style.display = 'none';
+          document.querySelector('.container').style.display = 'none';
+          document.getElementById('wallet').style.display = 'none';
+          document.getElementById('main-app').style.display = 'flex';
+          showTab('chat');
+        })
+        .catch((error) => {
+          if (error.code === 'auth/email-already-in-use') {
+            alert('Этот email уже зарегистрирован. Пожалуйста, войдите.');
+            // Переключаем на форму входа и подставляем email
+            registerForm.style.display = 'none';
+            loginForm.style.display = '';
+            showLoginForm.style.display = 'none';
+            showRegisterForm.style.display = '';
+            loginForm.querySelector('input[type="email"]').value = email;
+            loginForm.querySelector('input[type="password"]').focus();
+          } else {
+            alert('Ошибка регистрации: ' + error.message);
+          }
+        });
+    };
+
+    // Переключение вкладок
+    function showTab(tab) {
+      document.querySelectorAll('.tab-content').forEach(el => el.style.display = 'none');
+      document.getElementById('tab-' + tab).style.display = 'block';
+      document.querySelectorAll('.sidebar-item').forEach(el => el.classList.remove('active'));
+      document.querySelector('.sidebar-item[data-tab="' + tab + '"]').classList.add('active');
+    }
+    document.querySelectorAll('.sidebar-item').forEach(item => {
+      item.onclick = function() {
+        showTab(this.getAttribute('data-tab'));
+      };
+    });
+
+    // --- New club modal logic ---
+    const newClubBtn = document.getElementById('newClubBtn');
+    const clubModal = document.getElementById('clubModal');
+    const closeClubModal = document.getElementById('closeClubModal');
+    const clubCodeInput = document.getElementById('clubCodeInput');
+    const clubCodeSubmit = document.getElementById('clubCodeSubmit');
+    const clubCodeError = document.getElementById('clubCodeError');
+
+    // Добавляем модальное окно для ввода кода
+    const codeModal = document.createElement('div');
+    codeModal.id = 'codeModal';
+    codeModal.className = 'modal';
+    codeModal.innerHTML = `
+      <div class="modal-content" style="max-width:340px;">
+        <span class="close" id="closeCodeModal">&times;</span>
+        <h2>Enter access code</h2>
+        <input type="text" id="accessCodeInput" placeholder="Access code" style="padding:10px; border-radius:6px; border:1px solid #ddd; width:100%; margin-bottom:12px; font-size:1rem;">
+        <div id="accessCodeError" style="color:#e00; font-size:0.98rem; min-height:22px; margin-bottom:8px;"></div>
+        <button id="accessCodeSubmit" class="wallet-btn" style="width:100%;">Enter</button>
+      </div>
+    `;
+    document.body.appendChild(codeModal);
+
+    // Обработчики для модального окна с кодом
+    const closeCodeModal = document.getElementById('closeCodeModal');
+    const accessCodeInput = document.getElementById('accessCodeInput');
+    const accessCodeError = document.getElementById('accessCodeError');
+    const accessCodeSubmit = document.getElementById('accessCodeSubmit');
+
+    if (newClubBtn) {
+      newClubBtn.onclick = function() {
+        // Показываем сначала окно для ввода кода
+        codeModal.style.display = 'flex';
+        accessCodeInput.value = '';
+        accessCodeError.textContent = '';
+        accessCodeInput.focus();
+      };
+    }
+
+    if (closeCodeModal) {
+      closeCodeModal.onclick = function() {
+        codeModal.style.display = 'none';
+      };
+    }
+
+    // Закрытие по клику вне модального окна
+    window.addEventListener('click', function(e) {
+      if (e.target === codeModal) {
+        codeModal.style.display = 'none';
+      }
+      if (e.target === clubModal) {
+        clubModal.style.display = 'none';
+      }
+    });
+
+    if (accessCodeSubmit) {
+      accessCodeSubmit.onclick = function() {
+        const code = accessCodeInput.value.trim();
+        if (code === 'oldcode') {
+          accessCodeError.style.color = '#0a0';
+          accessCodeError.textContent = 'Access granted!';
+          setTimeout(() => {
+            codeModal.style.display = 'none';
+            accessCodeError.textContent = '';
+            // Показываем модальное окно создания клуба
+            clubModal.style.display = 'flex';
+          }, 1000);
+        } else {
+          accessCodeError.style.color = '#e00';
+          accessCodeError.textContent = 'Invalid code!';
+        }
+      };
+    }
+
+    if (closeClubModal) {
+      closeClubModal.onclick = function() {
+        clubModal.style.display = 'none';
+      };
+    }
+
+    // --- Discover tab logic ---
+    const discoverRankingsBtn = document.getElementById('discoverRankingsBtn');
+    const discoverRecentBtn = document.getElementById('discoverRecentBtn');
+    const discoverRankings = document.getElementById('discover-rankings');
+    const discoverRecent = document.getElementById('discover-recent');
+    if (discoverRankingsBtn && discoverRecentBtn) {
+      discoverRankingsBtn.onclick = function() {
+        discoverRankingsBtn.classList.add('active');
+        discoverRecentBtn.classList.remove('active');
+        discoverRankings.style.display = '';
+        discoverRecent.style.display = 'none';
+      };
+      discoverRecentBtn.onclick = function() {
+        discoverRecentBtn.classList.add('active');
+        discoverRankingsBtn.classList.remove('active');
+        discoverRankings.style.display = 'none';
+        discoverRecent.style.display = '';
+      };
+    }
+
+    // --- Firebase auto-login ---
+    firebase.auth().onAuthStateChanged(function(user) {
+      if (user) {
+        document.querySelector('.container').style.display = 'none';
+        document.getElementById('wallet').style.display = 'none';
+        document.getElementById('main-app').style.display = 'flex';
+        showTab('chat');
+
+        // Обновляем аватар пользователя
+        const profileAvatar = document.querySelector('.wallet-profile-avatar');
+        if (profileAvatar) {
+          profileAvatar.src = user.photoURL || 'https://e7.pngegg.com/pngimages/178/595/png-clipart-user-profile-computer-icons-login-user-avatars-monochrome-black-thumbnail.png';
+        }
+
+        // Обновляем имя пользователя
+        const profileName = document.querySelector('.wallet-profile-name');
+        if (profileName) {
+          // Генерируем случайное число для ID пользователя
+          const randomId = Math.floor(Math.random() * 10000);
+          if (user.providerData && user.providerData[0]?.providerId === 'twitter.com') {
+            // Если пользователь вошел через Twitter
+            profileName.innerHTML = `${user.displayName}<span class="wallet-profile-handle">@${user.providerData[0].username || user.displayName}_ETH</span>`;
+          } else {
+            // Если пользователь вошел через email/password
+            profileName.innerHTML = `User<span class="wallet-profile-handle">@user_${randomId}</span>`;
+          }
+        }
+
+        // Обновляем информацию о Twitter
+        const twitterInfo = document.querySelector('.wallet-profile-twitter');
+        if (twitterInfo) {
+          if (user.providerData && user.providerData[0]?.providerId === 'twitter.com') {
+            // Если пользователь вошел через Twitter, показываем ссылку
+            const username = user.providerData[0].username || user.displayName;
+            twitterInfo.innerHTML = `<a href="https://twitter.com/${username}" style="color:#00bfff;">@${username}</a> <span style="color:#00bfff;">✔️</span>`;
+          } else {
+            // Если не через Twitter - скрываем блок
+            twitterInfo.style.display = 'none';
+          }
+        }
+      } else {
+        document.querySelector('.container').style.display = '';
+        document.getElementById('wallet').style.display = 'none';
+        document.getElementById('main-app').style.display = 'none';
+        // Показываем только форму регистрации по умолчанию
+        document.getElementById('registerForm').style.display = '';
+        document.getElementById('loginForm').style.display = 'none';
+        document.getElementById('showLoginForm').style.display = '';
+        document.getElementById('showRegisterForm').style.display = 'none';
+      }
+    });
+
+    // --- Обработчик выхода из аккаунта ---
+    const logoutBtn = document.querySelector('.wallet-logout-btn');
+    if (logoutBtn) {
+      logoutBtn.onclick = function() {
+        firebase.auth().signOut()
+          .then(() => {
+            // Возвращаем на главный экран
+            document.querySelector('.container').style.display = '';
+            document.getElementById('wallet').style.display = 'none';
+            document.getElementById('main-app').style.display = 'none';
+            // Сбрасываем формы
+            document.getElementById('registerForm').reset();
+            document.getElementById('loginForm').reset();
+            // Показываем форму регистрации
+            document.getElementById('registerForm').style.display = '';
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('showLoginForm').style.display = '';
+            document.getElementById('showRegisterForm').style.display = 'none';
+          })
+          .catch((error) => {
+            alert('Ошибка при выходе: ' + error.message);
+          });
+      };
+    }
+
+    // --- Логика переключения между регистрацией и входом ---
+    // Повторные объявления переменных удалены, используем уже объявленные выше
+    if (showLoginForm && showRegisterForm && registerForm && loginForm) {
+      showLoginForm.onclick = function(e) {
+        e.preventDefault();
+        // Показываем модальное окно
+        modal.style.display = 'flex';
+        // Получаем email из формы регистрации, если есть
+        const regEmail = registerForm.querySelector('input[type="email"]').value;
+        registerForm.style.display = 'none';
+        loginForm.style.display = '';
+        showLoginForm.style.display = 'none';
+        showRegisterForm.style.display = '';
+        // Подставляем email, если был введён
+        if (regEmail) {
+          loginForm.querySelector('input[type="email"]').value = regEmail;
+        }
+        loginForm.querySelector('input[type="password"]').focus();
+      };
+      showRegisterForm.onclick = function(e) {
+        e.preventDefault();
+        registerForm.style.display = '';
+        loginForm.style.display = 'none';
+        showLoginForm.style.display = '';
+        showRegisterForm.style.display = 'none';
+        // Автофокус на email
+        registerForm.querySelector('input[type="email"]').focus();
+      };
+    }
+    // --- Вход через email/password ---
+    loginForm.onsubmit = function(e) {
+      e.preventDefault();
+      const email = loginForm.querySelector('input[type="email"]').value;
+      const password = loginForm.querySelector('input[type="password"]').value;
+      firebase.auth().signInWithEmailAndPassword(email, password)
+        .then((userCredential) => {
+          // Скрываем модальное окно и начальный контейнер
+          modal.style.display = 'none';
+          document.querySelector('.container').style.display = 'none';
+          // Скрываем кошелек
+          document.getElementById('wallet').style.display = 'none';
+          // Показываем основное приложение
+          document.getElementById('main-app').style.display = 'flex';
+          // Переключаемся на вкладку чата
+          showTab('chat');
+        })
+        .catch((error) => {
+          alert('Ошибка входа: ' + error.message);
+        });
+    };
+
+    // Закрытие модалки Create club
+    const closeCreateClubModal = document.getElementById('closeCreateClubModal');
+    if (closeCreateClubModal) {
+      closeCreateClubModal.onclick = function() {
+        document.getElementById('createClubModal').style.display = 'none';
+      };
+    }
+
+    // Загрузка и предпросмотр фото
+    document.getElementById('clubPhotoPreview').onclick = function() {
+      document.getElementById('clubPhotoInput').click();
+    };
+
+    document.getElementById('clubPhotoInput').onchange = function(e) {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(ev) {
+          document.getElementById('clubPhotoPreview').innerHTML = '<img src="' + ev.target.result + '" style="width:100%;height:100%;object-fit:cover;border-radius:12px;">';
+        };
+        reader.readAsDataURL(file);
+      }
+    };
+
+    // Выбор кривой цены
+    document.querySelectorAll('.curve-option').forEach(opt => {
+      opt.onclick = function() {
+        document.querySelectorAll('.curve-option').forEach(o => o.classList.remove('selected'));
+        this.classList.add('selected');
+      };
+    });
+
+    // --- Клубы ---
+    function getClubs() {
+      try {
+        return JSON.parse(localStorage.getItem('clubs') || '[]');
+      } catch { return []; }
+    }
+    function saveClubs(clubs) {
+      localStorage.setItem('clubs', JSON.stringify(clubs));
+    }
+    function renderClubs() {
+      const chatList = document.querySelector('.chat-list');
+      if (!chatList) return;
+      // Оставляем только первый (примерный) чат
+      const staticChat = chatList.querySelector('.chat-item');
+      chatList.innerHTML = '';
+      if (staticChat) chatList.appendChild(staticChat);
+      const clubs = getClubs();
+      clubs.forEach(club => {
+        const div = document.createElement('div');
+        div.className = 'chat-item';
+        div.innerHTML = `
+          <img src="${club.avatar || 'https://via.placeholder.com/40x40?text=Club'}" class="chat-avatar" alt="avatar">
+          <div class="chat-info">
+            <div class="chat-name">${club.name} <span style='color:#00bfff;font-size:0.95em;'>${club.ticker ? ('(' + club.ticker + ')') : ''}</span></div>
+            <div class="chat-msg" style="white-space:pre-line;">${club.desc || ''}</div>
+          </div>
+          <div class="chat-price">$0.00</div>
+        `;
+        chatList.appendChild(div);
+      });
+    }
+    // При загрузке страницы
+    renderClubs();
+
+    // --- Обработка создания клуба ---
+    document.getElementById('createClubBtn').onclick = function() {
+      const name = document.getElementById('clubNameInput').value.trim();
+      const ticker = document.getElementById('clubTickerInput').value.trim().toUpperCase();
+      const desc = document.getElementById('clubDescInput').value.trim();
+      const avatarEl = document.getElementById('clubPhotoPreview').querySelector('img');
+      const avatar = avatarEl ? avatarEl.src : '';
+      if (!name || !ticker) {
+        alert('Name and ticker are required!');
+        return;
+      }
+      const clubs = getClubs();
+      clubs.push({ name, ticker, desc, avatar });
+      saveClubs(clubs);
+      renderClubs();
+      document.getElementById('createClubModal').style.display = 'none';
+      // Сброс формы
+      document.getElementById('clubNameInput').value = '';
+      document.getElementById('clubTickerInput').value = '';
+      document.getElementById('clubDescInput').value = '';
+      document.getElementById('clubPhotoPreview').innerHTML = 'Tap to add<br>photo';
+      document.getElementById('clubPhotoInput').value = '';
+      document.querySelectorAll('.curve-option').forEach(o => o.classList.remove('selected'));
+      document.querySelector('.curve-option[data-curve="casual"]').classList.add('selected');
+    };
+
+    // --- Открытие чата клуба ---
+    let currentClubKey = null;
+    document.querySelector('.chat-list').addEventListener('click', function(e) {
+      let item = e.target;
+      while (item && !item.classList.contains('chat-item')) item = item.parentElement;
+      if (!item) return;
+      // Пропускаем первый (статичный) чат
+      const idx = Array.from(this.children).indexOf(item);
+      if (idx === 0) return;
+      const clubs = getClubs();
+      const club = clubs[idx - 1];
+      if (!club) return;
+      currentClubKey = club.name + '|' + club.ticker;
+      openFullscreenChat({
+        avatar: club.avatar || 'https://via.placeholder.com/40x40?text=Club',
+        title: club.name + (club.ticker ? ' (' + club.ticker + ')' : ''),
+        key: currentClubKey
+      });
+    });
+
+    // --- Открытие чата из Discover с кодом ---
+    let discoverChatData = null;
+    document.getElementById('discover-rankings').addEventListener('click', function(e) {
+      let item = e.target;
+      while (item && !item.classList.contains('discover-item')) item = item.parentElement;
+      if (!item) return;
+      const avatar = item.querySelector('.discover-avatar')?.src || '';
+      const name = item.querySelector('.discover-title')?.textContent || '';
+      const ticker = (item.querySelector('.discover-title')?.textContent.match(/\(([^)]+)\)/) || [])[1] || '';
+      discoverChatData = {
+        avatar,
+        title: name + (ticker ? ' (' + ticker + ')' : ''),
+        key: 'discover|' + name + '|' + ticker
+      };
+
+      // Проверяем, есть ли доступ у текущего пользователя к конкретному клубу
+      const currentUser = firebase.auth().currentUser;
+      if (currentUser) {
+        const clubAccessKey = `club_access_${currentUser.uid}_${name.trim()}`;
+        const hasAccess = localStorage.getItem(clubAccessKey) === 'true';
+        
+        if (hasAccess) {
+          // Если доступ к этому клубу уже есть, сразу открываем чат
+          openFullscreenChat(discoverChatData);
+        } else {
+          // Если доступа к этому клубу нет, показываем окно для ввода кода
+          document.getElementById('discoverCodeModal').style.display = 'flex';
+          document.getElementById('discoverCodeInput').value = '';
+          document.getElementById('discoverCodeError').textContent = '';
+          document.getElementById('discoverCodeInput').focus();
+        }
+      } else {
+        // Если пользователь не авторизован, показываем окно для ввода кода
+        document.getElementById('discoverCodeModal').style.display = 'flex';
+        document.getElementById('discoverCodeInput').value = '';
+        document.getElementById('discoverCodeError').textContent = '';
+        document.getElementById('discoverCodeInput').focus();
+      }
+    });
+
+    document.getElementById('closeDiscoverCodeModal').onclick = function() {
+      document.getElementById('discoverCodeModal').style.display = 'none';
+    };
+
+    document.getElementById('discoverCodeSubmit').onclick = function() {
+      const code = document.getElementById('discoverCodeInput').value.trim();
+      if (code === 'oldcode') {
+        document.getElementById('discoverCodeError').style.color = '#0a0';
+        document.getElementById('discoverCodeError').textContent = 'Access granted!';
+        
+        // Сохраняем информацию о доступе для текущего пользователя к конкретному клубу
+        const currentUser = firebase.auth().currentUser;
+        if (currentUser && discoverChatData) {
+          const clubName = discoverChatData.title.split('(')[0].trim();
+          const clubAccessKey = `club_access_${currentUser.uid}_${clubName}`;
+          localStorage.setItem(clubAccessKey, 'true');
+        }
+        
+        setTimeout(() => {
+          document.getElementById('discoverCodeModal').style.display = 'none';
+          if (discoverChatData) openFullscreenChat(discoverChatData);
+        }, 700);
+      } else {
+        document.getElementById('discoverCodeError').style.color = '#e00';
+        document.getElementById('discoverCodeError').textContent = 'Invalid code!';
+      }
+    };
+
+    // --- Web3 Chat: меню ---
+    (function(){
+      const menuBtn = document.querySelector('.fschat-menu-btn');
+      const menuWrap = document.querySelector('.fschat-menu-wrap');
+      if(menuBtn && menuWrap) {
+        menuBtn.onclick = function(e) {
+          e.stopPropagation();
+          menuWrap.classList.toggle('open');
+        };
+        document.body.addEventListener('click', function(){
+          menuWrap.classList.remove('open');
+        });
+      }
+    })();
+
+    // --- Web3 Chat: открытие ---
+    function openFullscreenChat({avatar, title, key}) {
+      document.getElementById('fullscreenChatAvatar').src = avatar;
+      document.getElementById('fullscreenChatTitle').textContent = title;
+      currentClubKey = key;
+      renderFullscreenChatMessages();
+      document.getElementById('fullscreenChat').style.display = 'flex';
+      document.querySelector('.main-app').style.display = 'none';
+      setTimeout(() => {
+        const msgBox = document.getElementById('fullscreenChatMessages');
+        msgBox.scrollTop = msgBox.scrollHeight;
+      }, 100);
+    }
+    document.getElementById('closeFullscreenChat').onclick = function() {
+      document.getElementById('fullscreenChat').style.display = 'none';
+      document.querySelector('.main-app').style.display = 'flex';
+    };
+    function getClubMessages(key) {
+      try {
+        return JSON.parse(localStorage.getItem('clubmsg_' + key) || '[]');
+      } catch { return []; }
+    }
+    function saveClubMessages(key, msgs) {
+      localStorage.setItem('clubmsg_' + key, JSON.stringify(msgs));
+    }
+    // --- Web3 Chat: сообщения ---
+    const demoUsers = [
+      { nick: 'Exo', avatar: 'https://randomuser.me/api/portraits/men/32.jpg' },
+      { nick: '#roc', avatar: 'https://randomuser.me/api/portraits/men/33.jpg' },
+      { nick: 'Gamb', avatar: 'https://randomuser.me/api/portraits/men/34.jpg' },
+      { nick: 'Smiroff', avatar: 'https://randomuser.me/api/portraits/men/35.jpg' }
+    ];
+    function renderFullscreenChatMessages() {
+      const box = document.getElementById('fullscreenChatMessages');
+      box.innerHTML = '';
+      if (!currentClubKey) return;
+      let msgs = getClubMessages(currentClubKey);
+      // Если сообщений нет, показываем демо-чат
+      if (!msgs.length) {
+        msgs = [
+          { user: 0, text: 'Hahahha', time: '5/30/23 6:57PM' },
+          { user: 0, text: 'Welcome', time: '5/30/23 6:57PM' },
+          { user: 1, text: 'gm', time: '5/31/23 9:04AM' },
+          { user: 2, text: 'gm', time: '6/1/23 9:07AM' },
+          { user: 1, text: '把眼睛睁开，就会知道未来...', time: '6/1/23 9:07PM' },
+          { user: 1, text: 'Best of luck!', time: '6/2/23 8:33AM' },
+          { user: 3, text: '👀 💬', time: '6/2/23 8:34AM' }
+        ];
+      }
+      msgs.forEach((m, i) => {
+        const currentUser = firebase.auth().currentUser;
+        const isMe = (m.user === 3) || (!m.user && m.nick === 'Smiroff') || (m.uid === currentUser?.uid);
+        let userAvatar, userNick;
+        
+        if (isMe) {
+          userAvatar = currentUser?.photoURL || 'https://e7.pngegg.com/pngimages/178/595/png-clipart-user-profile-computer-icons-login-user-avatars-monochrome-black-thumbnail.png';
+          userNick = currentUser?.displayName || 'User';
+        } else {
+          const demoUser = demoUsers[m.user ?? 0] || demoUsers[0];
+          userAvatar = m.avatar || demoUser.avatar;
+          userNick = m.nick || demoUser.nick;
+        }
+
+        const row = document.createElement('div');
+        row.className = 'fschat-message-row' + (isMe ? ' me' : '');
+        row.innerHTML = `
+          <div class="fschat-message${isMe ? ' me' : ''}">
+            <div class="fschat-msg-header">
+              <img class="fschat-msg-avatar" src="${userAvatar}" alt="avatar">
+              <span class="fschat-msg-nick">${userNick}</span>
+              <span class="fschat-msg-time">${m.time || ''}</span>
+            </div>
+            <div class="fschat-bubble">${m.text || ''}${m.img ? `<br><img src='${m.img}' style='max-width:180px;max-height:120px;border-radius:10px;margin-top:6px;'>` : ''}</div>
+          </div>
+        `;
+        box.appendChild(row);
+      });
+      setTimeout(() => { box.scrollTop = box.scrollHeight; }, 50);
+    }
+    document.getElementById('fullscreenChatForm').onsubmit = function(e) {
+      e.preventDefault();
+      const input = document.getElementById('fullscreenChatInput');
+      const text = input.value.trim();
+      if ((!text && !imgToSend) || !currentClubKey) return;
+      
+      const currentUser = firebase.auth().currentUser;
+      const msgs = getClubMessages(currentClubKey);
+      const now = new Date();
+      const time = now.toLocaleDateString() + ' ' + now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) + (now.getHours() >= 12 ? 'PM' : 'AM');
+      
+      const newMessage = {
+        uid: currentUser?.uid,
+        nick: currentUser?.displayName || 'User',
+        avatar: currentUser?.photoURL,
+        text,
+        time
+      };
+      
+      if (imgToSend) {
+        newMessage.img = imgToSend;
+      }
+      
+      msgs.push(newMessage);
+      saveClubMessages(currentClubKey, msgs);
+      input.value = '';
+      clearImgPreview();
+      renderFullscreenChatMessages();
+    };
+
+    // --- Emoji panel logic ---
+    const emojiPanel = document.getElementById('fschatEmojiPanel');
+    const emojiBtn = document.querySelector('.fschat-emoji');
+    const chatInput = document.getElementById('fullscreenChatInput');
+    const emojiList = [
+      '☺','☻','♡','♥','☀','☁','★','☆','☮','☯','☎','⌨','✉','☑','✓','✔','×','≠','∞','♪','♫','⌘','⌥','⌦','↵','⇧','⇪','○','◎','●','◐','◑','◒','◓','◌','◍','◉','◊','☘','♣','♠','♦','⚡','☕','✎','✏','✐','✑','✒','✍','✌','⭐'
+    ];
+    emojiBtn.onclick = function(e) {
+      e.preventDefault();
+      emojiPanel.innerHTML = '';
+      emojiList.forEach(em => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'fschat-emoji-btn';
+        btn.textContent = em;
+        btn.onclick = function(ev) {
+          ev.preventDefault();
+          chatInput.value += em;
+          emojiPanel.style.display = 'none';
+          chatInput.focus();
+        };
+        emojiPanel.appendChild(btn);
+      });
+      emojiPanel.style.display = emojiPanel.style.display === 'none' ? 'flex' : 'none';
+    };
+    document.body.addEventListener('click', function(e) {
+      if (!emojiPanel.contains(e.target) && e.target !== emojiBtn) emojiPanel.style.display = 'none';
+    });
+
+    // --- Image upload logic ---
+    const imgBtn = document.getElementById('fschatImgBtn');
+    const imgInput = document.getElementById('fschatImgInput');
+    let imgToSend = null;
+    imgBtn.onclick = function(e) {
+      e.preventDefault();
+      imgInput.click();
+    };
+    imgInput.onchange = function(e) {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(ev) {
+          imgToSend = ev.target.result;
+          // Показываем превью
+          if (!document.getElementById('fschatImgPreview')) {
+            const preview = document.createElement('img');
+            preview.id = 'fschatImgPreview';
+            preview.className = 'fschat-img-preview';
+            preview.src = imgToSend;
+            chatInput.parentNode.insertBefore(preview, chatInput);
+          } else {
+            document.getElementById('fschatImgPreview').src = imgToSend;
+          }
+        };
+        reader.readAsDataURL(file);
+      }
+    };
+    // Удалять превью при отправке или очистке
+    function clearImgPreview() {
+      imgToSend = null;
+      const prev = document.getElementById('fschatImgPreview');
+      if (prev) prev.remove();
+      imgInput.value = '';
+    }
+    // --- Переключение между регистрацией и входом (как на friends-sand.vercel.app) ---
+    (function(){
+      const showLoginForm = document.getElementById('showLoginForm');
+      const showRegisterForm = document.getElementById('showRegisterForm');
+      const registerForm = document.getElementById('registerForm');
+      const loginForm = document.getElementById('loginForm');
+      if (showLoginForm && showRegisterForm && registerForm && loginForm) {
+        showLoginForm.onclick = function(e) {
+          e.preventDefault();
+          registerForm.style.display = 'none';
+          loginForm.style.display = '';
+          showLoginForm.style.display = 'none';
+          showRegisterForm.style.display = '';
+          loginForm.querySelector('input[type="email"]').focus();
+        };
+        showRegisterForm.onclick = function(e) {
+          e.preventDefault();
+          registerForm.style.display = '';
+          loginForm.style.display = 'none';
+          showLoginForm.style.display = '';
+          showRegisterForm.style.display = 'none';
+          registerForm.querySelector('input[type="email"]').focus();
+        };
+      }
+    })();
+    // --- Конец блока переключения ---
+
+    // Добавляем JavaScript для работы с эмодзи
+    document.addEventListener('DOMContentLoaded', function() {
+      const emojiButton = document.querySelector('.fschat-emoji');
+      const emojiPanel = document.querySelector('.emoji-panel');
+      const chatInput = document.getElementById('fullscreenChatInput');
+
+      // Показать/скрыть панель эмодзи при клике на кнопку
+      emojiButton.addEventListener('click', function(e) {
+        e.stopPropagation();
+        emojiPanel.style.display = emojiPanel.style.display === 'grid' ? 'none' : 'grid';
+      });
+
+      // Добавить эмодзи в поле ввода при клике
+      document.querySelectorAll('.emoji-btn').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          const emoji = this.getAttribute('data-emoji');
+          const start = chatInput.selectionStart;
+          const end = chatInput.selectionEnd;
+          const text = chatInput.value;
+          chatInput.value = text.substring(0, start) + emoji + text.substring(end);
+          chatInput.focus();
+          chatInput.selectionStart = chatInput.selectionEnd = start + emoji.length;
+        });
+      });
+
+      // Закрыть панель при клике вне её
+      document.addEventListener('click', function(e) {
+        if (!emojiPanel.contains(e.target) && e.target !== emojiButton) {
+          emojiPanel.style.display = 'none';
+        }
+      });
+    });
+
+    // Копирование адреса кошелька
+    document.querySelector('.wallet-copy-btn').addEventListener('click', function() {
+      const address = this.getAttribute('data-address');
+      navigator.clipboard.writeText(address).then(() => {
+        // Временно меняем title кнопки для обратной связи
+        const originalTitle = this.title;
+        this.title = 'Copied!';
+        setTimeout(() => {
+          this.title = originalTitle;
+        }, 2000);
+      }).catch(err => {
+        console.error('Failed to copy:', err);
+      });
+    });
+
+    // Функция для генерации адреса кошелька
+    function generateWalletAddress() {
+      const chars = '0123456789abcdef';
+      let address = '0x';
+      // Генерируем 40 символов (20 байт) для адреса Ethereum
+      for (let i = 0; i < 40; i++) {
+        address += chars[Math.floor(Math.random() * chars.length)];
+      }
+      return address;
+    }
+
+    // Функция для сокращения адреса (показывает первые 6 и последние 4 символа)
+    function shortenAddress(address) {
+      return address.slice(0, 6) + '...' + address.slice(-4);
+    }
+
+    // Функция обновления адреса в профиле
+    function updateProfileAddress(user) {
+      const addressElement = document.querySelector('.wallet-profile-addr');
+      if (!addressElement) return;
+
+      // Получаем сохраненный адрес или генерируем новый
+      let walletAddress = localStorage.getItem(`wallet_address_${user.uid}`);
+      if (!walletAddress) {
+        walletAddress = generateWalletAddress();
+        localStorage.setItem(`wallet_address_${user.uid}`, walletAddress);
+      }
+
+      // Обновляем отображение
+      const shortenedAddress = shortenAddress(walletAddress);
+      addressElement.innerHTML = `${shortenedAddress} <button class="wallet-copy-btn" data-address="${walletAddress}" title="Copy address"><img src="https://png.pngtree.com/png-vector/20190223/ourmid/pngtree-vector-copy-icon-png-image_695355.jpg" style="width:14px;height:14px;vertical-align:middle;"></button>`;
+      
+      // Добавляем обработчик копирования
+      const copyBtn = addressElement.querySelector('.wallet-copy-btn');
+      copyBtn.addEventListener('click', function() {
+        const address = this.getAttribute('data-address');
+        navigator.clipboard.writeText(address).then(() => {
+          const originalTitle = this.title;
+          this.title = 'Copied!';
+          setTimeout(() => {
+            this.title = originalTitle;
+          }, 2000);
+        }).catch(err => {
+          console.error('Failed to copy:', err);
+        });
+      });
+    }
+
+    // Обновляем обработчик авторизации
+    firebase.auth().onAuthStateChanged(function(user) {
+      if (user) {
+        document.querySelector('.container').style.display = 'none';
+        document.getElementById('wallet').style.display = 'none';
+        document.getElementById('main-app').style.display = 'flex';
+        showTab('chat');
+
+        // Обновляем аватар пользователя
+        const profileAvatar = document.querySelector('.wallet-profile-avatar');
+        if (profileAvatar) {
+          profileAvatar.src = user.photoURL || 'https://e7.pngegg.com/pngimages/178/595/png-clipart-user-profile-computer-icons-login-user-avatars-monochrome-black-thumbnail.png';
+        }
+
+        // Обновляем имя пользователя
+        const profileName = document.querySelector('.wallet-profile-name');
+        if (profileName) {
+          const randomId = Math.floor(Math.random() * 10000);
+          if (user.providerData && user.providerData[0]?.providerId === 'twitter.com') {
+            profileName.innerHTML = `${user.displayName}<span class="wallet-profile-handle">@${user.providerData[0].username || user.displayName}_ETH</span>`;
+          } else {
+            profileName.innerHTML = `User<span class="wallet-profile-handle">@user_${randomId}</span>`;
+          }
+        }
+
+        // Обновляем адрес кошелька
+        updateProfileAddress(user);
+
+        // Обновляем информацию о Twitter
+        const twitterInfo = document.querySelector('.wallet-profile-twitter');
+        if (twitterInfo) {
+          if (user.providerData && user.providerData[0]?.providerId === 'twitter.com') {
+            const username = user.providerData[0].username || user.displayName;
+            twitterInfo.innerHTML = `<a href="https://twitter.com/${username}" style="color:#00bfff;">@${username}</a> <span style="color:#00bfff;">✔️</span>`;
+          } else {
+            twitterInfo.style.display = 'none';
+          }
+        }
+      } else {
+        document.querySelector('.container').style.display = '';
+        document.getElementById('wallet').style.display = 'none';
+        document.getElementById('main-app').style.display = 'none';
+        document.getElementById('registerForm').style.display = '';
+        document.getElementById('loginForm').style.display = 'none';
+        document.getElementById('showLoginForm').style.display = '';
+        document.getElementById('showRegisterForm').style.display = 'none';
+      }
+    });
 
     // Edit Profile Logic
     const editProfileBtn = document.querySelector('.wallet-profile-btn.edit-profile-trigger');
@@ -1171,5 +1967,30 @@
       };
     }
   </script>
+  <!-- Edit Profile Modal -->
+  <div id="editProfileModal" class="edit-profile-modal">
+    <div class="edit-profile-header">
+      <button class="edit-profile-back" id="closeEditProfile">←</button>
+      <div class="edit-profile-title">Edit profile</div>
+    </div>
+    <div class="edit-profile-content">
+      <div class="edit-profile-avatar-wrap">
+        <img id="editProfileAvatar" class="edit-profile-avatar" src="" alt="avatar">
+        <label class="edit-profile-avatar-overlay" for="editProfileAvatarInput">
+          <img src="https://www.svgrepo.com/show/495939/camera.svg" class="edit-profile-camera-icon" alt="camera">
+        </label>
+        <input type="file" id="editProfileAvatarInput" accept="image/*" style="display:none;">
+      </div>
+      <div class="edit-profile-form-group">
+        <label class="edit-profile-label">Name</label>
+        <input type="text" id="editProfileName" class="edit-profile-input" placeholder="Enter your name">
+      </div>
+      <div class="edit-profile-form-group">
+        <label class="edit-profile-label">Username</label>
+        <input type="text" id="editProfileUsername" class="edit-profile-input" placeholder="Enter your username">
+      </div>
+      <button class="edit-profile-save" id="saveProfile">Save</button>
+    </div>
+  </div>
 </body>
 </html> 
