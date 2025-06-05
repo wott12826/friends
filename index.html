@@ -2053,34 +2053,62 @@
     const closeEditProfile = document.getElementById('closeEditProfile');
     const editProfileAvatar = document.getElementById('editProfileAvatar');
     const editProfileAvatarInput = document.getElementById('editProfileAvatarInput');
+    const editProfileName = document.getElementById('editProfileName');
+    const editProfileUsername = document.getElementById('editProfileUsername');
+    const saveProfile = document.getElementById('saveProfile');
 
-    // Проверяем наличие элементов
-    console.log("Edit Profile Modal:", editProfileModal);
+    // Проверяем наличие всех необходимых элементов
+    const requiredElements = {
+      modal: editProfileModal,
+      closeBtn: closeEditProfile,
+      avatar: editProfileAvatar,
+      avatarInput: editProfileAvatarInput,
+      nameInput: editProfileName,
+      usernameInput: editProfileUsername,
+      saveBtn: saveProfile
+    };
+
+    // Логируем статус элементов для отладки
+    console.log("Required elements status:", Object.entries(requiredElements).reduce((acc, [key, value]) => {
+      acc[key] = !!value;
+      return acc;
+    }, {}));
 
     // Обработка загрузки новой аватарки
     if (editProfileAvatarInput && editProfileAvatar) {
       editProfileAvatarInput.onchange = function(e) {
         const file = e.target.files[0];
-        console.log("Selected file:", file);
-        
         if (file) {
+          // Проверяем размер файла (не более 5MB)
+          if (file.size > 5 * 1024 * 1024) {
+            alert('Файл слишком большой. Максимальный размер: 5MB');
+            return;
+          }
+          
+          // Проверяем тип файла
+          if (!file.type.startsWith('image/')) {
+            alert('Пожалуйста, выберите изображение');
+            return;
+          }
+
           const reader = new FileReader();
           reader.onload = function(ev) {
-            console.log("Loaded image base64:", ev.target.result.substring(0, 50) + "...");
             editProfileAvatar.src = ev.target.result;
+          };
+          reader.onerror = function() {
+            console.error('Ошибка чтения файла');
+            alert('Ошибка при загрузке изображения');
           };
           reader.readAsDataURL(file);
         }
       };
 
-      // Навешиваем click на overlay, чтобы открыть file input
+      // Обработчик клика по оверлею аватара
       const overlay = document.querySelector('.edit-profile-avatar-overlay');
       if (overlay) {
-        console.log("Found avatar overlay element");
         overlay.onclick = (e) => {
-          e.preventDefault(); // Предотвращаем всплытие события
-          e.stopPropagation(); // Останавливаем всплытие события
-          console.log("Overlay clicked, triggering file input");
+          e.preventDefault();
+          e.stopPropagation();
           editProfileAvatarInput.click();
         };
       }
@@ -2088,14 +2116,113 @@
 
     // Показываем модалку по нажатию на кнопку "Edit profile"
     if (editProfileBtn && editProfileModal) {
-      editProfileBtn.onclick = function() {
+      editProfileBtn.onclick = function(e) {
+        e.preventDefault();
         const user = firebase.auth().currentUser;
         if (user) {
-          editProfileModal.style.display = 'block';
-          // Set current user avatar
+          // Заполняем поля текущими данными
           if (editProfileAvatar) {
             editProfileAvatar.src = user.photoURL || 'https://e7.pngegg.com/pngimages/178/595/png-clipart-user-profile-computer-icons-login-user-avatars-monochrome-black-thumbnail.png';
           }
+          if (editProfileName) {
+            editProfileName.value = user.displayName || '';
+          }
+          if (editProfileUsername) {
+            const storedUsername = localStorage.getItem(`username_${user.uid}`);
+            editProfileUsername.value = storedUsername || (user.providerData[0]?.username + '_ETH') || '';
+          }
+          editProfileModal.style.display = 'block';
+        }
+      };
+    }
+
+    // Обработчик кнопки Save
+    if (saveProfile) {
+      saveProfile.onclick = async function(e) {
+        e.preventDefault();
+        const user = firebase.auth().currentUser;
+        if (!user) {
+          alert('Пожалуйста, войдите в систему');
+          return;
+        }
+
+        try {
+          // Валидация полей
+          const newName = editProfileName?.value?.trim();
+          const newUsername = editProfileUsername?.value?.trim();
+          
+          if (!newName || !newUsername) {
+            alert('Пожалуйста, заполните все поля');
+            return;
+          }
+
+          // Получаем новый URL аватарки, если она была изменена
+          const newPhotoURL = editProfileAvatar.src;
+          let photoURL = user.photoURL;
+
+          if (newPhotoURL !== user.photoURL && newPhotoURL.startsWith('data:image')) {
+            try {
+              // Загружаем аватар в Storage
+              const response = await fetch(newPhotoURL);
+              const blob = await response.blob();
+              
+              const storageRef = firebase.storage().ref();
+              const avatarRef = storageRef.child(`avatars/${user.uid}`);
+              await avatarRef.put(blob);
+              
+              photoURL = await avatarRef.getDownloadURL();
+            } catch (error) {
+              console.error('Ошибка загрузки аватара:', error);
+              alert('Ошибка при загрузке аватара. Попробуйте другое изображение.');
+              return;
+            }
+          }
+
+          // Обновляем профиль
+          await user.updateProfile({
+            displayName: newName,
+            photoURL: photoURL
+          });
+
+          // Перезагружаем данные пользователя
+          await user.reload();
+          const updatedUser = firebase.auth().currentUser;
+
+          // Сохраняем username в localStorage
+          localStorage.setItem(`username_${updatedUser.uid}`, newUsername);
+
+          // Обновляем UI
+          const profileBlock = document.querySelector('.wallet-profile-block');
+          if (profileBlock) {
+            // Обновляем аватар
+            const profileAvatar = profileBlock.querySelector('.wallet-profile-avatar');
+            if (profileAvatar) {
+              profileAvatar.src = updatedUser.photoURL;
+            }
+
+            // Обновляем информацию профиля
+            const profileInfo = profileBlock.querySelector('.wallet-profile-info');
+            if (profileInfo) {
+              const nameElement = profileInfo.querySelector('.wallet-profile-name');
+              if (nameElement) {
+                nameElement.innerHTML = `${updatedUser.displayName}<span class="wallet-profile-handle">@${newUsername}</span>`;
+              }
+
+              // Обновляем Twitter блок
+              const twitterInfo = profileInfo.querySelector('.wallet-profile-twitter');
+              if (twitterInfo && updatedUser.providerData[0]?.providerId === 'twitter.com') {
+                twitterInfo.style.display = 'block';
+                twitterInfo.innerHTML = `<a href="https://twitter.com/${newUsername}" style="color:#00bfff;">@${newUsername}</a> <span style="color:#00bfff;">✔️</span>`;
+              }
+            }
+          }
+
+          // Закрываем модальное окно
+          editProfileModal.style.display = 'none';
+
+        } catch (error) {
+          console.error('Ошибка обновления профиля:', error);
+          alert('Ошибка при сохранении профиля. Пожалуйста, попробуйте еще раз.');
         }
       };
     }
@@ -2115,8 +2242,6 @@
         }
       });
     }
-
-    // ... rest of your code ...
   });
 </script>
 
