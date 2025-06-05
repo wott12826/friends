@@ -2005,7 +2005,12 @@
     // Показываем модалку по нажатию на кнопку "Edit profile"
     document.querySelectorAll('.edit-profile-trigger').forEach(btn => {
       btn.addEventListener('click', () => {
-        editProfileModal.style.display = 'block';
+        const user = firebase.auth().currentUser;
+        if (user) {
+          editProfileModal.style.display = 'block';
+          // Set current user avatar
+          editProfileAvatar.src = user.photoURL || 'https://e7.pngegg.com/pngimages/178/595/png-clipart-user-profile-computer-icons-login-user-avatars-monochrome-black-thumbnail.png';
+        }
       });
     });
 
