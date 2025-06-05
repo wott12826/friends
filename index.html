@@ -1886,79 +1886,109 @@
     const editProfileAvatarInput = document.getElementById('editProfileAvatarInput');
     const editProfileName = document.getElementById('editProfileName');
     const editProfileUsername = document.getElementById('editProfileUsername');
-    const saveProfileBtn = document.getElementById('saveProfile');
+    const saveProfile = document.getElementById('saveProfile');
 
-    // Handle avatar file selection
-    editProfileAvatarInput.addEventListener('change', function(e) {
-      const file = e.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-          editProfileAvatar.src = e.target.result;
-        };
-        reader.readAsDataURL(file);
-      }
-    });
-
-    // Handle profile save
-    saveProfileBtn.addEventListener('click', async function() {
-      const user = firebase.auth().currentUser;
-      if (!user) return;
-
-      try {
-        // Get the values
-        const newName = editProfileName.value.trim();
-        const newUsername = editProfileUsername.value.trim();
-        const avatarFile = editProfileAvatarInput.files[0];
-
-        // Update profile in Firebase
-        if (avatarFile) {
-          // Upload avatar to storage
-          const storageRef = firebase.storage().ref();
-          const avatarRef = storageRef.child(`avatars/${user.uid}`);
-          await avatarRef.put(avatarFile);
-          const avatarURL = await avatarRef.getDownloadURL();
-
-          // Update profile with new avatar
-          await user.updateProfile({
-            displayName: newName,
-            photoURL: avatarURL
-          });
-
-          // Update avatar in UI
-          document.querySelectorAll('.user-avatar').forEach(avatar => {
-            avatar.src = avatarURL;
-          });
-        } else {
-          // Update profile without avatar
-          await user.updateProfile({
-            displayName: newName
-          });
+    // Открытие модального окна редактирования профиля
+    if (editProfileBtn) {
+      editProfileBtn.onclick = function() {
+        const user = firebase.auth().currentUser;
+        if (user) {
+          editProfileModal.style.display = 'block';
+          // Заполняем текущими данными
+          editProfileAvatar.src = user.photoURL || 'https://e7.pngegg.com/pngimages/178/595/png-clipart-user-profile-computer-icons-login-user-avatars-monochrome-black-thumbnail.png';
+          editProfileName.value = user.displayName || '';
+          const storedUsername = localStorage.getItem(`username_${user.uid}`);
+          editProfileUsername.value = storedUsername || (user.providerData[0]?.username + '_ETH') || '';
         }
+      };
+    }
 
-        // Update username in database
-        await firebase.firestore().collection('users').doc(user.uid).update({
-          username: newUsername,
-          displayName: newName
-        });
-
-        // Update UI elements
-        document.querySelectorAll('.user-name').forEach(name => {
-          name.textContent = newName;
-        });
-        document.querySelectorAll('.user-username').forEach(username => {
-          username.textContent = newUsername;
-        });
-
-        // Close modal
+    // Закрытие модального окна
+    if (closeEditProfile) {
+      closeEditProfile.onclick = function() {
         editProfileModal.style.display = 'none';
-      } catch (error) {
-        console.error('Error updating profile:', error);
-        alert('Failed to update profile. Please try again.');
+      };
+    }
+
+    // Обработка загрузки новой аватарки
+    if (editProfileAvatarInput) {
+      editProfileAvatarInput.onchange = function(e) {
+        const file = e.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = function(ev) {
+            editProfileAvatar.src = ev.target.result;
+          };
+          reader.readAsDataURL(file);
+        }
+      };
+    }
+
+    // Сохранение изменений профиля
+    if (saveProfile) {
+      saveProfile.onclick = async function() {
+        const user = firebase.auth().currentUser;
+        if (!user) return;
+
+        try {
+          // Get the values
+          const newName = editProfileName.value.trim();
+          const newUsername = editProfileUsername.value.trim();
+          const avatarFile = editProfileAvatarInput.files[0];
+
+          // Update profile in Firebase
+          if (avatarFile) {
+            // Upload avatar to storage
+            const storageRef = firebase.storage().ref();
+            const avatarRef = storageRef.child(`avatars/${user.uid}`);
+            await avatarRef.put(avatarFile);
+            const avatarURL = await avatarRef.getDownloadURL();
+
+            // Update profile with new avatar
+            await user.updateProfile({
+              displayName: newName,
+              photoURL: avatarURL
+            });
+
+            // Update avatar in UI
+            document.querySelector('.wallet-profile-avatar').src = avatarURL;
+          } else {
+            // Update profile without avatar
+            await user.updateProfile({
+              displayName: newName
+            });
+          }
+
+          // Save username to localStorage
+          localStorage.setItem(`username_${user.uid}`, newUsername);
+
+          // Update UI elements
+          const profileName = document.querySelector('.wallet-profile-name');
+          if (profileName) {
+            profileName.innerHTML = `${newName}<span class="wallet-profile-handle">@${newUsername}</span>`;
+          }
+
+          // Update Twitter info if exists
+          const twitterInfo = document.querySelector('.wallet-profile-twitter');
+          if (twitterInfo && user.providerData[0]?.providerId === 'twitter.com') {
+            twitterInfo.innerHTML = `<a href="https://twitter.com/${newUsername}" style="color:#00bfff;">@${newUsername}</a> <span style="color:#00bfff;">✔️</span>`;
+          }
+
+          // Close modal
+          editProfileModal.style.display = 'none';
+        } catch (error) {
+          console.error('Error updating profile:', error);
+          alert('Failed to update profile. Please try again.');
+        }
+      };
+    }
+
+    // Клик вне окна — закрытие
+    window.addEventListener('click', (e) => {
+      if (e.target === editProfileModal) {
+        editProfileModal.style.display = 'none';
       }
     });
-
-    // ... existing code ...
   </script>
   <!-- Edit Profile Modal -->
   <div id="editProfileModal" class="edit-profile-modal">
@@ -1986,90 +2016,5 @@
     </div>
   </div>
 </body>
-<script>
-  document.addEventListener("DOMContentLoaded", function() {
-    // Edit Profile Logic
-    const editProfileBtn = document.querySelector('.wallet-profile-btn.edit-profile-trigger');
-    const editProfileModal = document.getElementById('editProfileModal');
-    const closeEditProfile = document.getElementById('closeEditProfile');
-    const editProfileAvatar = document.getElementById('editProfileAvatar');
-    const editProfileAvatarInput = document.getElementById('editProfileAvatarInput');
-    const editProfileName = document.getElementById('editProfileName');
-    const editProfileUsername = document.getElementById('editProfileUsername');
-    const saveProfileBtn = document.getElementById('saveProfile');
-
-    // Handle avatar file selection
-    editProfileAvatarInput.addEventListener('change', function(e) {
-      const file = e.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-          editProfileAvatar.src = e.target.result;
-        };
-        reader.readAsDataURL(file);
-      }
-    });
-
-    // Handle profile save
-    saveProfileBtn.addEventListener('click', async function() {
-      const user = firebase.auth().currentUser;
-      if (!user) return;
-
-      try {
-        // Get the values
-        const newName = editProfileName.value.trim();
-        const newUsername = editProfileUsername.value.trim();
-        const avatarFile = editProfileAvatarInput.files[0];
-
-        // Update profile in Firebase
-        if (avatarFile) {
-          // Upload avatar to storage
-          const storageRef = firebase.storage().ref();
-          const avatarRef = storageRef.child(`avatars/${user.uid}`);
-          await avatarRef.put(avatarFile);
-          const avatarURL = await avatarRef.getDownloadURL();
-
-          // Update profile with new avatar
-          await user.updateProfile({
-            displayName: newName,
-            photoURL: avatarURL
-          });
-
-          // Update avatar in UI
-          document.querySelectorAll('.user-avatar').forEach(avatar => {
-            avatar.src = avatarURL;
-          });
-        } else {
-          // Update profile without avatar
-          await user.updateProfile({
-            displayName: newName
-          });
-        }
-
-        // Update username in database
-        await firebase.firestore().collection('users').doc(user.uid).update({
-          username: newUsername,
-          displayName: newName
-        });
-
-        // Update UI elements
-        document.querySelectorAll('.user-name').forEach(name => {
-          name.textContent = newName;
-        });
-        document.querySelectorAll('.user-username').forEach(username => {
-          username.textContent = newUsername;
-        });
-
-        // Close modal
-        editProfileModal.style.display = 'none';
-      } catch (error) {
-        console.error('Error updating profile:', error);
-        alert('Failed to update profile. Please try again.');
-      }
-    });
-
-    // ... existing code ...
-  });
-</script>
 
 </html> 
