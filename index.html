@@ -1496,15 +1496,26 @@
         ];
       }
       msgs.forEach((m, i) => {
-        const isMe = (m.user === 3) || (!m.user && m.nick === 'Smiroff');
-        const user = demoUsers[m.user ?? (isMe ? 3 : 0)] || demoUsers[0];
+        const currentUser = firebase.auth().currentUser;
+        const isMe = (m.user === 3) || (!m.user && m.nick === 'Smiroff') || (m.uid === currentUser?.uid);
+        let userAvatar, userNick;
+        
+        if (isMe) {
+          userAvatar = currentUser?.photoURL || 'https://e7.pngegg.com/pngimages/178/595/png-clipart-user-profile-computer-icons-login-user-avatars-monochrome-black-thumbnail.png';
+          userNick = currentUser?.displayName || 'User';
+        } else {
+          const demoUser = demoUsers[m.user ?? 0] || demoUsers[0];
+          userAvatar = m.avatar || demoUser.avatar;
+          userNick = m.nick || demoUser.nick;
+        }
+
         const row = document.createElement('div');
         row.className = 'fschat-message-row' + (isMe ? ' me' : '');
         row.innerHTML = `
           <div class="fschat-message${isMe ? ' me' : ''}">
             <div class="fschat-msg-header">
-              <img class="fschat-msg-avatar" src="${user.avatar}" alt="avatar">
-              <span class="fschat-msg-nick">${user.nick}</span>
+              <img class="fschat-msg-avatar" src="${userAvatar}" alt="avatar">
+              <span class="fschat-msg-nick">${userNick}</span>
               <span class="fschat-msg-time">${m.time || ''}</span>
             </div>
             <div class="fschat-bubble">${m.text || ''}${m.img ? `<br><img src='${m.img}' style='max-width:180px;max-height:120px;border-radius:10px;margin-top:6px;'>` : ''}</div>
@@ -1519,14 +1530,25 @@
       const input = document.getElementById('fullscreenChatInput');
       const text = input.value.trim();
       if ((!text && !imgToSend) || !currentClubKey) return;
+      
+      const currentUser = firebase.auth().currentUser;
       const msgs = getClubMessages(currentClubKey);
       const now = new Date();
       const time = now.toLocaleDateString() + ' ' + now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) + (now.getHours() >= 12 ? 'PM' : 'AM');
+      
+      const newMessage = {
+        uid: currentUser?.uid,
+        nick: currentUser?.displayName || 'User',
+        avatar: currentUser?.photoURL,
+        text,
+        time
+      };
+      
       if (imgToSend) {
-        msgs.push({ user: 3, text, img: imgToSend, time });
-      } else {
-        msgs.push({ user: 3, text, time });
+        newMessage.img = imgToSend;
       }
+      
+      msgs.push(newMessage);
       saveClubMessages(currentClubKey, msgs);
       input.value = '';
       clearImgPreview();
