@@ -2044,10 +2044,17 @@
     const closeEditProfile = document.getElementById('closeEditProfile');
     const editProfileAvatar = document.getElementById('editProfileAvatar');
     const editProfileAvatarInput = document.getElementById('editProfileAvatarInput');
+    const emojiPanel = document.getElementById('emojiPanel'); // Добавляем получение emojiPanel
 
     // Проверяем наличие элементов
-    console.log("Avatar input element:", editProfileAvatarInput);
-    console.log("Avatar image element:", editProfileAvatar);
+    console.log("Edit Profile Modal:", editProfileModal);
+    console.log("Emoji Panel:", emojiPanel);
+
+    // Обработка emoji panel, только если элемент существует
+    if (emojiPanel) {
+      // Ваш код для работы с emoji panel
+      // ...
+    }
 
     // Обработка загрузки новой аватарки
     if (editProfileAvatarInput && editProfileAvatar) {
@@ -2062,8 +2069,6 @@
             editProfileAvatar.src = ev.target.result;
           };
           reader.readAsDataURL(file);
-        } else {
-          console.log("No file selected.");
         }
       };
 
@@ -2071,46 +2076,41 @@
       const overlay = document.querySelector('.edit-profile-avatar-overlay');
       if (overlay) {
         console.log("Found avatar overlay element");
-        overlay.onclick = () => {
+        overlay.onclick = (e) => {
+          e.preventDefault(); // Предотвращаем всплытие события
           console.log("Overlay clicked, triggering file input");
           editProfileAvatarInput.click();
         };
-      } else {
-        console.log("Avatar overlay element not found");
       }
-    } else {
-      console.error("Required elements not found:", {
-        input: !!editProfileAvatarInput,
-        avatar: !!editProfileAvatar
-      });
     }
 
     // Показываем модалку по нажатию на кнопку "Edit profile"
-    document.querySelectorAll('.edit-profile-trigger').forEach(btn => {
-      btn.addEventListener('click', () => {
+    if (editProfileBtn && editProfileModal) {
+      editProfileBtn.onclick = function() {
         const user = firebase.auth().currentUser;
         if (user) {
           editProfileModal.style.display = 'block';
           // Set current user avatar
           editProfileAvatar.src = user.photoURL || 'https://e7.pngegg.com/pngimages/178/595/png-clipart-user-profile-computer-icons-login-user-avatars-monochrome-black-thumbnail.png';
         }
-      });
-    });
+      };
+    }
 
-    // Кнопка "←" для закрытия
-    const backBtn = document.querySelector('.edit-profile-back');
-    if (backBtn) {
-      backBtn.addEventListener('click', () => {
+    // Закрытие модального окна
+    if (closeEditProfile && editProfileModal) {
+      closeEditProfile.onclick = function() {
         editProfileModal.style.display = 'none';
+      };
+
+      // Клик вне окна — закрытие
+      window.addEventListener('click', (e) => {
+        if (e.target === editProfileModal) {
+          editProfileModal.style.display = 'none';
+        }
       });
     }
 
-    // Клик вне окна — закрытие
-    window.addEventListener('click', (e) => {
-      if (e.target === editProfileModal) {
-        editProfileModal.style.display = 'none';
-      }
-    });
+    // ... rest of your code ...
   });
 </script>
 
