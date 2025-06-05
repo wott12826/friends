@@ -3188,6 +3188,56 @@
         };
       }
     }
+
+    // --- Wallet address logic ---
+    function renderWalletAddress() {
+      const walletAddressEl = document.getElementById('walletAddress');
+      const address = localStorage.getItem('wallet_address');
+      if (address) {
+        // Показываем адрес и кнопку копирования
+        walletAddressEl.innerHTML = `${address.substring(0,6)}...${address.substring(address.length-4)} ` +
+          `<button class="wallet-copy-btn" data-address="${address}" title="Copy address"><img src="images/copy-icon.png" style="width:14px;height:14px;vertical-align:middle;"></button>`;
+        // Добавляем обработчик копирования
+        const newCopyBtn = walletAddressEl.querySelector('.wallet-copy-btn');
+        if (newCopyBtn) {
+          newCopyBtn.addEventListener('click', function () {
+            const addr = this.dataset.address;
+            if (addr) {
+              navigator.clipboard.writeText(addr)
+                .then(() => {
+                  this.title = 'Copied!';
+                  setTimeout(() => { this.title = 'Copy address'; }, 1500);
+                })
+                .catch(() => alert('Copy failed. Please copy manually.'));
+            }
+          });
+        }
+      } else {
+        // Показываем кнопку Connect Wallet
+        walletAddressEl.innerHTML = `<button id="connectPhantomBtn" class="connect-wallet-btn">Connect Wallet</button>`;
+        const connectBtn = document.getElementById('connectPhantomBtn');
+        if (connectBtn) {
+          connectBtn.addEventListener('click', async function () {
+            try {
+              if (!window.solana || !window.solana.isPhantom) {
+                alert('Please install Phantom wallet');
+                window.open('https://phantom.app/', '_blank');
+                return;
+              }
+              const resp = await window.solana.connect();
+              const address = resp.publicKey.toString();
+              localStorage.setItem('wallet_address', address);
+              renderWalletAddress();
+            } catch (err) {
+              alert('Error connecting to wallet');
+            }
+          });
+        }
+      }
+    }
+
+    // Вызовем при загрузке страницы
+    document.addEventListener('DOMContentLoaded', renderWalletAddress);
   </script>
   <!-- Edit Profile Modal -->
   <div id="editProfileModal" class="edit-profile-modal">
