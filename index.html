@@ -3179,6 +3179,7 @@
     // --- Wallet address logic ---
     function renderWalletAddress() {
       const walletAddressEl = document.getElementById('walletAddress');
+   if (!walletAddressEl) return;
       const address = localStorage.getItem('wallet_address');
       if (address) {
         // Показываем адрес, кнопку отключения и копирования
