@@ -1889,75 +1889,83 @@
     const saveProfile = document.getElementById('saveProfile');
 
     // Открытие модального окна редактирования профиля
-    editProfileBtn.onclick = function() {
-      const user = firebase.auth().currentUser;
-      if (user) {
-        editProfileModal.style.display = 'block';
-        // Заполняем текущими данными
-        editProfileAvatar.src = user.photoURL || 'https://e7.pngegg.com/pngimages/178/595/png-clipart-user-profile-computer-icons-login-user-avatars-monochrome-black-thumbnail.png';
-        editProfileName.value = user.displayName || '';
-        const storedUsername = localStorage.getItem(`username_${user.uid}`);
-        editProfileUsername.value = storedUsername || (user.providerData[0]?.username + '_ETH') || '';
-      }
-    };
+    if (editProfileBtn) {
+      editProfileBtn.onclick = function() {
+        const user = firebase.auth().currentUser;
+        if (user) {
+          editProfileModal.style.display = 'block';
+          // Заполняем текущими данными
+          editProfileAvatar.src = user.photoURL || 'https://e7.pngegg.com/pngimages/178/595/png-clipart-user-profile-computer-icons-login-user-avatars-monochrome-black-thumbnail.png';
+          editProfileName.value = user.displayName || '';
+          const storedUsername = localStorage.getItem(`username_${user.uid}`);
+          editProfileUsername.value = storedUsername || (user.providerData[0]?.username + '_ETH') || '';
+        }
+      };
+    }
 
     // Закрытие модального окна
-    closeEditProfile.onclick = function() {
-      editProfileModal.style.display = 'none';
-    };
+    if (closeEditProfile) {
+      closeEditProfile.onclick = function() {
+        editProfileModal.style.display = 'none';
+      };
+    }
 
     // Обработка загрузки новой аватарки
-    editProfileAvatarInput.onchange = function(e) {
-      const file = e.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = function(ev) {
-          editProfileAvatar.src = ev.target.result;
-        };
-        reader.readAsDataURL(file);
-      }
-    };
+    if (editProfileAvatarInput) {
+      editProfileAvatarInput.onchange = function(e) {
+        const file = e.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = function(ev) {
+            editProfileAvatar.src = ev.target.result;
+          };
+          reader.readAsDataURL(file);
+        }
+      };
+    }
 
     // Сохранение изменений профиля
-    saveProfile.onclick = function() {
-      const user = firebase.auth().currentUser;
-      if (user) {
-        const newName = editProfileName.value.trim();
-        const newUsername = editProfileUsername.value.trim();
-        
-        // Обновляем имя в Firebase
-        user.updateProfile({
-          displayName: newName
-        }).then(() => {
-          // Сохраняем username в localStorage
-          localStorage.setItem(`username_${user.uid}`, newUsername);
+    if (saveProfile) {
+      saveProfile.onclick = function() {
+        const user = firebase.auth().currentUser;
+        if (user) {
+          const newName = editProfileName.value.trim();
+          const newUsername = editProfileUsername.value.trim();
           
-          // Обновляем отображение в профиле
-          const profileName = document.querySelector('.wallet-profile-name');
-          if (profileName) {
-            profileName.innerHTML = `${newName}<span class="wallet-profile-handle">@${newUsername}</span>`;
-          }
-          
-          // Если есть Twitter блок, обновляем его
-          const twitterInfo = document.querySelector('.wallet-profile-twitter');
-          if (twitterInfo && user.providerData[0]?.providerId === 'twitter.com') {
-            twitterInfo.innerHTML = `<a href="https://twitter.com/${newUsername}" style="color:#00bfff;">@${newUsername}</a> <span style="color:#00bfff;">✔️</span>`;
-          }
+          // Обновляем имя в Firebase
+          user.updateProfile({
+            displayName: newName
+          }).then(() => {
+            // Сохраняем username в localStorage
+            localStorage.setItem(`username_${user.uid}`, newUsername);
+            
+            // Обновляем отображение в профиле
+            const profileName = document.querySelector('.wallet-profile-name');
+            if (profileName) {
+              profileName.innerHTML = `${newName}<span class="wallet-profile-handle">@${newUsername}</span>`;
+            }
+            
+            // Если есть Twitter блок, обновляем его
+            const twitterInfo = document.querySelector('.wallet-profile-twitter');
+            if (twitterInfo && user.providerData[0]?.providerId === 'twitter.com') {
+              twitterInfo.innerHTML = `<a href="https://twitter.com/${newUsername}" style="color:#00bfff;">@${newUsername}</a> <span style="color:#00bfff;">✔️</span>`;
+            }
 
-          // Если загружена новая аватарка
-          if (editProfileAvatar.src !== user.photoURL) {
-            // В реальном приложении здесь был бы код загрузки изображения в storage
-            // и обновления photoURL пользователя
-            document.querySelector('.wallet-profile-avatar').src = editProfileAvatar.src;
-          }
+            // Если загружена новая аватарка
+            if (editProfileAvatar.src !== user.photoURL) {
+              // В реальном приложении здесь был бы код загрузки изображения в storage
+              // и обновления photoURL пользователя
+              document.querySelector('.wallet-profile-avatar').src = editProfileAvatar.src;
+            }
 
-          editProfileModal.style.display = 'none';
-        }).catch(error => {
-          console.error('Error updating profile:', error);
-          alert('Failed to update profile');
-        });
-      }
-    };
+            editProfileModal.style.display = 'none';
+          }).catch(error => {
+            console.error('Error updating profile:', error);
+            alert('Failed to update profile');
+          });
+        }
+      };
+    }
   </script>
   <!-- Edit Profile Modal -->
   <div id="editProfileModal" class="edit-profile-modal">
