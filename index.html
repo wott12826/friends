@@ -535,6 +535,37 @@
     .fschat-emoji img:hover, .fschat-img-btn img:hover, .fschat-send img:hover {
       opacity: 1 !important;
     }
+    /* Стили для панели эмодзи */
+    .emoji-panel {
+      position: absolute;
+      bottom: 50px;
+      left: 0;
+      background: white;
+      border: 1px solid #eee;
+      border-radius: 8px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+      padding: 8px;
+      display: none;
+      grid-template-columns: repeat(8, 1fr);
+      gap: 8px;
+      z-index: 1000;
+    }
+    .emoji-btn {
+      background: none;
+      border: none;
+      padding: 6px;
+      cursor: pointer;
+      border-radius: 4px;
+      transition: background-color 0.2s;
+    }
+    .emoji-btn:hover {
+      background-color: #f0f0f0;
+    }
+    .emoji-btn img {
+      width: 20px;
+      height: 20px;
+      display: block;
+    }
   </style>
 </head>
 <body>
@@ -905,6 +936,24 @@
       <button type="button" class="fschat-emoji" style="background: none; border: none; padding: 0; cursor: pointer;">
         <img src="https://toppng.com/uploads/preview/font-emoji-svg-png-icon-free-download-389350-onlinewebfonts-play-button-image-11563230644rbzu7hlann.png" alt="emoji" style="width: 24px; height: 24px; opacity: 0.7;">
       </button>
+      <div class="emoji-panel">
+        <button type="button" class="emoji-btn" data-emoji="👍"><img src="https://em-content.zobj.net/thumbs/120/apple/325/thumbs-up_1f44d.png" alt="👍"></button>
+        <button type="button" class="emoji-btn" data-emoji="❤️"><img src="https://em-content.zobj.net/thumbs/120/apple/325/red-heart_2764-fe0f.png" alt="❤️"></button>
+        <button type="button" class="emoji-btn" data-emoji="😊"><img src="https://em-content.zobj.net/thumbs/120/apple/325/smiling-face-with-smiling-eyes_1f60a.png" alt="😊"></button>
+        <button type="button" class="emoji-btn" data-emoji="🎉"><img src="https://em-content.zobj.net/thumbs/120/apple/325/party-popper_1f389.png" alt="🎉"></button>
+        <button type="button" class="emoji-btn" data-emoji="👋"><img src="https://em-content.zobj.net/thumbs/120/apple/325/waving-hand_1f44b.png" alt="👋"></button>
+        <button type="button" class="emoji-btn" data-emoji="🔥"><img src="https://em-content.zobj.net/thumbs/120/apple/325/fire_1f525.png" alt="🔥"></button>
+        <button type="button" class="emoji-btn" data-emoji="😂"><img src="https://em-content.zobj.net/thumbs/120/apple/325/face-with-tears-of-joy_1f602.png" alt="😂"></button>
+        <button type="button" class="emoji-btn" data-emoji="🤔"><img src="https://em-content.zobj.net/thumbs/120/apple/325/thinking-face_1f914.png" alt="🤔"></button>
+        <button type="button" class="emoji-btn" data-emoji="✨"><img src="https://em-content.zobj.net/thumbs/120/apple/325/sparkles_2728.png" alt="✨"></button>
+        <button type="button" class="emoji-btn" data-emoji="😍"><img src="https://em-content.zobj.net/thumbs/120/apple/325/smiling-face-with-heart-eyes_1f60d.png" alt="😍"></button>
+        <button type="button" class="emoji-btn" data-emoji="🙌"><img src="https://em-content.zobj.net/thumbs/120/apple/325/raising-hands_1f64c.png" alt="🙌"></button>
+        <button type="button" class="emoji-btn" data-emoji="💪"><img src="https://em-content.zobj.net/thumbs/120/apple/325/flexed-biceps_1f4aa.png" alt="💪"></button>
+        <button type="button" class="emoji-btn" data-emoji="🎯"><img src="https://em-content.zobj.net/thumbs/120/apple/325/direct-hit_1f3af.png" alt="🎯"></button>
+        <button type="button" class="emoji-btn" data-emoji="💯"><img src="https://em-content.zobj.net/thumbs/120/apple/325/hundred-points_1f4af.png" alt="💯"></button>
+        <button type="button" class="emoji-btn" data-emoji="⭐"><img src="https://em-content.zobj.net/thumbs/120/apple/325/star_2b50.png" alt="⭐"></button>
+        <button type="button" class="emoji-btn" data-emoji="💡"><img src="https://em-content.zobj.net/thumbs/120/apple/325/light-bulb_1f4a1.png" alt="💡"></button>
+      </div>
       <button type="button" class="fschat-img-btn" id="fschatImgBtn" style="background: none; border: none; padding: 0; cursor: pointer;">
         <img src="https://static.thenounproject.com/png/1034957-200.png" alt="add image" style="width: 24px; height: 24px; opacity: 0.7;">
       </button>
@@ -1574,6 +1623,40 @@
       }
     })();
     // --- Конец блока переключения ---
+
+    // Добавляем JavaScript для работы с эмодзи
+    document.addEventListener('DOMContentLoaded', function() {
+      const emojiButton = document.querySelector('.fschat-emoji');
+      const emojiPanel = document.querySelector('.emoji-panel');
+      const chatInput = document.getElementById('fullscreenChatInput');
+
+      // Показать/скрыть панель эмодзи при клике на кнопку
+      emojiButton.addEventListener('click', function(e) {
+        e.stopPropagation();
+        emojiPanel.style.display = emojiPanel.style.display === 'grid' ? 'none' : 'grid';
+      });
+
+      // Добавить эмодзи в поле ввода при клике
+      document.querySelectorAll('.emoji-btn').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          const emoji = this.getAttribute('data-emoji');
+          const start = chatInput.selectionStart;
+          const end = chatInput.selectionEnd;
+          const text = chatInput.value;
+          chatInput.value = text.substring(0, start) + emoji + text.substring(end);
+          chatInput.focus();
+          chatInput.selectionStart = chatInput.selectionEnd = start + emoji.length;
+        });
+      });
+
+      // Закрыть панель при клике вне её
+      document.addEventListener('click', function(e) {
+        if (!emojiPanel.contains(e.target) && e.target !== emojiButton) {
+          emojiPanel.style.display = 'none';
+        }
+      });
+    });
   </script>
 </body>
 </html> 
