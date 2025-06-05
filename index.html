@@ -1504,122 +1504,7 @@
       display: block;
     }
 
-    /* --- Edit Profile Modal Styles --- */
-    .edit-profile-modal {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: #fff;
-      z-index: 1000;
-    }
-
-    .edit-profile-header {
-      display: flex;
-      align-items: center;
-      padding: 16px;
-      border-bottom: 1px solid #eee;
-    }
-
-    .edit-profile-back {
-      background: none;
-      border: none;
-      font-size: 24px;
-      padding: 8px;
-      cursor: pointer;
-      color: #000;
-    }
-
-    .edit-profile-title {
-      font-size: 20px;
-      font-weight: 600;
-      margin-left: 16px;
-    }
-
-    .edit-profile-content {
-      padding: 24px;
-      max-width: 600px;
-      margin: 0 auto;
-    }
-
-    .edit-profile-avatar-wrap {
-      position: relative;
-      width: 120px;
-      height: 120px;
-      margin: 0 auto 32px;
-    }
-
-    .edit-profile-avatar {
-      width: 100%;
-      height: 100%;
-      border-radius: 50%;
-      object-fit: cover;
-    }
-
-    .edit-profile-avatar-overlay {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.3);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      opacity: 0;
-      transition: opacity 0.2s;
-    }
-
-    .edit-profile-avatar-wrap:hover .edit-profile-avatar-overlay {
-      opacity: 1;
-    }
-
-    .edit-profile-camera-icon {
-      width: 32px;
-      height: 32px;
-      filter: invert(1);
-    }
-
-    .edit-profile-form-group {
-      margin-bottom: 24px;
-    }
-
-    .edit-profile-label {
-      display: block;
-      margin-bottom: 8px;
-      color: #666;
-    }
-
-    .edit-profile-input {
-      width: 100%;
-      padding: 12px;
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      font-size: 16px;
-    }
-
-    .edit-profile-save {
-      width: 100%;
-      padding: 14px;
-      background: #00bfff;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      font-size: 16px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: background 0.2s;
-    }
-
-    .edit-profile-save:hover {
-      background: #0099ff;
-    }
-
-    /* Modal styles */
+    /* --- Edit Profile Modal Styles */
     .modal {
       display: none;
       position: fixed;
@@ -1632,35 +1517,46 @@
     }
 
     .modal-content {
-      background-color: #fefefe;
-      margin: 15% auto;
-      padding: 20px;
-      border: 1px solid #888;
-      width: 80%;
+      background-color: #fff;
+      margin: 10% auto;
+      padding: 24px;
+      border-radius: 12px;
+      width: 90%;
       max-width: 500px;
-      border-radius: 10px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
     }
 
     .modal-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 20px;
+      margin-bottom: 24px;
+    }
+
+    .modal-header h2 {
+      margin: 0;
+      font-size: 1.5rem;
+      color: #222;
     }
 
     .close-button {
-      font-size: 28px;
-      font-weight: bold;
-      cursor: pointer;
       background: none;
       border: none;
+      font-size: 24px;
+      cursor: pointer;
+      color: #666;
+      padding: 4px 8px;
+    }
+
+    .close-button:hover {
+      color: #222;
     }
 
     .edit-profile-avatar-container {
       position: relative;
-      width: 100px;
-      height: 100px;
-      margin: 0 auto 20px;
+      width: 120px;
+      height: 120px;
+      margin: 0 auto 24px;
     }
 
     .edit-profile-avatar-container img {
@@ -1683,74 +1579,71 @@
       justify-content: center;
       cursor: pointer;
       opacity: 0;
-      transition: opacity 0.3s;
+      transition: opacity 0.2s;
     }
 
     .edit-profile-avatar-overlay:hover {
       opacity: 1;
     }
 
-    .edit-profile-form .form-group {
-      margin-bottom: 15px;
+    .edit-profile-camera-icon {
+      width: 32px;
+      height: 32px;
+      filter: invert(1);
     }
 
-    .edit-profile-form label {
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-group label {
       display: block;
-      margin-bottom: 5px;
+      margin-bottom: 8px;
+      color: #666;
+      font-size: 0.9rem;
     }
 
-    .edit-profile-form input,
-    .edit-profile-form textarea {
+    .form-group input {
       width: 100%;
-      padding: 8px;
+      padding: 12px;
       border: 1px solid #ddd;
-      border-radius: 4px;
+      border-radius: 8px;
+      font-size: 1rem;
+      transition: border-color 0.2s;
+    }
+
+    .form-group input:focus {
+      border-color: #00bfff;
+      outline: none;
     }
 
     .save-profile-btn {
       width: 100%;
-      padding: 10px;
-      background-color: #1da1f2;
+      padding: 14px;
+      background: #00bfff;
       color: white;
       border: none;
-      border-radius: 4px;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
       cursor: pointer;
+      transition: background 0.2s;
     }
 
     .save-profile-btn:hover {
-      background-color: #1991db;
+      background: #0099ff;
     }
 
-    /* Emoji panel styles */
-    .emoji-panel {
-      position: absolute;
-      background: white;
-      border: 1px solid #ddd;
-      border-radius: 4px;
-      padding: 10px;
-      display: grid;
-      grid-template-columns: repeat(5, 1fr);
-      gap: 5px;
-      z-index: 1000;
-    }
+    @media (max-width: 600px) {
+      .modal-content {
+        margin: 5% auto;
+        padding: 16px;
+      }
 
-    .emoji-panel span {
-      cursor: pointer;
-      text-align: center;
-      padding: 5px;
-    }
-
-    .emoji-panel span:hover {
-      background-color: #f0f0f0;
-      border-radius: 4px;
-    }
-
-    .emoji-trigger {
-      background: none;
-      border: none;
-      cursor: pointer;
-      font-size: 1.2em;
-      padding: 5px;
+      .edit-profile-avatar-container {
+        width: 100px;
+        height: 100px;
+      }
     }
   </style>
 </head>
@@ -3254,293 +3147,124 @@ document.addEventListener('DOMContentLoaded', renderWalletAddress);
 
   </script>
   <!-- Edit Profile Modal -->
-  <div id="editProfileModal" class="edit-profile-modal">
-    <div class="edit-profile-header">
-      <button class="edit-profile-back" id="closeEditProfile">←</button>
-      <div class="edit-profile-title">Edit profile</div>
-    </div>
-    <div class="edit-profile-content">
-      <div class="edit-profile-avatar-wrap">
-        <img id="editProfileAvatar" class="edit-profile-avatar" src="" alt="avatar">
-        <label class="edit-profile-avatar-overlay" for="editProfileAvatarInput">
-          <img src="https://www.svgrepo.com/show/495939/camera.svg" class="edit-profile-camera-icon">
-        </label>
-        <input type="file" id="editProfileAvatarInput" accept="image/*" style="display:none;">
+  <div id="editProfileModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Edit Profile</h2>
+        <button class="close-button" id="closeEditProfile">&times;</button>
       </div>
-      <div class="edit-profile-form-group">
-        <label class="edit-profile-label">Name</label>
-        <input type="text" id="editProfileName" class="edit-profile-input" placeholder="Enter your name">
+      <div class="edit-profile-form">
+        <div class="edit-profile-avatar-container">
+          <img id="editProfileAvatar" src="" alt="Profile Avatar">
+          <div class="edit-profile-avatar-overlay">
+            <input type="file" id="editProfileAvatarInput" accept="image/*" style="display: none;">
+            <label for="editProfileAvatarInput">
+              <img src="https://www.svgrepo.com/show/495939/camera.svg" class="edit-profile-camera-icon">
+            </label>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="editProfileName">Name</label>
+          <input type="text" id="editProfileName" placeholder="Enter your name">
+        </div>
+        <div class="form-group">
+          <label for="editProfileUsername">Username</label>
+          <input type="text" id="editProfileUsername" placeholder="Enter your username">
+        </div>
+        <button id="saveProfile" class="save-profile-btn">Save Changes</button>
       </div>
-      <div class="edit-profile-form-group">
-        <label class="edit-profile-label">Username</label>
-        <input type="text" id="editProfileUsername" class="edit-profile-input" placeholder="Enter your username">
-      </div>
-      <button class="edit-profile-save" id="saveProfile">Save</button>
     </div>
   </div>
-
   <script>
-    // Функция для сокращения адреса кошелька (0x98d8...a5ab)
-    function formatAddress(address) {
-      return `${address.substring(0, 6)}...${address.substring(address.length - 4)}`;
-    }
-
-    // Функция для подключения к Phantom
-    async function connectPhantom() {
-      try {
-        // Проверяем, установлен ли Phantom
-        if (!window.solana || !window.solana.isPhantom) {
-          alert('Пожалуйста, установите Phantom кошелек');
-          window.open('https://phantom.app/', '_blank');
-          return;
-        }
-
-        // Подключаемся к кошельку
-        const resp = await window.solana.connect();
-        const address = resp.publicKey.toString();
-
-        // Обновляем UI
-        const walletAddressEl = document.getElementById('walletAddress');
-        const copyBtn = document.querySelector('.wallet-copy-btn');
-
-        if (walletAddressEl && copyBtn) {
-          walletAddressEl.textContent = formatAddress(address);
-          copyBtn.dataset.address = address;
-          copyBtn.style.display = 'inline-block';
-        }
-
-        // Сохраняем адрес в localStorage
-        localStorage.setItem('phantomWallet', address);
-
-      } catch (err) {
-        console.error('Ошибка подключения к Phantom:', err);
-        alert('Ошибка подключения к кошельку');
-      }
-    }
-
-    document.addEventListener("DOMContentLoaded", function () {
-      // Initialize UI elements
-      const editProfileBtn = document.querySelector('.wallet-profile-btn.edit-profile-trigger');
+    document.addEventListener('DOMContentLoaded', function() {
+      // Get DOM elements
+      const editProfileBtn = document.querySelector('.edit-profile-trigger');
       const editProfileModal = document.getElementById('editProfileModal');
       const closeEditProfile = document.getElementById('closeEditProfile');
       const editProfileAvatar = document.getElementById('editProfileAvatar');
       const editProfileAvatarInput = document.getElementById('editProfileAvatarInput');
       const editProfileName = document.getElementById('editProfileName');
       const editProfileUsername = document.getElementById('editProfileUsername');
-      const editProfileBio = document.getElementById('editProfileBio');
       const saveProfile = document.getElementById('saveProfile');
-      const emojiTrigger = document.getElementById('emojiTrigger');
-      const connectBtn = document.getElementById('connectPhantomBtn');
-      const walletAddressEl = document.getElementById('walletAddress');
-      const copyBtn = document.querySelector('.wallet-copy-btn');
-      const profileEmojiPanel = document.getElementById('emojiPanel');
-      const syncTwitterBtn = document.querySelector('.wallet-profile-btn:nth-child(2)'); // Sync Twitter button
-      const unlinkTwitterBtn = document.querySelector('.wallet-profile-btn:nth-child(3)'); // Unlink Twitter button
-      const twitterInfo = document.querySelector('.wallet-profile-twitter');
 
-      // Initialize button states based on Twitter connection
-      const user = firebase.auth().currentUser;
-      
-      // Check if user has previously linked Twitter
-      const hasLinkedTwitter = localStorage.getItem('twitter_linked') === 'true' || 
-        (user && user.providerData && user.providerData.some(provider => provider.providerId === 'twitter.com'));
-      
-      if (hasLinkedTwitter) {
-        // Show Sync and Unlink buttons if Twitter is linked
-        syncTwitterBtn.textContent = 'Sync Twitter';
-        unlinkTwitterBtn.style.display = '';
-        if (twitterInfo) {
-          const username = user?.providerData?.find(p => p.providerId === 'twitter.com')?.username || 
-                          JSON.parse(localStorage.getItem('user_profile_data') || '{}').username || 
-                          user?.displayName;
-          twitterInfo.innerHTML = `<a href="https://twitter.com/${username}" style="color:#00bfff;">@${username}</a> <span style="color:#00bfff;">✔️</span>`;
-          twitterInfo.style.display = '';
-        }
-      } else {
-        // Show only Link button if Twitter is not linked
-        syncTwitterBtn.textContent = 'Link Twitter';
-        unlinkTwitterBtn.style.display = 'none';
-        if (twitterInfo) {
-          twitterInfo.style.display = 'none';
-        }
-      }
+      // Load current profile data
+      const currentUser = firebase.auth().currentUser;
+      const profileAvatar = document.querySelector('.wallet-profile-avatar');
+      const profileName = document.querySelector('.wallet-profile-name');
 
-      // Add Twitter sync functionality
-      if (syncTwitterBtn) {
-        syncTwitterBtn.addEventListener('click', async function() {
-          try {
-            const provider = new firebase.auth.TwitterAuthProvider();
-            const result = await firebase.auth().signInWithPopup(provider);
-            const user = result.user;
-            
-            // Update profile information
-            const profileAvatar = document.querySelector('.wallet-profile-avatar');
-            const profileName = document.querySelector('.wallet-profile-name');
-            const twitterInfo = document.querySelector('.wallet-profile-twitter');
-            
-            if (profileAvatar) {
-              profileAvatar.src = user.photoURL || 'https://e7.pngegg.com/pngimages/178/595/png-clipart-user-profile-computer-icons-login-user-avatars-monochrome-black-thumbnail.png';
-            }
-            
-            if (profileName) {
-              profileName.innerHTML = `${user.displayName}<span class="wallet-profile-handle">@${user.providerData[0].username || user.displayName}</span>`;
-            }
-            
-            if (twitterInfo) {
-              const username = user.providerData[0].username || user.displayName;
-              twitterInfo.innerHTML = `<a href="https://twitter.com/${username}" style="color:#00bfff;">@${username}</a> <span style="color:#00bfff;">✔️</span>`;
-              twitterInfo.style.display = '';
-            }
-            
-            // Save updated profile data and Twitter connection status
+      // Open modal
+      editProfileBtn.addEventListener('click', function() {
+        // Set current values
+        editProfileAvatar.src = profileAvatar.src;
+        editProfileName.value = profileName.textContent.split('@')[0].trim();
+        editProfileUsername.value = profileName.querySelector('.wallet-profile-handle').textContent.replace('@', '');
+        
+        editProfileModal.style.display = 'block';
+      });
+
+      // Close modal
+      closeEditProfile.addEventListener('click', function() {
+        editProfileModal.style.display = 'none';
+      });
+
+      // Close modal when clicking outside
+      window.addEventListener('click', function(event) {
+        if (event.target === editProfileModal) {
+          editProfileModal.style.display = 'none';
+        }
+      });
+
+      // Handle avatar upload
+      editProfileAvatarInput.addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = function(e) {
+            editProfileAvatar.src = e.target.result;
+          };
+          reader.readAsDataURL(file);
+        }
+      });
+
+      // Save profile changes
+      saveProfile.addEventListener('click', function() {
+        const newName = editProfileName.value.trim();
+        const newUsername = editProfileUsername.value.trim();
+        const newAvatar = editProfileAvatar.src;
+
+        if (!newName || !newUsername) {
+          alert('Please fill in all required fields');
+          return;
+        }
+
+        // Update profile in Firebase
+        const user = firebase.auth().currentUser;
+        if (user) {
+          user.updateProfile({
+            displayName: newName,
+            photoURL: newAvatar
+          }).then(() => {
+            // Update UI
+            profileAvatar.src = newAvatar;
+            profileName.innerHTML = `${newName} <span class="wallet-profile-handle">@${newUsername}</span>`;
+
+            // Save to localStorage
             const profileData = {
-              name: user.displayName,
-              username: user.providerData[0].username || user.displayName,
-              avatar: user.photoURL,
-              bio: user.providerData[0].bio || ''
+              name: newName,
+              username: newUsername,
+              avatar: newAvatar
             };
             localStorage.setItem('user_profile_data', JSON.stringify(profileData));
-            localStorage.setItem('twitter_linked', 'true');
-            
-            // Update button states
-            syncTwitterBtn.textContent = 'Sync Twitter';
-            unlinkTwitterBtn.style.display = '';
-            
-            alert('Twitter profile synchronized successfully!');
-          } catch (error) {
-            console.error('Error syncing Twitter profile:', error);
-            alert('Error syncing Twitter profile: ' + error.message);
-          }
-        });
-      }
 
-      // Add unlink Twitter functionality
-      if (unlinkTwitterBtn) {
-        unlinkTwitterBtn.addEventListener('click', async function() {
-          try {
-            // Remove Twitter provider from user
-            const user = firebase.auth().currentUser;
-            if (user) {
-              // Remove Twitter data from profile and connection status
-              const profileData = JSON.parse(localStorage.getItem('user_profile_data') || '{}');
-              delete profileData.twitter;
-              localStorage.setItem('user_profile_data', JSON.stringify(profileData));
-              localStorage.removeItem('twitter_linked');
-
-              // Update UI
-              const twitterInfo = document.querySelector('.wallet-profile-twitter');
-              if (twitterInfo) {
-                twitterInfo.style.display = 'none';
-              }
-
-              // Update button states
-              syncTwitterBtn.textContent = 'Link Twitter';
-              unlinkTwitterBtn.style.display = 'none';
-
-              alert('Twitter account unlinked successfully!');
-            }
-          } catch (error) {
-            console.error('Error unlinking Twitter:', error);
-            alert('Error unlinking Twitter: ' + error.message);
-          }
-        });
-      }
-
-      // Load saved profile data
-      const storedData = localStorage.getItem('user_profile_data');
-      if (storedData) {
-        try {
-          const profileData = JSON.parse(storedData);
-          const nameElement = document.querySelector('.wallet-profile-name');
-          const bioElement = document.querySelector('.wallet-profile-bio');
-          const avatarElement = document.querySelector('.wallet-profile-avatar');
-          const twitterElement = document.querySelector('.wallet-profile-twitter a');
-
-          if (nameElement && profileData.name) {
-            nameElement.innerHTML = `${profileData.name} <span class="wallet-profile-handle">@${profileData.username || 'username'}</span>`;
-          }
-          if (bioElement && profileData.bio) {
-            bioElement.textContent = profileData.bio;
-          }
-          if (avatarElement && profileData.avatar) {
-            avatarElement.src = profileData.avatar;
-          }
-          if (twitterElement && profileData.username) {
-            twitterElement.textContent = `@${profileData.username}`;
-            twitterElement.href = `https://twitter.com/${profileData.username}`;
-          }
-        } catch (err) {
-          console.error('Error loading profile data:', err);
+            // Close modal
+            editProfileModal.style.display = 'none';
+            alert('Profile updated successfully!');
+          }).catch((error) => {
+            console.error('Error updating profile:', error);
+            alert('Error updating profile: ' + error.message);
+          });
         }
-      }
-
-      // Load saved wallet address
-      const savedAddress = localStorage.getItem('wallet_address');
-      if (savedAddress) {
-        renderWalletAddress();
-      }
-
-      // Setup Phantom wallet
-      if (connectBtn) {
-        connectBtn.addEventListener('click', async function () {
-          try {
-            if (!window.solana || !window.solana.isPhantom) {
-              alert('Please install Phantom wallet');
-              window.open('https://phantom.app/', '_blank');
-              return;
-            }
-
-            const resp = await window.solana.connect({ onlyIfTrusted: false });
-            const address = resp.publicKey.toString();
-
-            // Save address
-            localStorage.setItem('wallet_address', address);
-
-            // Update UI
-            renderWalletAddress();
-          } catch (err) {
-            console.error('Error connecting to wallet:', err);
-            alert('Error connecting to wallet: ' + err.message);
-          }
-        });
-      }
-
-      // Setup emoji panel
-      if (profileEmojiPanel && editProfileBio && emojiTrigger) {
-        const emojis = ['😊', '😂', '🤣', '❤️', '😍', '🙌', '👍', '👋', '🎉', '✨', '🔥', '💯', '🤔', '👀', '🎈', '🌟', '💪', '🙏', '👏', '🌈'];
-
-        // Clear existing content
-        profileEmojiPanel.innerHTML = '';
-
-        emojis.forEach(emoji => {
-          const span = document.createElement('span');
-          span.textContent = emoji;
-          span.onclick = () => {
-            const start = editProfileBio.selectionStart;
-            const end = editProfileBio.selectionEnd;
-            const text = editProfileBio.value;
-            editProfileBio.value = text.substring(0, start) + emoji + text.substring(end);
-            editProfileBio.focus();
-            editProfileBio.selectionStart = editProfileBio.selectionEnd = start + emoji.length;
-            profileEmojiPanel.style.display = 'none';
-          };
-          profileEmojiPanel.appendChild(span);
-        });
-
-        // Toggle emoji panel
-        emojiTrigger.onclick = (e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          profileEmojiPanel.style.display = profileEmojiPanel.style.display === 'none' ? 'grid' : 'none';
-        };
-
-        // Close emoji panel when clicking outside
-        document.addEventListener('click', (e) => {
-          if (!profileEmojiPanel.contains(e.target) && e.target !== emojiTrigger) {
-            profileEmojiPanel.style.display = 'none';
-          }
-        });
-      }
+      });
     });
   </script>
 </body>
