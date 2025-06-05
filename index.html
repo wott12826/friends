@@ -3342,14 +3342,17 @@ document.addEventListener('DOMContentLoaded', renderWalletAddress);
       const user = firebase.auth().currentUser;
       
       // Check if user has previously linked Twitter
-      const hasLinkedTwitter = user && user.providerData && user.providerData.some(provider => provider.providerId === 'twitter.com');
+      const hasLinkedTwitter = localStorage.getItem('twitter_linked') === 'true' || 
+        (user && user.providerData && user.providerData.some(provider => provider.providerId === 'twitter.com'));
       
       if (hasLinkedTwitter) {
         // Show Sync and Unlink buttons if Twitter is linked
         syncTwitterBtn.textContent = 'Sync Twitter';
         unlinkTwitterBtn.style.display = '';
         if (twitterInfo) {
-          const username = user.providerData.find(p => p.providerId === 'twitter.com').username || user.displayName;
+          const username = user?.providerData?.find(p => p.providerId === 'twitter.com')?.username || 
+                          JSON.parse(localStorage.getItem('user_profile_data') || '{}').username || 
+                          user?.displayName;
           twitterInfo.innerHTML = `<a href="https://twitter.com/${username}" style="color:#00bfff;">@${username}</a> <span style="color:#00bfff;">✔️</span>`;
           twitterInfo.style.display = '';
         }
@@ -3389,7 +3392,7 @@ document.addEventListener('DOMContentLoaded', renderWalletAddress);
               twitterInfo.style.display = '';
             }
             
-            // Save updated profile data
+            // Save updated profile data and Twitter connection status
             const profileData = {
               name: user.displayName,
               username: user.providerData[0].username || user.displayName,
@@ -3397,6 +3400,7 @@ document.addEventListener('DOMContentLoaded', renderWalletAddress);
               bio: user.providerData[0].bio || ''
             };
             localStorage.setItem('user_profile_data', JSON.stringify(profileData));
+            localStorage.setItem('twitter_linked', 'true');
             
             // Update button states
             syncTwitterBtn.textContent = 'Sync Twitter';
@@ -3417,10 +3421,11 @@ document.addEventListener('DOMContentLoaded', renderWalletAddress);
             // Remove Twitter provider from user
             const user = firebase.auth().currentUser;
             if (user) {
-              // Remove Twitter data from profile
+              // Remove Twitter data from profile and connection status
               const profileData = JSON.parse(localStorage.getItem('user_profile_data') || '{}');
               delete profileData.twitter;
               localStorage.setItem('user_profile_data', JSON.stringify(profileData));
+              localStorage.removeItem('twitter_linked');
 
               // Update UI
               const twitterInfo = document.querySelector('.wallet-profile-twitter');
