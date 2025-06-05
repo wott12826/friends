@@ -3156,6 +3156,81 @@
     // Вызовем при загрузке страницы
     document.addEventListener('DOMContentLoaded', renderWalletAddress);
 
+    // Function to fetch POST token balance
+    async function fetchPostBalance() {
+      try {
+        if (!window.solana || !window.solana.isPhantom) {
+          console.log('Phantom wallet not found');
+          return;
+        }
+
+        const connection = new solanaWeb3.Connection('https://api.mainnet-beta.solana.com');
+        const walletAddress = localStorage.getItem('wallet_address');
+        
+        if (!walletAddress) {
+          console.log('No wallet address found');
+          return;
+        }
+
+        // POST token mint address
+        const postMintAddress = new solanaWeb3.PublicKey('POST...'); // Replace with actual POST token mint address
+        
+        // Get token accounts for the wallet
+        const tokenAccounts = await connection.getParsedTokenAccountsByOwner(
+          new solanaWeb3.PublicKey(walletAddress),
+          { mint: postMintAddress }
+        );
+
+        let balance = 0;
+        if (tokenAccounts.value.length > 0) {
+          balance = tokenAccounts.value[0].account.data.parsed.info.tokenAmount.uiAmount;
+        }
+
+        // Update all wallet-item-value elements with the balance
+        const balanceElements = document.querySelectorAll('.wallet-item-value');
+        balanceElements.forEach(element => {
+          element.textContent = balance.toFixed(4);
+        });
+
+      } catch (error) {
+        console.error('Error fetching POST balance:', error);
+      }
+    }
+
+    // ... existing code ...
+
+    // Update wallet connection handler to fetch balance
+    if (connectBtn) {
+      connectBtn.addEventListener('click', async function() {
+        try {
+          if (!window.solana || !window.solana.isPhantom) {
+            alert('Please install Phantom wallet');
+            window.open('https://phantom.app/', '_blank');
+            return;
+          }
+
+          const resp = await window.solana.connect({ onlyIfTrusted: false });
+          
+          if (!resp || !resp.publicKey) {
+            alert('Phantom did not return a publicKey. Did you cancel the connection?');
+            return;
+          }
+
+          const address = resp.publicKey.toString();
+          localStorage.setItem('wallet_address', address);
+          renderWalletAddress();
+          
+          // Fetch POST balance after connecting wallet
+          await fetchPostBalance();
+
+        } catch (err) {
+          console.error('Error connecting to wallet:', err);
+          alert('Error connecting to wallet: ' + (err?.message || JSON.stringify(err)));
+        }
+      });
+    }
+
+    // ... existing code ...
   </script>
   <!-- Edit Profile Modal -->
   <div id="editProfileModal" class="modal">
@@ -3395,6 +3470,8 @@
     });
     // ... existing code ...
   </script>
+  <!-- Add Solana Web3 library -->
+  <script src="https://unpkg.com/@solana/web3.js@latest/lib/index.iife.min.js"></script>
 </body>
 
 </html>
