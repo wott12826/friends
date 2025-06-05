@@ -1954,7 +1954,7 @@
                 photoURL: photoURL
               });
               
-              // Обновляем аватар в UI
+              // Обновляем аватар в wallet-profile-info
               const profileAvatar = document.querySelector('.wallet-profile-avatar');
               if (profileAvatar) {
                 profileAvatar.src = photoURL;
@@ -1969,10 +1969,13 @@
             // Сохраняем username в localStorage
             localStorage.setItem(`username_${user.uid}`, newUsername);
 
-            // Обновляем отображение имени/юзернейма
+            // === Обновляем wallet-profile-info ===
             const profileName = document.querySelector('.wallet-profile-name');
+            const profileHandle = document.querySelector('.wallet-profile-handle');
+            
+            // Обновляем имя и handle
             if (profileName) {
-              profileName.innerHTML = `${newName}<span class="wallet-profile-handle">@${newUsername}</span>`;
+              profileName.innerHTML = `${newName} <span class="wallet-profile-handle">@${newUsername}</span>`;
             }
 
             // Обновляем Twitter-блок, если есть
@@ -1981,8 +1984,24 @@
               twitterInfo.innerHTML = `<a href="https://twitter.com/${newUsername}" style="color:#00bfff;">@${newUsername}</a> <span style="color:#00bfff;">✔️</span>`;
             }
 
-            // Закрываем окно
+            // Закрываем модальное окно
             editProfileModal.style.display = 'none';
+
+            // Переключаемся на вкладку Wallet
+            const walletTab = document.querySelector('.wallet-tab');
+            if (walletTab) {
+              walletTab.click();
+            } else {
+              // Если нет кнопки, то просто показываем контент вкладки
+              document.querySelectorAll('.tab-content').forEach(content => {
+                content.style.display = 'none';
+              });
+              const walletContent = document.querySelector('.wallet-content');
+              if (walletContent) {
+                walletContent.style.display = 'block';
+              }
+            }
+
           } catch (error) {
             console.error('Ошибка обновления профиля:', error);
             alert('Ошибка обновления профиля');
