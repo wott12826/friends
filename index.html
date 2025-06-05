@@ -1886,92 +1886,85 @@
     const editProfileAvatarInput = document.getElementById('editProfileAvatarInput');
     const editProfileName = document.getElementById('editProfileName');
     const editProfileUsername = document.getElementById('editProfileUsername');
-    const saveProfile = document.getElementById('saveProfile');
+    const saveProfileBtn = document.getElementById('saveProfile');
 
-    // Открытие модального окна редактирования профиля
-    if (editProfileBtn) {
-      editProfileBtn.onclick = function() {
-        const user = firebase.auth().currentUser;
-        if (user) {
-          editProfileModal.style.display = 'block';
-          // Заполняем текущими данными
-          editProfileAvatar.src = user.photoURL || 'https://e7.pngegg.com/pngimages/178/595/png-clipart-user-profile-computer-icons-login-user-avatars-monochrome-black-thumbnail.png';
-          editProfileName.value = user.displayName || '';
-          const storedUsername = localStorage.getItem(`username_${user.uid}`);
-          editProfileUsername.value = storedUsername || (user.providerData[0]?.username + '_ETH') || '';
-        }
-      };
-    }
+    // Handle avatar file selection
+    editProfileAvatarInput.addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          editProfileAvatar.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+      }
+    });
 
-    // Закрытие модального окна
-    if (closeEditProfile) {
-      closeEditProfile.onclick = function() {
-        editProfileModal.style.display = 'none';
-      };
-    }
+    // Handle profile save
+    saveProfileBtn.addEventListener('click', async function() {
+      const user = firebase.auth().currentUser;
+      if (!user) return;
 
-    // Обработка загрузки новой аватарки
-    if (editProfileAvatarInput) {
-      editProfileAvatarInput.onchange = function(e) {
-        const file = e.target.files[0];
-        if (file) {
-          const reader = new FileReader();
-          reader.onload = function(ev) {
-            editProfileAvatar.src = ev.target.result;
-          };
-          reader.readAsDataURL(file);
-        }
-      };
-    }
+      try {
+        // Get the values
+        const newName = editProfileName.value.trim();
+        const newUsername = editProfileUsername.value.trim();
+        const avatarFile = editProfileAvatarInput.files[0];
 
-    // Сохранение изменений профиля
-    if (saveProfile) {
-      saveProfile.onclick = function() {
-        const user = firebase.auth().currentUser;
-        if (user) {
-          const newName = editProfileName.value.trim();
-          const newUsername = editProfileUsername.value.trim();
-          
-          // Обновляем имя в Firebase
-          user.updateProfile({
+        // Update profile in Firebase
+        if (avatarFile) {
+          // Upload avatar to storage
+          const storageRef = firebase.storage().ref();
+          const avatarRef = storageRef.child(`avatars/${user.uid}`);
+          await avatarRef.put(avatarFile);
+          const avatarURL = await avatarRef.getDownloadURL();
+
+          // Update profile with new avatar
+          await user.updateProfile({
+            displayName: newName,
+            photoURL: avatarURL
+          });
+
+          // Update avatar in UI
+          document.querySelectorAll('.user-avatar').forEach(avatar => {
+            avatar.src = avatarURL;
+          });
+        } else {
+          // Update profile without avatar
+          await user.updateProfile({
             displayName: newName
-          }).then(() => {
-            // Сохраняем username в localStorage
-            localStorage.setItem(`username_${user.uid}`, newUsername);
-            
-            // Обновляем отображение в профиле
-            const profileName = document.querySelector('.wallet-profile-name');
-            if (profileName) {
-              profileName.innerHTML = `${newName}<span class="wallet-profile-handle">@${newUsername}</span>`;
-            }
-            
-            // Если есть Twitter блок, обновляем его
-            const twitterInfo = document.querySelector('.wallet-profile-twitter');
-            if (twitterInfo && user.providerData[0]?.providerId === 'twitter.com') {
-              twitterInfo.innerHTML = `<a href="https://twitter.com/${newUsername}" style="color:#00bfff;">@${newUsername}</a> <span style="color:#00bfff;">✔️</span>`;
-            }
-
-            // Если загружена новая аватарка
-            if (editProfileAvatar.src !== user.photoURL) {
-              // В реальном приложении здесь был бы код загрузки изображения в storage
-              // и обновления photoURL пользователя
-              document.querySelector('.wallet-profile-avatar').src = editProfileAvatar.src;
-            }
-
-            editProfileModal.style.display = 'none';
-          }).catch(error => {
-            console.error('Error updating profile:', error);
-            alert('Failed to update profile');
           });
         }
-      };
-    }
+
+        // Update username in database
+        await firebase.firestore().collection('users').doc(user.uid).update({
+          username: newUsername,
+          displayName: newName
+        });
+
+        // Update UI elements
+        document.querySelectorAll('.user-name').forEach(name => {
+          name.textContent = newName;
+        });
+        document.querySelectorAll('.user-username').forEach(username => {
+          username.textContent = newUsername;
+        });
+
+        // Close modal
+        editProfileModal.style.display = 'none';
+      } catch (error) {
+        console.error('Error updating profile:', error);
+        alert('Failed to update profile. Please try again.');
+      }
+    });
+
+    // ... existing code ...
   </script>
   <!-- Edit Profile Modal -->
   <div id="editProfileModal" class="edit-profile-modal">
     <div class="edit-profile-header">
       <button class="edit-profile-back" id="closeEditProfile">←</button>
-      <div class="edit-profile-title">Edit profile</div>
+      <span class="edit-profile-title">Edit profile</span>
     </div>
     <div class="edit-profile-content">
       <div class="edit-profile-avatar-wrap">
@@ -1979,7 +1972,7 @@
         <label class="edit-profile-avatar-overlay" for="editProfileAvatarInput">
           <img src="https://www.svgrepo.com/show/495939/camera.svg" class="edit-profile-camera-icon" alt="camera">
         </label>
-        <input type="file" id="editProfileAvatarInput" accept="image/*" style="display:none;">
+        <input type="file" id="editProfileAvatarInput" accept="image/*" style="display:none;" wfd-invisible="true">
       </div>
       <div class="edit-profile-form-group">
         <label class="edit-profile-label">Name</label>
@@ -2001,28 +1994,81 @@
     const closeEditProfile = document.getElementById('closeEditProfile');
     const editProfileAvatar = document.getElementById('editProfileAvatar');
     const editProfileAvatarInput = document.getElementById('editProfileAvatarInput');
+    const editProfileName = document.getElementById('editProfileName');
+    const editProfileUsername = document.getElementById('editProfileUsername');
+    const saveProfileBtn = document.getElementById('saveProfile');
 
-    // Показываем модалку по нажатию на кнопку "Edit profile"
-    document.querySelectorAll('.edit-profile-trigger').forEach(btn => {
-      btn.addEventListener('click', () => {
-        editProfileModal.style.display = 'block';
-      });
-    });
-
-    // Кнопка "←" для закрытия
-    const backBtn = document.querySelector('.edit-profile-back');
-    if (backBtn) {
-      backBtn.addEventListener('click', () => {
-        editProfileModal.style.display = 'none';
-      });
-    }
-
-    // Клик вне окна — закрытие
-    window.addEventListener('click', (e) => {
-      if (e.target === editProfileModal) {
-        editProfileModal.style.display = 'none';
+    // Handle avatar file selection
+    editProfileAvatarInput.addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          editProfileAvatar.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
       }
     });
+
+    // Handle profile save
+    saveProfileBtn.addEventListener('click', async function() {
+      const user = firebase.auth().currentUser;
+      if (!user) return;
+
+      try {
+        // Get the values
+        const newName = editProfileName.value.trim();
+        const newUsername = editProfileUsername.value.trim();
+        const avatarFile = editProfileAvatarInput.files[0];
+
+        // Update profile in Firebase
+        if (avatarFile) {
+          // Upload avatar to storage
+          const storageRef = firebase.storage().ref();
+          const avatarRef = storageRef.child(`avatars/${user.uid}`);
+          await avatarRef.put(avatarFile);
+          const avatarURL = await avatarRef.getDownloadURL();
+
+          // Update profile with new avatar
+          await user.updateProfile({
+            displayName: newName,
+            photoURL: avatarURL
+          });
+
+          // Update avatar in UI
+          document.querySelectorAll('.user-avatar').forEach(avatar => {
+            avatar.src = avatarURL;
+          });
+        } else {
+          // Update profile without avatar
+          await user.updateProfile({
+            displayName: newName
+          });
+        }
+
+        // Update username in database
+        await firebase.firestore().collection('users').doc(user.uid).update({
+          username: newUsername,
+          displayName: newName
+        });
+
+        // Update UI elements
+        document.querySelectorAll('.user-name').forEach(name => {
+          name.textContent = newName;
+        });
+        document.querySelectorAll('.user-username').forEach(username => {
+          username.textContent = newUsername;
+        });
+
+        // Close modal
+        editProfileModal.style.display = 'none';
+      } catch (error) {
+        console.error('Error updating profile:', error);
+        alert('Failed to update profile. Please try again.');
+      }
+    });
+
+    // ... existing code ...
   });
 </script>
 
