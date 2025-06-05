@@ -3227,7 +3227,7 @@ document.addEventListener('DOMContentLoaded', renderWalletAddress);
       });
 
       // Save profile changes
-      saveProfile.addEventListener('click', function() {
+      saveProfile.addEventListener('click', async function() {
         const newName = editProfileName.value.trim();
         const newUsername = editProfileUsername.value.trim();
         const newAvatar = editProfileAvatar.src;
@@ -3240,29 +3240,49 @@ document.addEventListener('DOMContentLoaded', renderWalletAddress);
         // Update profile in Firebase
         const user = firebase.auth().currentUser;
         if (user) {
-          user.updateProfile({
-            displayName: newName,
-            photoURL: newAvatar
-          }).then(() => {
+          try {
+            let photoURL = user.photoURL; // Keep existing photo URL by default
+
+            // Only upload new image if it's different from the current one
+            if (newAvatar && newAvatar !== user.photoURL) {
+              // Convert base64 to blob
+              const response = await fetch(newAvatar);
+              const blob = await response.blob();
+              
+              // Upload to Firebase Storage
+              const storageRef = firebase.storage().ref();
+              const imageRef = storageRef.child(`profile_photos/${user.uid}/${Date.now()}`);
+              await imageRef.put(blob);
+              
+              // Get download URL
+              photoURL = await imageRef.getDownloadURL();
+            }
+
+            // Update profile with new photo URL
+            await user.updateProfile({
+              displayName: newName,
+              photoURL: photoURL
+            });
+
             // Update UI
-            profileAvatar.src = newAvatar;
+            profileAvatar.src = photoURL;
             profileName.innerHTML = `${newName} <span class="wallet-profile-handle">@${newUsername}</span>`;
 
             // Save to localStorage
             const profileData = {
               name: newName,
               username: newUsername,
-              avatar: newAvatar
+              avatar: photoURL
             };
             localStorage.setItem('user_profile_data', JSON.stringify(profileData));
 
             // Close modal
             editProfileModal.style.display = 'none';
             alert('Profile updated successfully!');
-          }).catch((error) => {
+          } catch (error) {
             console.error('Error updating profile:', error);
             alert('Error updating profile: ' + error.message);
-          });
+          }
         }
       });
     });
