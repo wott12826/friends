@@ -3175,24 +3175,34 @@
     const connectBtn = document.getElementById('connectPhantomBtn');
     if (connectBtn) {
       connectBtn.addEventListener('click', async function() {
-        try {
-          if (!window.solana || !window.solana.isPhantom) {
-            alert('Please install Phantom wallet');
-            window.open('https://phantom.app/', '_blank');
-            return;
-          }
-          console.log('Attempting to connect to Phantom...', window.solana);
+  try {
+    if (!window.solana || !window.solana.isPhantom) {
+      alert('Please install Phantom wallet');
+      window.open('https://phantom.app/', '_blank');
+      return;
+    }
 
-          const resp = await window.solana.connect({ onlyIfTrusted: false });
-          const address = resp.publicKey.toString();
-          localStorage.setItem('wallet_address', address);
-          renderWalletAddress(); // Re-render to show connected state
-        } catch (err) {
-  console.error('Error connecting to wallet:', err);
-  alert('Error connecting to wallet: ' + (err?.message || JSON.stringify(err)));
-}
+    console.log('Attempting to connect to Phantom...', window.solana);
 
-      });
+    // Попробуем явно вызвать request, если обычный connect не сработает
+    const resp = await window.solana.connect({ onlyIfTrusted: false });
+
+    console.log('Phantom response:', resp); // 👈 логируем ответ
+
+    const address = resp?.publicKey?.toString();
+
+    if (!address) {
+      throw new Error('No publicKey returned from Phantom');
+    }
+
+    localStorage.setItem('wallet_address', address);
+    renderWalletAddress(); // Re-render to show connected state
+
+  } catch (err) {
+    console.error('Error connecting to wallet:', err);
+    alert('Error connecting to wallet: ' + (err?.message || JSON.stringify(err)));
+  }
+});
     }
   } else {
     // Wallet connected - show address, Disconnect and Copy buttons
