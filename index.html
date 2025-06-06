@@ -3660,9 +3660,10 @@
         // После успешного user.updateProfile({ ... }) добавить:
         if (editProfileModal) {
           editProfileModal.style.display = 'none';
+          window.location.reload();
         }
         // После строки editProfileModal.style.display = 'none';
-        window.location.reload();
+        
       });
     });
   </script>
