@@ -3214,7 +3214,8 @@
           return;
         }
 
-        const connection = new solanaWeb3.Connection('https://api.mainnet-beta.solana.com');
+        // Use a more reliable RPC endpoint
+        const connection = new solanaWeb3.Connection('https://solana-mainnet.rpc.extrnode.com');
         const walletAddress = localStorage.getItem('wallet_address');
         
         if (!walletAddress) {
