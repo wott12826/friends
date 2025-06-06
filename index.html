@@ -3601,11 +3601,18 @@
     // В JS добавить функцию для обновления clubWalletBalance:
     function updateClubWalletBalance() {
       const el = document.getElementById('clubWalletBalance');
+      const createClubBtn = document.getElementById('createClubBtn');
       const address = localStorage.getItem('wallet_address');
       if (!el) return;
       if (!address) {
         el.textContent = 'Connect wallet first';
         el.style.color = '#e00';
+        // Disable the button when wallet is not connected
+        if (createClubBtn) {
+          createClubBtn.disabled = true;
+          createClubBtn.style.opacity = '0.5';
+          createClubBtn.style.cursor = 'not-allowed';
+        }
         return;
       }
       // Получаем баланс $POST (например, из localStorage или глобальной переменной)
@@ -3619,6 +3626,12 @@
       }
       el.textContent = balance > 0 ? balance.toFixed(4) : '0.0000';
       el.style.color = '#a020f0';
+      // Enable the button when wallet is connected
+      if (createClubBtn) {
+        createClubBtn.disabled = false;
+        createClubBtn.style.opacity = '1';
+        createClubBtn.style.cursor = 'pointer';
+      }
     }
     // Вызвать updateClubWalletBalance() при открытии модалки создания клуба и после подключения кошелька/обновления баланса.
   </script>
