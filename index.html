@@ -8,6 +8,102 @@
   <link href="https://fonts.googleapis.com/css?family=Inter:400,500,700&display=swap" rel="stylesheet">
   <link rel="icon" type="image/png" href="images/logo2.png">
   <style>
+    /* --- FRIEND.TECH STYLE ENHANCEMENTS --- */
+    body, html {
+      background: #fafbfc;
+      font-family: 'Inter', 'Roboto', Arial, sans-serif;
+      color: #222;
+    }
+    .sidebar {
+      background: #fff;
+      border-right: 1px solid #eee;
+      min-height: 100vh;
+      width: 220px;
+      padding-top: 40px;
+      box-shadow: 2px 0 8px rgba(0,0,0,0.03);
+    }
+    .sidebar-item {
+      border-radius: 8px 0 0 8px;
+      margin-bottom: 8px;
+      padding-left: 32px;
+      transition: background 0.2s, color 0.2s;
+    }
+    .sidebar-item.active, .sidebar-item.selected {
+      color: #00bfff !important;
+      background: #eaf7fd !important;
+      border-left: 4px solid #00bfff !important;
+      font-weight: bold;
+    }
+    .main-content, .wallet-section, .tab-content, .discover-list {
+      background: #fff;
+      border-radius: 18px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+      padding: 40px 48px;
+      margin: 32px 0;
+    }
+    .wallet-header, .chat-header, .discover-tabs {
+      margin-bottom: 32px;
+    }
+    .wallet-btn, .register-btn, .create-club-btn, .chat-tab, .discover-tab, .chat-notify-btn, .wallet-profile-btn, .wallet-profile-withdraw, .wallet-fund-btn, .wallet-logout-btn, .save-profile-btn, .button, .btn, button {
+      background: #00bfff !important;
+      color: #fff !important;
+      border: none;
+      border-radius: 10px;
+      padding: 12px 28px !important;
+      font-weight: bold;
+      font-size: 1.08rem;
+      box-shadow: 0 2px 8px rgba(0,191,255,0.08);
+      transition: background 0.2s;
+    }
+    .wallet-btn:hover, .register-btn:hover, .create-club-btn:hover, .chat-tab:hover, .discover-tab:hover, .chat-notify-btn:hover, .wallet-profile-btn:hover, .wallet-profile-withdraw:hover, .wallet-fund-btn:hover, .wallet-logout-btn:hover, .save-profile-btn:hover, .button:hover, .btn:hover, button:hover {
+      background: #0099cc !important;
+    }
+    input, select, textarea {
+      border: 1px solid #eee !important;
+      border-radius: 10px !important;
+      padding: 12px 16px !important;
+      background: #fafbfc !important;
+      font-size: 1.08rem !important;
+      margin-bottom: 16px !important;
+    }
+    .card, .panel, .block {
+      background: #fff;
+      border-radius: 18px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+      padding: 32px 32px;
+      margin-bottom: 32px;
+    }
+    ::-webkit-scrollbar {
+      width: 8px;
+      background: #f0f0f0;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #e0e0e0;
+      border-radius: 8px;
+    }
+    @media (max-width: 900px) {
+      .main-content, .wallet-section, .tab-content, .discover-list {
+        padding: 24px 8px;
+      }
+      .card, .panel, .block {
+        padding: 18px 8px;
+      }
+      .sidebar {
+        width: 60px;
+        padding-top: 12px;
+      }
+    }
+    @media (max-width: 600px) {
+      .main-content, .wallet-section, .tab-content, .discover-list {
+        padding: 8px 2vw;
+        margin: 12px 0;
+      }
+      .card, .panel, .block {
+        padding: 8px 2vw;
+        margin-bottom: 12px;
+      }
+    }
+
     html,
     body {
       height: 100%;
