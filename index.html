@@ -3811,6 +3811,31 @@
 
     // ... existing code ...
   </script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // ... существующий код ...
+      const unlinkTwitterBtn = document.querySelector('.wallet-profile-btn:not(.edit-profile-trigger):not(.sync-twitter-btn)');
+      if (unlinkTwitterBtn) {
+        unlinkTwitterBtn.addEventListener('click', async function() {
+          const user = firebase.auth().currentUser;
+          if (!user) {
+            alert('Please log in first');
+            return;
+          }
+          try {
+            await user.unlink('twitter.com');
+            alert('Twitter account unlinked!');
+            // Скрыть Twitter-инфо
+            const twitterInfo = document.querySelector('.wallet-profile-twitter');
+            if (twitterInfo) twitterInfo.style.display = 'none';
+          } catch (error) {
+            alert('Error unlinking Twitter: ' + error.message);
+          }
+        });
+      }
+    });
+
+</script>
 </body>
 
 </html>
