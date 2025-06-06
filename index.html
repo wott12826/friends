@@ -3627,9 +3627,11 @@
           const user = firebase.auth().currentUser;
           if (user) {
             try {
-              const storageRef = ref(storage, `profile_images/${user.uid}/${Date.now()}_${file.name}`);
-              await uploadBytes(storageRef, file);
-              newAvatar = await getDownloadURL(storageRef);
+              const storage = firebase.storage();
+              // Сохраняем в profile_images
+              const storageRef = storage.ref(`profile_images/${user.uid}/${Date.now()}_${file.name}`);
+              await storageRef.put(file);
+              newAvatar = await storageRef.getDownloadURL();
             } catch (error) {
               alert('Error uploading avatar: ' + error.message);
               return;
