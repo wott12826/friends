@@ -2016,10 +2016,82 @@
       border-radius: 50%;
       border: 2px solid white;
     }
+
+    /* --- Sidebar (drawer) for mobile --- */
+    .sidebar-dim {
+      display: none;
+      position: fixed;
+      z-index: 999;
+      left: 0; top: 0;
+      width: 100vw; height: 100vh;
+      background: rgba(0,0,0,0.25);
+      transition: opacity 0.2s;
+    }
+    .sidebar.mobile-open + .sidebar-dim {
+      display: block;
+    }
+    .sidebar {
+      transition: left 0.25s, box-shadow 0.25s;
+    }
+    @media (max-width: 700px) {
+      .sidebar {
+        position: fixed;
+        left: -220px;
+        top: 0;
+        height: 100vh;
+        z-index: 1000;
+        box-shadow: 2px 0 16px rgba(0,0,0,0.08);
+        background: #fff;
+        width: 220px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding-top: 32px;
+      }
+      .sidebar.mobile-open {
+        left: 0;
+      }
+      .main-app {
+        width: 100vw;
+        min-width: 0;
+      }
+      .main-content {
+        padding: 12px 0 0 0;
+      }
+      .sidebar-toggle {
+        display: block;
+        position: fixed;
+        left: 16px;
+        top: 16px;
+        z-index: 1100;
+        background: #fff;
+        border: none;
+        border-radius: 8px;
+        width: 44px;
+        height: 44px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        cursor: pointer;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+      }
+    }
+    @media (min-width: 701px) {
+      .sidebar-toggle {
+        display: none;
+      }
+      .sidebar-dim {
+        display: none !important;
+      }
+    }
   </style>
 </head>
 
 <body>
+  <button class="sidebar-toggle" id="sidebarToggle" aria-label="Open menu" style="display:none;">
+    &#9776;
+  </button>
+  <div class="sidebar-dim" id="sidebarDim"></div>
   <div class="container">
     <div class="content">
       <!-- SVG логотип -->
@@ -2088,7 +2160,7 @@
   </div>
   <!-- Main app layout (скрыт по умолчанию) -->
   <div id="main-app" class="main-app" style="display:none;">
-    <div class="sidebar">
+    <div class="sidebar" id="sidebar">
       <div class="sidebar-logo">
         <img src="images/logo2.png" width="52" height="52" alt="logo">
       </div>
@@ -4365,6 +4437,39 @@
       // Initialize notification badge
       updateNotificationBadge();
     })();
+  </script>
+  <script>
+    // --- Sidebar drawer logic for mobile ---
+    const sidebar = document.getElementById('sidebar');
+    const sidebarToggle = document.getElementById('sidebarToggle');
+    const sidebarDim = document.getElementById('sidebarDim');
+    function updateSidebarToggleVisibility() {
+      if (window.innerWidth <= 700) {
+        sidebarToggle.style.display = 'flex';
+      } else {
+        sidebarToggle.style.display = 'none';
+        sidebar.classList.remove('mobile-open');
+      }
+    }
+    sidebarToggle.onclick = function() {
+      sidebar.classList.add('mobile-open');
+      sidebarDim.style.display = 'block';
+    };
+    sidebarDim.onclick = function() {
+      sidebar.classList.remove('mobile-open');
+      sidebarDim.style.display = 'none';
+    };
+    // Закрытие по клику на пункт меню (на мобильных)
+    sidebar.querySelectorAll('.sidebar-item').forEach(item => {
+      item.onclick = function() {
+        if (window.innerWidth <= 700) {
+          sidebar.classList.remove('mobile-open');
+          sidebarDim.style.display = 'none';
+        }
+      };
+    });
+    window.addEventListener('resize', updateSidebarToggleVisibility);
+    document.addEventListener('DOMContentLoaded', updateSidebarToggleVisibility);
   </script>
 </body>
 
