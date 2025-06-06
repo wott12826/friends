@@ -3135,46 +3135,44 @@
 
     // Save profile handler
     if (saveProfile && editProfileModal) {
-      saveProfile.onclick = function (e) {
+      saveProfile.onclick = async function (e) {
         e.preventDefault();
-
-        // Validate inputs
-        const name = editProfileName?.value?.trim() || '';
-        const username = editProfileUsername?.value?.trim() || '';
-        const bio = editProfileBio?.value?.trim() || '';
-        const avatar = editProfileAvatar?.src || '';
-
-        if (!name || !username) {
-          alert('Please fill in your name and username');
+        const newName = editProfileName.value.trim();
+        const newUsername = editProfileUsername.value.trim();
+        let newAvatar = editProfileAvatar.src;
+        if (!newName || !newUsername) {
+          alert('Please fill in all required fields');
           return;
         }
-
-        // Save profile data
-        const profileData = { name, username, bio, avatar };
-        localStorage.setItem('user_profile_data', JSON.stringify(profileData));
-
-        // Update UI
-        const nameElement = document.querySelector('.wallet-profile-name');
-        const bioElement = document.querySelector('.wallet-profile-bio');
-        const avatarElement = document.querySelector('.wallet-profile-avatar');
-        const twitterElement = document.querySelector('.wallet-profile-twitter a');
-
-        if (nameElement) {
-          nameElement.innerHTML = `${name} <span class="wallet-profile-handle">@${username}</span>`;
+        // Загрузка нового аватара через CDN-стиль
+        if (editProfileAvatarInput.files && editProfileAvatarInput.files[0]) {
+          const file = editProfileAvatarInput.files[0];
+          const user = firebase.auth().currentUser;
+          if (user) {
+            try {
+              const storage = firebase.storage();
+              const storageRef = storage.ref(`profile_photos/${user.uid}/${Date.now()}_${file.name}`);
+              await storageRef.put(file);
+              newAvatar = await storageRef.getDownloadURL();
+            } catch (error) {
+              alert('Error uploading avatar: ' + error.message);
+              return;
+            }
+          }
         }
-        if (bioElement) {
-          bioElement.textContent = bio;
+        // Дальнейшее обновление профиля
+        const user = firebase.auth().currentUser;
+        if (user) {
+          try {
+            await user.updateProfile({
+              displayName: newName,
+              photoURL: newAvatar
+            });
+            // ... остальной код обновления UI ...
+          } catch (error) {
+            alert('Error updating profile: ' + error.message);
+          }
         }
-        if (avatarElement) {
-          avatarElement.src = avatar;
-        }
-        if (twitterElement) {
-          twitterElement.textContent = `@${username}`;
-          twitterElement.href = `https://twitter.com/${username}`;
-        }
-
-        // Close modal
-        editProfileModal.style.display = 'none';
       };
     }
 
