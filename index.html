@@ -985,24 +985,21 @@
     /* --- Fullscreen Web3 Chat Styles --- */
     .fullscreen-chat {
       position: fixed;
-      top: 40px;
+      top: 0;
       left: 220px; /* ширина sidebar */
       width: calc(100vw - 220px);
-      max-width: 900px;
-      height: 80vh;
-      max-height: 800px;
+      height: 100vh;
       background: #fff;
-      border-radius: 18px;
-      box-shadow: 0 4px 32px rgba(0,0,0,0.10);
+      border-radius: 0;
+      box-shadow: none;
       display: flex;
       flex-direction: column;
       z-index: 5000;
     }
-    @media (max-width: 1200px) {
+    @media (max-width: 700px) {
       .fullscreen-chat {
         left: 0;
         width: 100vw;
-        max-width: 100vw;
         border-radius: 0;
       }
     }
