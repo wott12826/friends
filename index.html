@@ -3223,48 +3223,51 @@
           return;
         }
 
-        // POST token mint address
-        const postMintAddress = new solanaWeb3.PublicKey('POST...'); // Replace with actual POST token mint address
+        // POST token mint address - replace with your actual token mint address
+        const postMintAddress = new solanaWeb3.PublicKey('POST...'); // TODO: Replace with actual POST token mint address
         
-        // Get token accounts for the wallet
-        const tokenAccounts = await connection.getParsedTokenAccountsByOwner(
-          new solanaWeb3.PublicKey(walletAddress),
-          { mint: postMintAddress }
-        );
+        try {
+          // Get token accounts for the wallet
+          const tokenAccounts = await connection.getParsedTokenAccountsByOwner(
+            new solanaWeb3.PublicKey(walletAddress),
+            { mint: postMintAddress }
+          );
 
-        let balance = 0;
-        if (tokenAccounts.value.length > 0) {
-          balance = tokenAccounts.value[0].account.data.parsed.info.tokenAmount.uiAmount;
-        }
-
-        // Update wallet-item-value elements
-        const balanceElements = document.querySelectorAll('.wallet-item-value');
-        balanceElements.forEach(element => {
-          element.textContent = balance.toFixed(4);
-        });
-
-        // Update wallet-profile-balance elements
-        const profileBalanceElements = document.querySelectorAll('.wallet-profile-balance');
-        profileBalanceElements.forEach(element => {
-          element.innerHTML = `<img src="images/logo2.png" style="width:14px;height:14px;vertical-align:middle;margin-right:2px;"> ${balance.toFixed(4)}`;
-        });
-
-        // Update wallet value after balance update
-        updateWalletValue();
-
-      } catch (error) {
-        console.error('Error fetching POST balance:', error);
-        // Set balance to 0 on error
-        const balanceElements = document.querySelectorAll('.wallet-item-value, .wallet-profile-balance');
-        balanceElements.forEach(element => {
-          if (element.classList.contains('wallet-profile-balance')) {
-            element.innerHTML = `<img src="images/logo2.png" style="width:14px;height:14px;vertical-align:middle;margin-right:2px;"> 0.0000`;
-          } else {
-            element.textContent = '0.0000';
+          let balance = 0;
+          if (tokenAccounts.value.length > 0) {
+            balance = tokenAccounts.value[0].account.data.parsed.info.tokenAmount.uiAmount;
           }
-        });
-        // Update wallet value with zero balance
-        updateWalletValue();
+
+          // Update wallet-item-value elements
+          const balanceElements = document.querySelectorAll('.wallet-item-value');
+          balanceElements.forEach(element => {
+            element.textContent = balance.toFixed(4);
+          });
+
+          // Update wallet-profile-balance elements
+          const profileBalanceElements = document.querySelectorAll('.wallet-profile-balance');
+          profileBalanceElements.forEach(element => {
+            element.innerHTML = `<img src="images/logo2.png" style="width:14px;height:14px;vertical-align:middle;margin-right:2px;"> ${balance.toFixed(4)}`;
+          });
+
+          // Update wallet value after balance update
+          updateWalletValue();
+        } catch (error) {
+          console.error('Error fetching token accounts:', error);
+          // Set balance to 0 on error
+          const balanceElements = document.querySelectorAll('.wallet-item-value, .wallet-profile-balance');
+          balanceElements.forEach(element => {
+            if (element.classList.contains('wallet-profile-balance')) {
+              element.innerHTML = `<img src="images/logo2.png" style="width:14px;height:14px;vertical-align:middle;margin-right:2px;"> 0.0000`;
+            } else {
+              element.textContent = '0.0000';
+            }
+          });
+          // Update wallet value with zero balance
+          updateWalletValue();
+        }
+      } catch (error) {
+        console.error('Error in fetchPostBalance:', error);
       }
     }
 
@@ -3627,7 +3630,7 @@
     // ... existing code ...
   </script>
   <!-- Add Solana Web3 library -->
-  <script src="https://unpkg.com/@solana/web3.js@latest/lib/index.iife.min.js"></script>
+  <script src="https://unpkg.com/@solana/web3.js@1.87.6/lib/index.iife.min.js"></script>
 </body>
 
 </html>
