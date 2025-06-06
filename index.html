@@ -2229,7 +2229,7 @@
     }
 
     // Initialize Storage
-    const storage = firebase.storage();
+
 
     const modal = document.getElementById('modal');
     const loginBtn = document.querySelector('.login-btn');
@@ -3846,6 +3846,55 @@
       }
     });
 
+</script>
+<script type="module">
+  import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
+  const storage = getStorage();
+
+  async function uploadAvatar(file, userId) {
+    try {
+      const storageRef = ref(storage, `avatars/${userId}/${Date.now()}_${file.name}`);
+      await uploadBytes(storageRef, file);
+      const downloadURL = await getDownloadURL(storageRef);
+      return downloadURL;
+    } catch (error) {
+      console.error("Error uploading avatar:", error);
+      throw error;
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', function() {
+    // ... существующий код ...
+    const editProfileAvatarInput = document.getElementById('editProfileAvatarInput');
+    const editProfileAvatar = document.getElementById('editProfileAvatar');
+    const saveProfile = document.getElementById('saveProfile');
+    const editProfileName = document.getElementById('editProfileName');
+    const editProfileUsername = document.getElementById('editProfileUsername');
+
+    saveProfile.addEventListener('click', async function() {
+      const newName = editProfileName.value.trim();
+      const newUsername = editProfileUsername.value.trim();
+      let newAvatar = editProfileAvatar.src;
+      if (!newName || !newUsername) {
+        alert('Please fill in all required fields');
+        return;
+      }
+      if (editProfileAvatarInput.files && editProfileAvatarInput.files[0]) {
+        const file = editProfileAvatarInput.files[0];
+        const user = firebase.auth().currentUser;
+        if (user) {
+          try {
+            newAvatar = await uploadAvatar(file, user.uid);
+          } catch (error) {
+            alert('Error uploading avatar: ' + error.message);
+            return;
+          }
+        }
+      }
+      // ... остальной код сохранения профиля ...
+      // Например, user.updateProfile({ displayName: newName, photoURL: newAvatar })
+    });
+  });
 </script>
 </body>
 
