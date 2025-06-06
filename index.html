@@ -3828,6 +3828,29 @@
             // Скрыть Twitter-инфо
             const twitterInfo = document.querySelector('.wallet-profile-twitter');
             if (twitterInfo) twitterInfo.style.display = 'none';
+            // Скрыть кнопку Sync Twitter
+            const syncTwitterBtn = document.querySelector('.sync-twitter-btn');
+            if (syncTwitterBtn) syncTwitterBtn.style.display = 'none';
+            // Заменить Unlink Twitter на Link Twitter
+            unlinkTwitterBtn.textContent = 'Link Twitter';
+            unlinkTwitterBtn.classList.add('link-twitter-btn');
+            // Назначить обработчик для Link Twitter
+            unlinkTwitterBtn.onclick = async function() {
+              const provider = new firebase.auth.TwitterAuthProvider();
+              try {
+                await user.linkWithPopup(provider);
+                alert('Twitter account linked!');
+                // Можно обновить UI, например, показать Sync Twitter и Twitter-инфо
+                if (syncTwitterBtn) syncTwitterBtn.style.display = '';
+                if (twitterInfo) twitterInfo.style.display = '';
+                unlinkTwitterBtn.textContent = 'Unlink Twitter';
+                unlinkTwitterBtn.classList.remove('link-twitter-btn');
+                // Вернуть исходный обработчик
+                window.location.reload(); // проще всего перезагрузить для корректного UI
+              } catch (error) {
+                alert('Error linking Twitter: ' + error.message);
+              }
+            };
           } catch (error) {
             alert('Error unlinking Twitter: ' + error.message);
           }
