@@ -4009,6 +4009,32 @@
     });
   });
 </script>
+  <!-- ... existing code ...
+    // --- Chat notification toggle ---
+    document.querySelector('.chat-notify-btn').addEventListener('click', function() {
+      if ('Notification' in window) {
+        if (this.textContent === 'Turn on') {
+          Notification.requestPermission().then(permission => {
+            if (permission === 'granted') {
+              localStorage.setItem('notifications_enabled', 'true');
+              this.textContent = 'Turn off';
+            }
+          });
+        } else {
+          localStorage.removeItem('notifications_enabled');
+          this.textContent = 'Turn on';
+        }
+      }
+    });
+
+    // Check notification status on page load
+    document.addEventListener('DOMContentLoaded', function() {
+      const notifyBtn = document.querySelector('.chat-notify-btn');
+      if (localStorage.getItem('notifications_enabled') === 'true') {
+        notifyBtn.textContent = 'Turn off';
+      }
+    });
+  // ... existing code ...
 </body>
 
 </html>
