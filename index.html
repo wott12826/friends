@@ -778,6 +778,48 @@
       padding: 32px;
       border-radius: 18px;
       position: relative;
+      transition: all 0.3s ease;
+    }
+
+    @media (max-width: 900px) {
+      .create-club-modal-content {
+        max-width: 90vw;
+        padding: 24px;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .create-club-modal-content {
+        max-width: 95vw;
+        padding: 16px;
+      }
+      
+      .create-club-form {
+        gap: 12px;
+      }
+      
+      .create-club-photo-label {
+        width: 100px;
+        height: 100px;
+      }
+      
+      .create-club-input {
+        font-size: 1rem !important;
+      }
+      
+      .create-club-section-label {
+        font-size: 0.95rem;
+      }
+      
+      .curve-option {
+        min-width: 100px;
+        padding: 6px 12px;
+      }
+      
+      .create-club-btn {
+        font-size: 1.1rem;
+        padding: 14px 0;
+      }
     }
 
     .create-club-form {
