@@ -3222,8 +3222,8 @@
           return;
         }
 
-        // POST token mint address - replace with your actual token mint address
-        const postMintAddress = new solanaWeb3.PublicKey('POST...'); // TODO: Replace with actual POST token mint address
+        // POST token mint address on Solana
+        const postMintAddress = new solanaWeb3.PublicKey('C9U2Ksk6KKWvLEeo5yUQ7Xu46X7NzeBJtd9PBfuXaUSM');
         
         try {
           // Get token accounts for the wallet
@@ -3366,11 +3366,15 @@
       const balanceElements = document.querySelectorAll('.wallet-item-value');
       
       if (priceElements.length > 0 && balanceElements.length > 0) {
+        // Get price from wallet-post-price element (remove $ and convert to number)
         const price = parseFloat(priceElements[0].textContent.replace('$', ''));
+        // Get balance from wallet-item-value element
         const balance = parseFloat(balanceElements[0].textContent);
         
+        // Calculate total value as price * balance
         const totalValue = price * balance;
         
+        // Update all wallet-value elements with the calculated total
         const valueElements = document.querySelectorAll('.wallet-value');
         valueElements.forEach(element => {
           element.textContent = `$${totalValue.toFixed(2)}`;
@@ -3551,18 +3555,21 @@
     document.addEventListener('DOMContentLoaded', function() {
       // ... existing code ...
 
-      // Function to fetch price from dexscreener
+      // Function to fetch price from GeckoTerminal
       async function fetchPrice() {
         try {
-          const response = await fetch('https://api.dexscreener.com/latest/dex/pairs/solana/apjqvcapkjkzdkzketwl615pevr6nuecchqzgz1noxk3');
+          const response = await fetch('https://api.geckoterminal.com/api/v2/networks/solana/pools/C9U2Ksk6KKWvLEeo5yUQ7Xu46X7NzeBJtd9PBfuXaUSM');
           const data = await response.json();
           
-          if (data && data.pairs && data.pairs[0]) {
-            const price = data.pairs[0].priceUsd;
+          if (data && data.data && data.data.attributes) {
+            const price = data.data.attributes.price_usd;
             const priceElements = document.querySelectorAll('.wallet-post-price');
             priceElements.forEach(element => {
               element.textContent = `$${parseFloat(price).toFixed(4)}`;
             });
+            
+            // Update wallet value after price update
+            updateWalletValue();
           }
         } catch (error) {
           console.error('Error fetching price:', error);
