@@ -1740,8 +1740,8 @@
                   
                 </span>
               </div>
-              <div class="wallet-profile-twitter"><a href="#" style="color:#00bfff;">@Smirnoff_ETH</a> <span
-                  style="color:#00bfff;">✔️</span></div>
+              <div class="wallet-profile-twitter"><a href="#" style="color:#a020f0;">@Smirnoff_ETH</a> <span
+                  style="color:#a020f0;">✔️</span></div>
             </div>
             <div class="wallet-profile-actions">
               <button class="wallet-profile-btn edit-profile-trigger">Edit profile</button>
@@ -1756,7 +1756,7 @@
             <div class="wallet-profile-balance-row">
               <div>Wallet balance <span class="wallet-profile-balance"><img src="images/logo2.png"
                     style="width:14px;height:14px;vertical-align:middle;margin-right:2px;"> 0.001</span></div>
-              <button class="wallet-profile-withdraw"><span style="color:#00bfff;">▶</span> Withdraw ETH</button>
+              <button class="wallet-profile-withdraw"><span style="color:#a020f0;">▶</span> Withdraw ETH</button>
             </div>
           </div>
           <div class="wallet-profile-fund-label">Fund your POST from</div>
@@ -1937,9 +1937,9 @@
         </div>
         <div class="create-club-row" style="margin-top:8px; align-items:center;">
           <div style="color:#888; font-size:0.98rem;">You will spend:</div>
-          <div style="margin-left:8px; color:#00bfff; font-weight:600; font-size:1.1rem;">--</div>
+          <div style="margin-left:8px; color:#a020f0; font-weight:600; font-size:1.1rem;">--</div>
           <div style="margin-left:24px; color:#888; font-size:0.98rem;">Your balance:</div>
-          <div style="margin-left:8px; color:#00bfff; font-weight:600; font-size:1.1rem;">0.9000</div>
+          <div style="margin-left:8px; color:#a020f0; font-weight:600; font-size:1.1rem;">0.9000</div>
         </div>
         <button class="create-club-btn" id="createClubBtn">Approve spending $POST</button>
         <div style="color:#aaa; font-size:0.95rem; margin-top:10px; text-align:center;">Once you create your club, you
@@ -2307,7 +2307,7 @@
           if (user.providerData && user.providerData[0]?.providerId === 'twitter.com') {
             // Если пользователь вошел через Twitter, показываем ссылку
             const username = user.providerData[0].username || user.displayName;
-            twitterInfo.innerHTML = `<a href="https://twitter.com/${username}" style="color:#00bfff;">@${username}</a> <span style="color:#00bfff;">✔️</span>`;
+            twitterInfo.innerHTML = `<a href="https://twitter.com/${username}" style="color:#a020f0;">@${username}</a> <span style="color:#a020f0;">✔️</span>`;
           } else {
             // Если не через Twitter - скрываем блок
             twitterInfo.style.display = 'none';
@@ -2456,7 +2456,7 @@
         div.innerHTML = `
           <img src="${club.avatar || 'https://via.placeholder.com/40x40?text=Club'}" class="chat-avatar" alt="avatar">
           <div class="chat-info">
-            <div class="chat-name">${club.name} <span style='color:#00bfff;font-size:0.95em;'>${club.ticker ? ('(' + club.ticker + ')') : ''}</span></div>
+            <div class="chat-name">${club.name} <span style='color:#a020f0;font-size:0.95em;'>${club.ticker ? ('(' + club.ticker + ')') : ''}</span></div>
             <div class="chat-msg" style="white-space:pre-line;">${club.desc || ''}</div>
           </div>
           <div class="chat-price">$0.00</div>
@@ -2474,11 +2474,24 @@
       const desc = document.getElementById('clubDescInput').value.trim();
       const avatarEl = document.getElementById('clubPhotoPreview').querySelector('img');
       const avatar = avatarEl ? avatarEl.src : '';
+      
       if (!name || !ticker) {
         alert('Name and ticker are required!');
         return;
       }
+
+      // Check for duplicate name or ticker
       const clubs = getClubs();
+      const isDuplicate = clubs.some(club => 
+        club.name.toLowerCase() === name.toLowerCase() || 
+        club.ticker.toUpperCase() === ticker.toUpperCase()
+      );
+
+      if (isDuplicate) {
+        alert('A club with this name or ticker already exists!');
+        return;
+      }
+
       clubs.push({ name, ticker, desc, avatar });
       saveClubs(clubs);
       renderClubs();
@@ -2900,7 +2913,7 @@
         if (twitterInfo) {
           if (user.providerData && user.providerData[0]?.providerId === 'twitter.com') {
             const username = user.providerData[0].username || user.displayName;
-            twitterInfo.innerHTML = `<a href="https://twitter.com/${username}" style="color:#00bfff;">@${username}</a> <span style="color:#00bfff;">✔️</span>`;
+            twitterInfo.innerHTML = `<a href="https://twitter.com/${username}" style="color:#a020f0;">@${username}</a> <span style="color:#a020f0;">✔️</span>`;
           } else {
             twitterInfo.style.display = 'none';
           }
