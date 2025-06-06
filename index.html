@@ -3174,6 +3174,10 @@
             alert('Error updating profile: ' + error.message);
           }
         }
+        // После успешного user.updateProfile({ ... }) добавить:
+        if (editProfileModal) {
+          editProfileModal.style.display = 'none';
+        }
       };
     }
 
@@ -3651,6 +3655,10 @@
           } catch (error) {
             alert('Error updating profile: ' + error.message);
           }
+        }
+        // После успешного user.updateProfile({ ... }) добавить:
+        if (editProfileModal) {
+          editProfileModal.style.display = 'none';
         }
       });
     });
