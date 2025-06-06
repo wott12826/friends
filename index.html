@@ -1249,54 +1249,65 @@
       height: 100vh;
       background: #fff;
       flex-direction: column;
+      overflow-x: hidden; /* Prevent horizontal scroll */
     }
 
     .fschat-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 0 24px;
+      padding: 0 16px;
       height: 64px;
       border-bottom: 1px solid #f0f0f0;
       background: #fff;
       position: sticky;
       top: 0;
       z-index: 10;
+      width: 100%;
+      box-sizing: border-box;
     }
 
     .fschat-header-left {
       display: flex;
       align-items: center;
       gap: 12px;
+      min-width: 0; /* Allow flex items to shrink below content size */
+      flex: 1; /* Take available space */
     }
 
-    .fschat-back {
-      background: none;
-      border: none;
-      font-size: 2rem;
-      cursor: pointer;
-      color: black;
-      margin-right: 4px;
+    #closeFullscreenChat {
+      width: 32px;
+      height: 32px;
+      flex-shrink: 0; /* Prevent button from shrinking */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
     }
 
-    .fschat-avatar {
-      width: 40px;
-      height: 40px;
+    #fullscreenChatAvatar {
+      width: 36px;
+      height: 36px;
       border-radius: 50%;
       object-fit: cover;
+      flex-shrink: 0; /* Prevent avatar from shrinking */
     }
 
-    .fschat-title {
+    #fullscreenChatTitle {
       font-size: 1.15rem;
       font-weight: 600;
       color: #222;
-      margin-left: 2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      min-width: 0; /* Allow text to shrink */
     }
 
     .fschat-header-right {
       display: flex;
       align-items: center;
-      gap: 16px;
+      gap: 12px;
+      flex-shrink: 0; /* Prevent right section from shrinking */
     }
 
     .fschat-balance {
@@ -1304,26 +1315,22 @@
       color: #fff;
       border: none;
       border-radius: 8px;
-      padding: 8px 18px;
-      font-size: 1rem;
+      padding: 8px 12px;
+      font-size: 0.95rem;
       font-weight: 600;
       cursor: pointer;
       display: flex;
       align-items: center;
       gap: 4px;
+      max-width: 120px; /* Limit balance width */
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .fschat-menu-wrap {
       position: relative;
-    }
-
-    .fschat-menu-btn {
-      background: none;
-      border: none;
-      font-size: 1.6rem;
-      color: black;
-      cursor: pointer;
-      padding: 0 8px;
+      flex-shrink: 0;
     }
 
     .fschat-menu {
@@ -1334,23 +1341,117 @@
       background: #fff;
       border-radius: 10px;
       box-shadow: 0 2px 12px rgba(0, 0, 0, 0.07);
-      min-width: 180px;
+      min-width: 150px;
+      max-width: 85vw;
       border: 1px solid #eee;
+      overflow-x: auto;
+      white-space: nowrap;
     }
 
-    .fschat-menu-item {
-      padding: 12px 18px;
+    .fschat-form {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-top: 1px solid #f0f0f0;
+      background: #fff;
+      padding: 12px 16px;
+      position: sticky;
+      bottom: 0;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    #fullscreenChatInput {
+      flex: 1;
+      padding: 12px 16px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-size: 1.08rem;
+      width: 100%;
+      box-sizing: border-box;
+      min-width: 0; /* Prevents flex item from overflowing */
+    }
+
+    .fschat-send {
+      background: none;
+      border: none;
+      padding: 0;
       cursor: pointer;
-      color: #222;
-      font-size: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      width: 40px;
+      height: 40px;
     }
 
-    .fschat-menu-item:hover {
-      background: #f5f5f5;
+    .fschat-send img {
+      width: 24px;
+      height: 24px;
+      opacity: 0.7;
     }
 
-    .fschat-menu-wrap.open .fschat-menu {
-      display: block;
+    @media (max-width: 768px) {
+      .fschat-header {
+        padding: 0 12px;
+      }
+
+      .fschat-form {
+        padding: 8px 12px;
+        gap: 4px;
+      }
+
+      #fullscreenChatInput {
+        padding: 8px 12px;
+        font-size: 1rem;
+      }
+
+      .fschat-balance {
+        padding: 6px 10px;
+        font-size: 0.9rem;
+        max-width: 100px;
+      }
+
+      .fschat-menu {
+        min-width: 140px;
+      }
+
+      .fschat-menu-item {
+        padding: 10px 14px;
+        font-size: 0.95rem;
+      }
+    }
+
+    @media (max-width: 320px) {
+      .fschat-header {
+        padding: 0 8px;
+      }
+
+      .fschat-form {
+        padding: 6px 8px;
+      }
+
+      #fullscreenChatInput {
+        padding: 6px 10px;
+        font-size: 0.95rem;
+      }
+
+      .fschat-balance {
+        padding: 4px 8px;
+        font-size: 0.85rem;
+        max-width: 80px;
+      }
+
+      #fullscreenChatAvatar {
+        width: 32px;
+        height: 32px;
+      }
+
+      #closeFullscreenChat {
+        width: 28px;
+        height: 28px;
+        font-size: 1.3rem;
+      }
     }
 
     .fschat-messages {
