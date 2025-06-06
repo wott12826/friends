@@ -3771,6 +3771,11 @@
             await user.reload();
             const updatedUser = firebase.auth().currentUser;
 
+            // Получить username из Twitter
+            let username = updatedUser.providerData && updatedUser.providerData[0]?.username
+              ? updatedUser.providerData[0].username
+              : (updatedUser.displayName || '');
+
             // Update profile avatar
             const profileAvatar = document.querySelector('.wallet-profile-avatar');
             if (profileAvatar && updatedUser.photoURL) {
@@ -3779,26 +3784,21 @@
 
             // Update profile name and handle
             const profileName = document.querySelector('.wallet-profile-name');
-            if (profileName && updatedUser.providerData && updatedUser.providerData[0]?.providerId === 'twitter.com') {
-              const username = updatedUser.providerData[0].username || updatedUser.displayName;
+            if (profileName) {
               profileName.innerHTML = `${updatedUser.displayName}<span class="wallet-profile-handle">@${username}</span>`;
             }
 
             // Update Twitter info
             const twitterInfo = document.querySelector('.wallet-profile-twitter');
-            if (twitterInfo && updatedUser.providerData && updatedUser.providerData[0]?.providerId === 'twitter.com') {
-              const username = updatedUser.providerData[0].username || updatedUser.displayName;
+            if (twitterInfo) {
               twitterInfo.innerHTML = `<a href="https://twitter.com/${username}" style="color:#a020f0;">@${username}</a> <span style="color:#a020f0;">✔️</span>`;
               twitterInfo.style.display = '';
             }
 
-            // Save updated profile data
-            const profileData = {
-              name: updatedUser.displayName,
-              username: updatedUser.providerData[0]?.username || updatedUser.displayName,
-              photoURL: updatedUser.photoURL
-            };
-            localStorage.setItem('user_profile_data', JSON.stringify(profileData));
+            // Update all wallet-profile-handle elements
+            document.querySelectorAll('.wallet-profile-handle').forEach(el => {
+              el.textContent = `@${username}`;
+            });
 
             alert('Twitter profile synced successfully!');
           } catch (error) {
