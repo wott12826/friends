@@ -3151,7 +3151,8 @@
           if (user) {
             try {
               const storage = firebase.storage();
-              const storageRef = storage.ref(`profile_photos/${user.uid}/${Date.now()}_${file.name}`);
+              // Сохраняем в profile_images
+              const storageRef = storage.ref(`profile_images/${user.uid}/${Date.now()}_${file.name}`);
               await storageRef.put(file);
               newAvatar = await storageRef.getDownloadURL();
             } catch (error) {
@@ -3626,7 +3627,7 @@
           const user = firebase.auth().currentUser;
           if (user) {
             try {
-              const storageRef = ref(storage, `profile_photos/${user.uid}/${Date.now()}_${file.name}`);
+              const storageRef = ref(storage, `profile_images/${user.uid}/${Date.now()}_${file.name}`);
               await uploadBytes(storageRef, file);
               newAvatar = await getDownloadURL(storageRef);
             } catch (error) {
