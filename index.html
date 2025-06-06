@@ -789,6 +789,37 @@
         padding: 24px;
         margin: 10% auto;
       }
+      
+      .create-club-form {
+        gap: 20px;
+      }
+      
+      .create-club-photo-label {
+        width: 100px;
+        height: 100px;
+        margin: 0 auto 16px;
+      }
+      
+      .create-club-row {
+        flex-direction: column;
+        gap: 16px;
+      }
+      
+      .create-club-input[type="text"],
+      .create-club-input[type="number"] {
+        width: 100%;
+        min-width: 0;
+      }
+      
+      .create-club-curves {
+        gap: 12px;
+      }
+      
+      .curve-option {
+        min-width: 0;
+        flex: 1;
+        padding: 12px;
+      }
     }
 
     @media (max-width: 600px) {
@@ -796,10 +827,11 @@
         max-width: 95vw;
         padding: 20px;
         margin: 15% auto;
+        border-radius: 16px;
       }
       
       .create-club-form {
-        gap: 16px;
+        gap: 24px;
       }
       
       .create-club-photo-label {
@@ -809,21 +841,38 @@
       
       .create-club-input {
         font-size: 1.1rem !important;
-        padding: 12px 16px !important;
+        padding: 14px 16px !important;
       }
       
       .create-club-section-label {
         font-size: 1.1rem;
+        margin-top: 8px;
+      }
+      
+      .create-club-curves {
+        flex-direction: column;
+        gap: 16px;
       }
       
       .curve-option {
-        min-width: 120px;
-        padding: 12px 16px;
+        width: 100%;
+        padding: 16px;
       }
       
       .create-club-btn {
         font-size: 1.2rem;
         padding: 16px 0;
+        width: 100%;
+      }
+      
+      .create-club-row[style*="margin-top:8px"] {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+      }
+      
+      .create-club-row[style*="margin-top:8px"] > div {
+        margin-left: 0 !important;
       }
     }
 
@@ -846,7 +895,7 @@
       
       .create-club-input {
         font-size: 1.2rem !important;
-        padding: 14px 18px !important;
+        padding: 16px 18px !important;
       }
       
       .create-club-section-label {
@@ -854,8 +903,7 @@
       }
       
       .curve-option {
-        min-width: 140px;
-        padding: 14px 18px;
+        padding: 18px;
       }
       
       .create-club-btn {
