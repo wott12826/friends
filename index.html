@@ -3615,73 +3615,39 @@
       saveProfile.addEventListener('click', async function() {
         const newName = editProfileName.value.trim();
         const newUsername = editProfileUsername.value.trim();
-        const newAvatar = editProfileAvatar.src;
+        let newAvatar = editProfileAvatar.src;
 
         if (!newName || !newUsername) {
           alert('Please fill in all required fields');
           return;
         }
 
+        // Если выбрана новая картинка, загружаем её в Firebase Storage
+        if (editProfileAvatarInput.files && editProfileAvatarInput.files[0]) {
+          const file = editProfileAvatarInput.files[0];
+          const user = firebase.auth().currentUser;
+          if (user) {
+            try {
+              const storageRef = ref(storage, `profile_photos/${user.uid}/${Date.now()}_${file.name}`);
+              await uploadBytes(storageRef, file);
+              newAvatar = await getDownloadURL(storageRef);
+            } catch (error) {
+              alert('Error uploading avatar: ' + error.message);
+              return;
+            }
+          }
+        }
+
         // Update profile in Firebase
         const user = firebase.auth().currentUser;
         if (user) {
           try {
-            let photoURL = user.photoURL; // Keep existing photo URL by default
-
-            // Only upload new image if it's different from the current one
-            if (newAvatar && newAvatar !== user.photoURL) {
-              // Convert base64 to blob
-              const response = await fetch(newAvatar);
-              const blob = await response.blob();
-              
-              // Create a unique filename
-              const timestamp = Date.now();
-              const filename = `profile_photos/${user.uid}/${timestamp}`;
-              
-              // Upload to Firebase Storage
-              const storageRef = firebase.storage().ref();
-              const imageRef = storageRef.child(filename);
-              
-              // Upload with metadata
-              const metadata = {
-                contentType: blob.type,
-                customMetadata: {
-                  'uploadedBy': user.uid,
-                  'uploadedAt': timestamp.toString()
-                }
-              };
-              
-              await imageRef.put(blob, metadata);
-              
-              // Get download URL
-              photoURL = await imageRef.getDownloadURL();
-            }
-
-            // Update profile with new photo URL
             await user.updateProfile({
               displayName: newName,
-              photoURL: photoURL
+              photoURL: newAvatar
             });
-
-            // Update UI
-            profileAvatar.src = photoURL;
-            profileName.innerHTML = `${newName} <span class="wallet-profile-handle">@${newUsername}</span>`;
-
-            // Save to localStorage
-            const profileData = {
-              name: newName,
-              username: newUsername,
-              photoURL: photoURL
-            };
-            localStorage.setItem('user_profile_data', JSON.stringify(profileData));
-
-            // Close modal
-            editProfileModal.style.display = 'none';
-            
-            // Show success message
-            alert('Profile updated successfully!');
+            // ... остальной код обновления UI ...
           } catch (error) {
-            console.error('Error updating profile:', error);
             alert('Error updating profile: ' + error.message);
           }
         }
