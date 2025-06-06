@@ -1783,7 +1783,7 @@
             </div>
             <div class="wallet-profile-actions">
               <button class="wallet-profile-btn edit-profile-trigger">Edit profile</button>
-              <button class="wallet-profile-btn">Sync Twitter</button>
+              <button class="wallet-profile-btn sync-twitter-btn">Sync Twitter</button>
               <button class="wallet-profile-btn">Unlink Twitter</button>
             </div>
           </div>
@@ -3638,6 +3638,65 @@
   </script>
   <!-- Add Solana Web3 library -->
   <script src="https://unpkg.com/@solana/web3.js@1.87.6/lib/index.iife.min.js"></script>
+  <script>
+    // ... existing code ...
+
+    // Add Sync Twitter button handler
+    document.addEventListener('DOMContentLoaded', function() {
+      const syncTwitterBtn = document.querySelector('.sync-twitter-btn');
+      if (syncTwitterBtn) {
+        syncTwitterBtn.addEventListener('click', async function() {
+          try {
+            const user = firebase.auth().currentUser;
+            if (!user) {
+              alert('Please log in first');
+              return;
+            }
+
+            // Get fresh user data from Firebase
+            await user.reload();
+            const updatedUser = firebase.auth().currentUser;
+
+            // Update profile avatar
+            const profileAvatar = document.querySelector('.wallet-profile-avatar');
+            if (profileAvatar && updatedUser.photoURL) {
+              profileAvatar.src = updatedUser.photoURL;
+            }
+
+            // Update profile name and handle
+            const profileName = document.querySelector('.wallet-profile-name');
+            if (profileName && updatedUser.providerData && updatedUser.providerData[0]?.providerId === 'twitter.com') {
+              const username = updatedUser.providerData[0].username || updatedUser.displayName;
+              profileName.innerHTML = `${updatedUser.displayName}<span class="wallet-profile-handle">@${username}</span>`;
+            }
+
+            // Update Twitter info
+            const twitterInfo = document.querySelector('.wallet-profile-twitter');
+            if (twitterInfo && updatedUser.providerData && updatedUser.providerData[0]?.providerId === 'twitter.com') {
+              const username = updatedUser.providerData[0].username || updatedUser.displayName;
+              twitterInfo.innerHTML = `<a href="https://twitter.com/${username}" style="color:#a020f0;">@${username}</a> <span style="color:#a020f0;">✔️</span>`;
+              twitterInfo.style.display = '';
+            }
+
+            // Save updated profile data
+            const profileData = {
+              name: updatedUser.displayName,
+              username: updatedUser.providerData[0]?.username || updatedUser.displayName,
+              photoURL: updatedUser.photoURL
+            };
+            localStorage.setItem('user_profile_data', JSON.stringify(profileData));
+
+            alert('Twitter profile synced successfully!');
+          } catch (error) {
+            console.error('Error syncing Twitter profile:', error);
+            alert('Error syncing Twitter profile: ' + error.message);
+          }
+        });
+      }
+    });
+
+    // ... existing code ...
+  </script>
 </body>
 
 </html>
