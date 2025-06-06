@@ -2804,17 +2804,9 @@
       box.innerHTML = '';
       if (!currentClubKey) return;
       let msgs = getClubMessages(currentClubKey);
-      // Если сообщений нет, показываем демо-чат
+      // Если сообщений нет, ничего не показываем
       if (!msgs.length) {
-        msgs = [
-          { user: 0, text: 'Hahahha', time: '5/30/23 6:57PM' },
-          { user: 0, text: 'Welcome', time: '5/30/23 6:57PM' },
-          { user: 1, text: 'gm', time: '5/31/23 9:04AM' },
-          { user: 2, text: 'gm', time: '6/1/23 9:07AM' },
-          { user: 1, text: '把眼睛睁开，就会知道未来...', time: '6/1/23 9:07PM' },
-          { user: 1, text: 'Best of luck!', time: '6/2/23 8:33AM' },
-          { user: 3, text: '👀 💬', time: '6/2/23 8:34AM' }
-        ];
+        return;
       }
       msgs.forEach((m, i) => {
         const currentUser = firebase.auth().currentUser;
@@ -3185,6 +3177,8 @@
         if (editProfileModal) {
           editProfileModal.style.display = 'none';
         }
+        // После строки editProfileModal.style.display = 'none';
+        window.location.reload();
       };
     }
 
@@ -3667,6 +3661,8 @@
         if (editProfileModal) {
           editProfileModal.style.display = 'none';
         }
+        // После строки editProfileModal.style.display = 'none';
+        window.location.reload();
       });
     });
   </script>
