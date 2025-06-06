@@ -1191,6 +1191,7 @@
       max-width: 60%;
       font-size: 1.05rem;
       word-break: break-word;
+      overflow-wrap: break-word;
     }
 
     .club-chat-message.me .club-chat-bubble {
@@ -1371,6 +1372,8 @@
       flex-direction: column;
       align-items: flex-start;
       max-width: 420px;
+      width: 100%;
+      padding: 0 16px;
     }
 
     .fschat-message.me {
@@ -1410,7 +1413,8 @@
       padding: 12px 18px;
       font-size: 1.08rem;
       word-break: break-word;
-      margin-bottom: 2px;
+      overflow-wrap: break-word;
+      max-width: 100%;
     }
 
     .fschat-message.me .fschat-bubble {
@@ -1471,34 +1475,79 @@
     }
 
     @media (max-width: 700px) {
-
-      .fschat-header,
-      .fschat-form {
-        padding: 0 8px;
+      .fschat-header {
+        padding: 0 16px;
+        height: 56px;
       }
 
       .fschat-messages {
-        padding-top: 16px;
+        padding: 16px 0 0 0;
       }
 
       .fschat-message {
-        max-width: 98vw;
+        max-width: 100%;
+        padding: 0 12px;
+      }
+
+      .fschat-bubble {
+        padding: 10px 16px;
+        font-size: 1rem;
+      }
+
+      .fschat-form {
+        padding: 8px 16px;
+      }
+
+      #fullscreenChatInput {
+        padding: 10px 14px;
+        font-size: 1rem;
+      }
+
+      .fschat-avatar {
+        width: 32px;
+        height: 32px;
+      }
+
+      .fschat-title {
+        font-size: 1rem;
       }
     }
 
     @media (max-width: 500px) {
-
-      .fschat-header,
-      .fschat-form {
-        padding: 0 2vw;
+      .fschat-header {
+        padding: 0 12px;
+        height: 48px;
       }
 
       .fschat-messages {
-        padding-top: 8px;
+        padding: 12px 0 0 0;
       }
 
       .fschat-message {
-        max-width: 99vw;
+        padding: 0 8px;
+      }
+
+      .fschat-bubble {
+        padding: 8px 14px;
+        font-size: 0.95rem;
+      }
+
+      .fschat-form {
+        padding: 6px 12px;
+      }
+
+      #fullscreenChatInput {
+        padding: 8px 12px;
+        font-size: 0.95rem;
+      }
+
+      .fschat-avatar {
+        width: 32px;
+        height: 32px;
+      }
+
+      .fschat-title {
+        font-size: 1rem;
       }
     }
 
