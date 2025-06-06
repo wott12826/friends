@@ -1862,7 +1862,7 @@
   <div id="main-app" class="main-app" style="display:none;">
     <div class="sidebar">
       <div class="sidebar-logo">
-        <img src="images/logo2.png" width="32" height="32" alt="logo">
+        <img src="images/logo2.png" width="52" height="52" alt="logo">
       </div>
       <div class="sidebar-menu">
         <div class="sidebar-item active" data-tab="wallet">Wallet</div>
@@ -1912,14 +1912,8 @@
             <a href="https://swap.pump.fun/?input=So11111111111111111111111111111111111111112&output=D8Vk48JaC865y6tvBW1hoAi3qH6kxQHRLc6Wu77Tpump" target="_blank" style="color:#a020f0;text-decoration:underline;font-size:1em;margin-left:8px;">swap.pump.fun</a>
           </div>
           <div class="wallet-profile-fund-row">
-            <button class="wallet-fund-btn wallet-fund-base">
-              <img src="images/base-logo.png" style="height:20px;vertical-align:middle;margin-right:8px;">BASE
-            </button>
             <button class="wallet-fund-btn wallet-fund-coinbase">
-              coinbase <span style="font-size:0.9em;">PAY</span>
-            </button>
-            <button class="wallet-fund-btn wallet-fund-eth">
-              <img src="images/ethereum-logo.png" style="height:20px;vertical-align:middle;margin-right:8px;">ethereum
+              <a href="https://swap.pump.fun/?input=So11111111111111111111111111111111111111112&amp;output=D8Vk48JaC865y6tvBW1hoAi3qH6kxQHRLc6Wu77Tpump" target="_blank" style="color:#a020f0;text-decoration:underline;font-size:1em;">coinbase <span style="font-size:0.9em;">PAY</span> / swap.pump.fun</a>
             </button>
           </div>
           <button class="wallet-logout-btn">Log out</button>
@@ -3267,8 +3261,8 @@
         // Wallet connected - show address, Disconnect and Copy buttons
         walletAddressEl.innerHTML = `
           ${address.substring(0,6)}...${address.substring(address.length-4)}
-          <button class="wallet-disconnect-btn" title="Disconnect wallet" style="margin-right:6px;">Disconnect</button>
-          <button class="wallet-copy-btn" data-address="${address}" title="Copy address"><img src="images/copy-icon.jpg" style="width:14px;height:14px;vertical-align:middle;"></button>
+          <button class="wallet-disconnect-btn" title="Disconnect wallet" style="margin-right:4px;padding:2px 8px;font-size:0.92em;">Disconnect</button>
+          <button class="wallet-copy-btn" data-address="Cm4qzi9sB9S6xgLje6kVq447aK4N5XM8DjgJXLJ963mU" title="Copy address" style="padding:2px 6px;"><img src="images/copy-icon.jpg" style="width:12px;height:12px;vertical-align:middle;"></button>
         `;
         
         // Disconnect button handler
