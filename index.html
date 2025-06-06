@@ -1975,7 +1975,7 @@
         </div>
         <div class="chat-notify">
           <span>Stay up to date with friend.tech by turning on notifications</span>
-          <button class="chat-notify-btn">Turn on</button>
+          <button class="chat-notify-btn" id="notificationToggleBtn">Turn on</button>
         </div>
         <div class="chat-list">
           
@@ -4038,7 +4038,7 @@
 
     // --- Chat notification toggle ---
     (function() {
-      const notifyBtn = document.querySelector('.chat-notify-btn');
+      const notifyBtn = document.getElementById('notificationToggleBtn');
       
       // Function to update button state
       function updateNotificationButtonState() {
