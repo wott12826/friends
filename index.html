@@ -2091,7 +2091,7 @@
           <div style="color:#888; font-size:0.98rem;">You will spend:</div>
           <div style="margin-left:8px; color:#a020f0; font-weight:600; font-size:1.1rem;">--</div>
           <div style="margin-left:24px; color:#888; font-size:0.98rem;">Your balance:</div>
-          <div style="margin-left:8px; color:#a020f0; font-weight:600; font-size:1.1rem;">0.9000</div>
+          <div id="clubWalletBalance" style="margin-left:8px; color:#a020f0; font-weight:600; font-size:1.1rem;">...</div>
         </div>
         <button class="create-club-btn" id="createClubBtn">Approve spending $POST</button>
         <div style="color:#aaa; font-size:0.95rem; margin-top:10px; text-align:center;">Once you create your club, you
@@ -2361,6 +2361,7 @@
         accessCodeInput.value = '';
         accessCodeError.textContent = '';
         accessCodeInput.focus();
+        setTimeout(updateClubWalletBalance, 100); // обновить баланс после открытия
       };
     }
 
@@ -3364,6 +3365,8 @@
 
           // Update wallet value after balance update
           updateWalletValue();
+          window.postTokenBalance = balance;
+          updateClubWalletBalance();
         } catch (error) {
           console.error('Error fetching token accounts:', error);
           // Set balance to 0 on error
@@ -3528,6 +3531,30 @@
         console.error('Error fetching price:', error);
       }
     }
+
+    // В JS добавить функцию для обновления clubWalletBalance:
+    function updateClubWalletBalance() {
+      const el = document.getElementById('clubWalletBalance');
+      const address = localStorage.getItem('wallet_address');
+      if (!el) return;
+      if (!address) {
+        el.textContent = 'Connect wallet first';
+        el.style.color = '#e00';
+        return;
+      }
+      // Получаем баланс $POST (например, из localStorage или глобальной переменной)
+      let balance = 0;
+      if (window.postTokenBalance !== undefined) {
+        balance = window.postTokenBalance;
+      } else {
+        // Попробовать получить из DOM, если уже отображается
+        const balEl = document.querySelector('.wallet-item-value');
+        if (balEl) balance = parseFloat(balEl.textContent) || 0;
+      }
+      el.textContent = balance > 0 ? balance.toFixed(4) : '0.0000';
+      el.style.color = '#a020f0';
+    }
+    // Вызвать updateClubWalletBalance() при открытии модалки создания клуба и после подключения кошелька/обновления баланса.
   </script>
   <!-- Edit Profile Modal -->
   <div id="editProfileModal" class="modal">
