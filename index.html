@@ -3443,19 +3443,23 @@
       
       // Update discover item price if it exists
       const discoverItem = document.querySelector(`.discover-item[data-club="${key}"]`);
-      if (!discoverItem) {
-        console.warn('discover-item не знайдено для:', key);
-        return newBalance;
+      if (discoverItem) {
+        const priceEl = discoverItem.querySelector('.discover-price');
+        if (priceEl) {
+          priceEl.textContent = `Price: ${newBalance.toFixed(1)} $POST`;
+          console.log('✅ Updated discover-price:', priceEl.textContent);
+        }
       }
 
-      const priceEl = discoverItem.querySelector('.discover-price');
-      if (!priceEl) {
-        console.warn('Не знайдено .discover-price для:', key);
-        return newBalance;
+      // Update fschat-balance if it exists
+      const fschat = document.querySelector(`.fschat[data-club="${key}"]`);
+      if (fschat) {
+        const balanceEl = fschat.querySelector('.fschat-balance');
+        if (balanceEl) {
+          balanceEl.innerHTML = `<img src="images/logo2.png" style="width:18px;vertical-align:middle;margin-right:4px;">${newBalance.toFixed(1)}`;
+          console.log('✅ Updated fschat-balance:', balanceEl.textContent);
+        }
       }
-
-      priceEl.textContent = `Price: ${newBalance.toFixed(4)} $POST`;
-      console.log('✅ Updated priceEl:', priceEl.textContent);
       
       return newBalance;
     }
