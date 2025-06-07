@@ -9,11 +9,13 @@
   <link rel="icon" type="image/png" href="images/logo2.png">
   <style>
     /* --- FRIEND.TECH STYLE ENHANCEMENTS --- */
-    body, html {
+    body,
+    html {
       background: #fafbfc;
       font-family: 'Inter', 'Roboto', Arial, sans-serif;
       color: #222;
     }
+
     .sidebar {
       background: #fff;
       border-right: 1px solid #eee;
@@ -21,7 +23,7 @@
       width: 85vw;
       max-width: 300px;
       padding: 16px 0;
-      box-shadow: 2px 0 8px rgba(0,0,0,0.03);
+      box-shadow: 2px 0 8px rgba(0, 0, 0, 0.03);
       position: fixed;
       left: 0;
       top: 0;
@@ -29,9 +31,11 @@
       transition: left 0.3s ease;
       overflow-y: auto;
     }
+
     .sidebar.active {
       left: 0;
     }
+
     .sidebar-item {
       padding: 12px 16px;
       margin: 4px 8px;
@@ -41,11 +45,13 @@
       align-items: center;
       gap: 8px;
     }
+
     .sidebar-item i {
       font-size: 1.2rem;
       width: 24px;
       text-align: center;
     }
+
     .mobile-menu-btn {
       position: fixed;
       top: 0px;
@@ -63,11 +69,13 @@
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
       cursor: pointer;
     }
+
     .mobile-menu-btn img {
       width: 100%;
       height: 100%;
       object-fit: contain;
     }
+
     .mobile-menu-btn span {
       display: block;
       width: 24px;
@@ -76,55 +84,86 @@
       margin: 4px 0;
       transition: 0.3s;
     }
+
     .mobile-menu-btn.active span:nth-child(1) {
       transform: rotate(45deg) translate(5px, 5px);
     }
+
     .mobile-menu-btn.active span:nth-child(2) {
       opacity: 0;
     }
+
     .mobile-menu-btn.active span:nth-child(3) {
       transform: rotate(-45deg) translate(5px, -5px);
     }
+
     @media (max-width: 900px) {
       .mobile-menu-btn {
         display: flex;
       }
+
       .sidebar {
         transform: translateX(-100%);
         transition: transform 0.3s ease;
       }
+
       .sidebar.active {
         transform: translateX(0);
       }
+
       .main-content {
         margin-left: 0;
         width: 100%;
       }
     }
+
     @media (max-width: 600px) {
       .container {
         padding: 10px;
       }
+
       .content {
         margin-top: 60px;
         padding: 0 10px;
       }
+
       .sidebar {
         width: 100%;
         max-width: none;
       }
     }
-    .main-content, .wallet-section, .tab-content, .discover-list {
+
+    .main-content,
+    .wallet-section,
+    .tab-content,
+    .discover-list {
       background: #fff;
       border-radius: 18px;
-      box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
       padding: 40px 48px;
       margin: 32px 0;
     }
-    .wallet-header, .chat-header, .discover-tabs {
+
+    .wallet-header,
+    .chat-header,
+    .discover-tabs {
       margin-bottom: 32px;
     }
-    .wallet-btn, .register-btn, .create-club-btn, .chat-tab, .discover-tab, .chat-notify-btn, .wallet-profile-btn, .wallet-profile-withdraw, .wallet-fund-btn, .wallet-logout-btn, .save-profile-btn, .button, .btn, button {
+
+    .wallet-btn,
+    .register-btn,
+    .create-club-btn,
+    .chat-tab,
+    .discover-tab,
+    .chat-notify-btn,
+    .wallet-profile-btn,
+    .wallet-profile-withdraw,
+    .wallet-fund-btn,
+    .wallet-logout-btn,
+    .save-profile-btn,
+    .button,
+    .btn,
+    button {
       background: #a020f0;
       color: #fff;
       border: none;
@@ -135,10 +174,27 @@
       box-shadow: 0 2px 8px rgba(160, 32, 240, 0.08);
       transition: background 0.2s;
     }
-    .wallet-btn:hover, .register-btn:hover, .create-club-btn:hover, .chat-tab:hover, .discover-tab:hover, .chat-notify-btn:hover, .wallet-profile-btn:hover, .wallet-profile-withdraw:hover, .wallet-fund-btn:hover, .wallet-logout-btn:hover, .save-profile-btn:hover, .button:hover, .btn:hover, button:hover {
+
+    .wallet-btn:hover,
+    .register-btn:hover,
+    .create-club-btn:hover,
+    .chat-tab:hover,
+    .discover-tab:hover,
+    .chat-notify-btn:hover,
+    .wallet-profile-btn:hover,
+    .wallet-profile-withdraw:hover,
+    .wallet-fund-btn:hover,
+    .wallet-logout-btn:hover,
+    .save-profile-btn:hover,
+    .button:hover,
+    .btn:hover,
+    button:hover {
       background: #9900ff;
     }
-    input, select, textarea {
+
+    input,
+    select,
+    textarea {
       border: 1px solid #eee !important;
       border-radius: 10px !important;
       padding: 12px 16px !important;
@@ -146,41 +202,63 @@
       font-size: 1.08rem !important;
       margin-bottom: 16px !important;
     }
-    .card, .panel, .block {
+
+    .card,
+    .panel,
+    .block {
       background: #fff;
       border-radius: 12px;
-      box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
       padding: 16px;
       margin-bottom: 16px;
       width: 100%;
       box-sizing: border-box;
     }
+
     ::-webkit-scrollbar {
       width: 8px;
       background: #f0f0f0;
     }
+
     ::-webkit-scrollbar-thumb {
       background: #e0e0e0;
       border-radius: 8px;
     }
+
     @media (max-width: 900px) {
-      .main-content, .wallet-section, .tab-content, .discover-list {
+
+      .main-content,
+      .wallet-section,
+      .tab-content,
+      .discover-list {
         padding: 24px 8px;
       }
-      .card, .panel, .block {
+
+      .card,
+      .panel,
+      .block {
         padding: 18px 8px;
       }
+
       .sidebar {
         width: 60px;
         padding-top: 12px;
       }
     }
+
     @media (max-width: 600px) {
-      .main-content, .wallet-section, .tab-content, .discover-list {
+
+      .main-content,
+      .wallet-section,
+      .tab-content,
+      .discover-list {
         padding: 8px 2vw;
         margin: 12px 0;
       }
-      .card, .panel, .block {
+
+      .card,
+      .panel,
+      .block {
         padding: 8px 2vw;
         margin-bottom: 12px;
       }
@@ -594,7 +672,18 @@
       }
 
       .sidebar {
-        display: none;
+        width: 100%;
+        max-width: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+        z-index: 1000;
+      }
+
+      .sidebar.active {
+        transform: translateX(0);
       }
 
       .main-app {
@@ -603,6 +692,7 @@
 
       .main-content {
         padding: 8px 0 0 0;
+        width: 100%;
       }
 
       .modal-content,
@@ -700,8 +790,9 @@
     .main-content {
       flex: 1;
       padding: 40px 0 0 0;
-      margin-left: 300px;
+      margin-left: 180px;
       transition: margin-left 0.3s ease;
+      width: calc(100% - 180px);
     }
 
     /* --- Chat tab styles --- */
@@ -780,6 +871,7 @@
       gap: 16px;
       padding: 12px 0;
       border-bottom: 1px solid #f0f0f0;
+      cursor: pointer;
     }
 
     .chat-avatar {
@@ -812,18 +904,23 @@
       display: flex;
       gap: 12px;
       margin-bottom: 24px;
-      margin-left: 8px;
+      padding: 0 20px;
     }
 
     .discover-tab {
       background: #f5f5f5;
       border: none;
-      border-radius: 8px;
-      padding: 8px 18px;
-      font-size: 1rem;
+      border-radius: 12px;
+      padding: 12px 24px;
+      font-size: 1.1rem;
       color: #222;
       cursor: pointer;
       font-weight: 500;
+      transition: all 0.2s;
+    }
+
+    .discover-tab:hover {
+      background: #efefef;
     }
 
     .discover-tab.active {
@@ -832,42 +929,66 @@
     }
 
     .discover-list {
-      max-width: 600px;
+      max-width: 800px;
       margin: 0 auto;
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+      padding: 20px;
     }
 
     .discover-item {
       display: flex;
       align-items: center;
-      gap: 12px;
-      padding: 12px;
+      gap: 16px;
+      padding: 16px;
       border-bottom: 1px solid #f0f0f0;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .discover-item:hover {
+      background: #fafafa;
+    }
+
+    .discover-item:last-child {
+      border-bottom: none;
+    }
+
+    .discover-rank {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: #a020f0;
+      min-width: 30px;
     }
 
     .discover-avatar {
-      width: 48px;
-      height: 48px;
-      border-radius: 8px;
+      width: 56px;
+      height: 56px;
+      border-radius: 12px;
       object-fit: cover;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
     }
 
     .discover-info {
       flex: 1;
       min-width: 0;
+      padding-right: 16px;
     }
 
     .discover-title {
       font-weight: 600;
-      font-size: 1rem;
-      margin-bottom: 4px;
+      font-size: 1.1rem;
+      margin-bottom: 6px;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+      color: #222;
     }
 
     .discover-desc {
       color: #666;
-      font-size: 0.9rem;
+      font-size: 0.95rem;
       display: -webkit-box;
       -webkit-line-clamp: 2;
       -webkit-box-orient: vertical;
@@ -876,10 +997,13 @@
 
     .discover-price {
       color: #a020f0;
-      font-size: 0.98rem;
-      font-weight: 500;
+      font-size: 1.05rem;
+      font-weight: 600;
       margin-left: 8px;
       white-space: nowrap;
+      padding: 8px 16px;
+      background: rgba(160, 32, 240, 0.08);
+      border-radius: 8px;
     }
 
     /* --- Create club modal styles --- */
@@ -982,7 +1106,7 @@
         gap: 12px;
       }
       
-      .create-club-row[style*="margin-top:8px"] > div {
+      .create-club-row[style*="margin-top:8px"]>div {
         margin-left: 0 !important;
       }
     }
@@ -1239,17 +1363,60 @@
     }
 
     /* --- Fullscreen Web3 Chat Styles --- */
+    .chat-backdrop {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.3);
+      z-index: 4999;
+    }
+
     .fullscreen-chat {
       display: none;
       position: fixed;
       z-index: 5000;
+      background: #fff;
+      flex-direction: column;
+      overflow-x: hidden;
+      border-radius: 16px;
+      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.1);
+    }
+
+    .fullscreen-chat .fschat-header {
+      padding: 16px 20px;
+    }
+
+    .fullscreen-chat .fschat-messages {
+      padding: 0 20px;
+    }
+
+    .fullscreen-chat .fschat-input {
+      padding: 16px 20px;
+      border-top: 1px solid #f0f0f0;
+    }
+
+    @media (min-width: 769px) {
+      .fullscreen-chat {
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        width: 90%;
+        max-width: 800px;
+        height: 80vh;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .fullscreen-chat {
       left: 0;
       top: 0;
       width: 100vw;
       height: 100vh;
-      background: #fff;
-      flex-direction: column;
-      overflow-x: hidden; /* Prevent horizontal scroll */
+        border-radius: 0;
+      }
     }
 
     .fschat-header {
@@ -1271,14 +1438,17 @@
       display: flex;
       align-items: center;
       gap: 12px;
-      min-width: 0; /* Allow flex items to shrink below content size */
-      flex: 1; /* Take available space */
+      min-width: 0;
+      /* Allow flex items to shrink below content size */
+      flex: 1;
+      /* Take available space */
     }
 
     #closeFullscreenChat {
       width: 32px;
       height: 32px;
-      flex-shrink: 0; /* Prevent button from shrinking */
+      flex-shrink: 0;
+      /* Prevent button from shrinking */
       display: flex;
       align-items: center;
       justify-content: center;
@@ -1290,7 +1460,8 @@
       height: 36px;
       border-radius: 50%;
       object-fit: cover;
-      flex-shrink: 0; /* Prevent avatar from shrinking */
+      flex-shrink: 0;
+      /* Prevent avatar from shrinking */
     }
 
     #fullscreenChatTitle {
@@ -1300,14 +1471,16 @@
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-      min-width: 0; /* Allow text to shrink */
+      min-width: 0;
+      /* Allow text to shrink */
     }
 
     .fschat-header-right {
       display: flex;
       align-items: center;
       gap: 12px;
-      flex-shrink: 0; /* Prevent right section from shrinking */
+      flex-shrink: 0;
+      /* Prevent right section from shrinking */
     }
 
     .fschat-balance {
@@ -1322,7 +1495,8 @@
       display: flex;
       align-items: center;
       gap: 4px;
-      max-width: 120px; /* Limit balance width */
+      max-width: 120px;
+      /* Limit balance width */
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -1346,6 +1520,35 @@
       border: 1px solid #eee;
       overflow-x: auto;
       white-space: nowrap;
+      z-index: 1000;
+    }
+
+    .fschat-menu.open {
+      display: block;
+    }
+
+    .fschat-menu-btn {
+      cursor: pointer;
+      padding: 8px;
+      border: none;
+      background: rgba(0, 0, 0, 0.1);
+      font-size: 20px;
+
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 8px;
+    }
+
+    .fschat-menu-item {
+      padding: 10px 16px;
+      cursor: pointer;
+    }
+
+    .fschat-menu-item:hover {
+      background: #f5f5f5;
     }
 
     .fschat-form {
@@ -1369,7 +1572,8 @@
       font-size: 1.08rem;
       width: 100%;
       box-sizing: border-box;
-      min-width: 0; /* Prevents flex item from overflowing */
+      min-width: 0;
+      /* Prevents flex item from overflowing */
     }
 
     .fschat-send {
@@ -1558,7 +1762,8 @@
       font-size: 1.08rem;
       width: 100%;
       box-sizing: border-box;
-      min-width: 0; /* Prevents flex item from overflowing */
+      min-width: 0;
+      /* Prevents flex item from overflowing */
     }
 
     .fschat-emoji {
@@ -1580,8 +1785,10 @@
       font-weight: 600;
       display: flex;
       align-items: center;
-      flex-shrink: 0; /* Prevents button from shrinking */
-      min-width: 40px; /* Minimum width for the button */
+      flex-shrink: 0;
+      /* Prevents button from shrinking */
+      min-width: 40px;
+      /* Minimum width for the button */
     }
 
     .fschat-send:hover {
@@ -1618,7 +1825,8 @@
 
     .fschat-menu-wrap {
       position: relative;
-      flex-shrink: 0; /* Prevents menu from shrinking */
+      flex-shrink: 0;
+      /* Prevents menu from shrinking */
     }
 
     .fschat-menu {
@@ -1631,8 +1839,10 @@
       box-shadow: 0 2px 12px rgba(0, 0, 0, 0.07);
       min-width: 180px;
       border: 1px solid #eee;
-      max-width: 90vw; /* Limits menu width on mobile */
-      overflow-x: auto; /* Allows horizontal scrolling if needed */
+      max-width: 90vw;
+      /* Limits menu width on mobile */
+      overflow-x: auto;
+      /* Allows horizontal scrolling if needed */
     }
 
     @media (max-width: 768px) {
@@ -1735,9 +1945,33 @@
     }
 
     .wallet-copy-btn {
-      border: none !important;
-      background: transparent;
-      box-shadow: none;
+      padding: 1px 4px;
+      background: rgba(0, 0, 0, 0.1);
+      border-radius: 4px;
+      border: none;
+      cursor: pointer;
+    }
+
+    .wallet-disconnect-btn {
+      margin-right: 2px;
+      padding: 8px 8px !important;
+      font-size: 0.85em;
+      background: rgba(0, 0, 0, 0.1);
+      color: #000;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .wallet-copy-btn {
+      padding: 1px 6px;
+      background: rgba(0, 0, 0, 0.1);
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
     }
 
     .wallet-profile-twitter {
@@ -2170,6 +2404,7 @@
       color: white !important;
       text-decoration: none !important;
     }
+
     .wallet-fund-btn a:hover {
       color: white !important;
       text-decoration: none !important;
@@ -2178,6 +2413,7 @@
     .wallet-profile-twitter a {
       text-decoration: none !important;
     }
+
     .wallet-profile-twitter a:hover {
       text-decoration: none !important;
     }
@@ -2257,19 +2493,24 @@
       display: none;
       position: fixed;
       z-index: 999;
-      left: 0; top: 0;
-      width: 100vw; height: 100vh;
-      background: rgba(0,0,0,0.25);
+      left: 0;
+      top: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.25);
       transition: opacity 0.3s ease;
       opacity: 0;
     }
+
     .sidebar-dim.active {
       display: block;
       opacity: 1;
     }
+
     .sidebar {
       transition: transform 0.3s ease;
     }
+
     @media (max-width: 768px) {
       .sidebar {
         position: fixed;
@@ -2277,7 +2518,7 @@
         top: 0;
         height: 100vh;
         z-index: 1000;
-        box-shadow: 2px 0 16px rgba(0,0,0,0.08);
+        box-shadow: 2px 0 16px rgba(0, 0, 0, 0.08);
         background: #fff;
         width: 220px;
         display: flex;
@@ -2285,17 +2526,22 @@
         align-items: center;
         padding-top: 32px;
       }
+
       .sidebar.mobile-open {
         transform: translateX(0);
       }
+
       .main-app {
-        width: 100vw;
+        width: 100%;
         min-width: 0;
       }
+
       .main-content {
-        padding: 12px 0 0 0;
+        padding: 12px 16px 0 16px;
         margin-left: 0 !important;
+        width: 100% !important;
       }
+
       .mobile-menu-btn {
         display: flex;
         position: fixed;
@@ -2307,24 +2553,28 @@
         border-radius: 8px;
         width: 44px;
         height: 44px;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
         cursor: pointer;
         align-items: center;
         justify-content: center;
         font-size: 2rem;
         transition: transform 0.3s ease;
       }
+
       .mobile-menu-btn.open {
         transform: rotate(90deg);
       }
     }
+
     @media (min-width: 769px) {
       .mobile-menu-btn {
         display: none;
       }
+
       .sidebar-dim {
         display: none !important;
       }
+
       .sidebar {
         transform: none !important;
         position: relative;
@@ -2335,17 +2585,17 @@
     }
   </style>
   <script>
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
       const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
       const sidebar = document.querySelector('.sidebar');
       
-      mobileMenuBtn.addEventListener('click', function() {
+      mobileMenuBtn.addEventListener('click', function () {
         this.classList.toggle('active');
         sidebar.classList.toggle('active');
       });
 
       // Close sidebar when clicking outside
-      document.addEventListener('click', function(event) {
+      document.addEventListener('click', function (event) {
         if (!sidebar.contains(event.target) && !mobileMenuBtn.contains(event.target)) {
           sidebar.classList.remove('active');
           mobileMenuBtn.classList.remove('active');
@@ -2479,7 +2729,8 @@
           </div>
           <div class="wallet-profile-fund-row">
             <button class="wallet-fund-btn wallet-fund-coinbase">
-              <a href="https://swap.pump.fun/?input=So11111111111111111111111111111111111111112&amp;output=D8Vk48JaC865y6tvBW1hoAi3qH6kxQHRLc6Wu77Tpump" target="_blank" style="color:white;font-size:1em;"> <span style="font-size:0.9em;"></span> pumpswap</a>
+              <a href="https://swap.pump.fun/?input=So11111111111111111111111111111111111111112&amp;output=D8Vk48JaC865y6tvBW1hoAi3qH6kxQHRLc6Wu77Tpump"
+                target="_blank" style="color:white;font-size:1em;"> <span style="font-size:0.9em;"></span> pumpswap</a>
             </button>
           </div>
           <button class="wallet-logout-btn">Log out</button>
@@ -2518,7 +2769,8 @@
       <div id="tab-chat" class="tab-content" style="display:none;">
         <div class="chat-header">
           <input class="chat-search" type="text" placeholder="Find friends or clubs...">
-          <img class="chat-bell" src="images/notification.png" alt="notification" style="width:24px;height:24px;vertical-align:middle;">
+          <img class="chat-bell" src="images/notification.png" alt="notification"
+            style="width:24px;height:24px;vertical-align:middle;">
           <div class="notification-popup">
             <div class="notification-header">Notifications</div>
             <div class="notification-list">
@@ -2535,11 +2787,22 @@
           <button class="chat-notify-btn" id="notificationToggleBtn">Turn on</button>
         </div>
         <div class="chat-list">
-          
+          <div class="chat-item user-item" onclick="openFullscreenChat({
+              avatar: this.querySelector('img').src,
+              title: this.querySelector('.chat-name').textContent,
+              clubId: 'user_' + this.querySelector('.chat-name').textContent
+            })">
+            <img src="images/avatar.png" alt="avatar" class="chat-avatar">
+            <div class="chat-info">
+              <div class="chat-name">sadasd</div>
+              <div class="chat-msg">Click to start chatting</div>
+            </div>
+            <div class="chat-price">$0.00</div>
+          </div>
         </div>
       </div>
-      <!-- Discover tab (заглушка) -->
-      <div id="tab-discover" class="tab-content" style="display:none;">
+      <!-- Discover tab -->
+      <div id="tab-discover" class="tab-content" style="display:none; padding: 20px;">
         <div class="discover-tabs">
           <button class="discover-tab active" id="discoverRankingsBtn">Rankings</button>
           <button class="discover-tab" id="discoverRecentBtn">Recent</button>
@@ -2639,8 +2902,7 @@
           <!-- ... ещё элементы ... -->
         </div>
         <div id="discover-recent" class="discover-list" style="display:none;">
-          <div style="color:#888; font-size:1.1rem; margin:40px auto; text-align:center;">Recent clubs coming soon...
-          </div>
+          <div style="color:#888; font-size:1.1rem; margin:40px auto; text-align:center;">Recent clubs coming soon...</div>
         </div>
       </div>
     </div>
@@ -2660,8 +2922,8 @@
           <input type="text" id="clubTickerInput" class="create-club-input" placeholder="$TICKER" maxlength="8"
             style="text-transform:uppercase;">
         </div>
-        <textarea id="clubDescInput" class="create-club-input" placeholder="Add a description for your club (optional)"
-          style="resize:none;"></textarea>
+          <textarea id="clubDescInput" class="create-club-input"
+            placeholder="Add a description for your club (optional)" style="resize:none;"></textarea>
         <div class="create-club-section-label">Select price curve</div>
         <div class="create-club-curves">
           <div class="curve-option selected" data-curve="casual">
@@ -2685,14 +2947,18 @@
         </div>
         <div class="create-club-section-label" style="margin-top:18px;">Buy club keys</div>
         <div class="create-club-row">
-          <input type="number" id="clubKeysInput" class="create-club-input" value="1" min="1" max="1" style="width:80px;" readonly>
+            <input type="number" id="clubKeysInput" class="create-club-input" value="1" min="1" max="1"
+              style="width:80px;" readonly>
           <div style="margin-left:12px; color:#888; font-size:0.98rem;">Become the owner of your club</div>
         </div>
         <div class="create-club-row" style="margin-top:8px; align-items:center;">
           <div style="color:#888; font-size:0.98rem;">You will spend:</div>
           <div style="margin-left:8px; color:#a020f0; font-weight:600; font-size:1.1rem;">--</div>
           <div style="margin-left:24px; color:#888; font-size:0.98rem;">Your balance:</div>
-          <div id="clubWalletBalance" style="margin-left:8px; color:#a020f0; font-weight:600; font-size:1.1rem;">...</div>
+            <div id="clubWalletBalance" style="margin-left:8px; color:#a020f0; font-weight:600; font-size:1.1rem;">...
+            </div>
+            <button id="clubConnectWalletBtn" class="connect-wallet-btn"
+              style="margin-left:auto; padding:8px 16px; font-size:0.95rem;">Connect wallet</button>
         </div>
         <button class="create-club-btn" id="createClubBtn">Approve spending $POST</button>
         <div style="color:#aaa; font-size:0.95rem; margin-top:10px; text-align:center;">Once you create your club, you
@@ -2727,6 +2993,7 @@
     </div>
   </div>
   <!-- Фуллскрин чат -->
+    <div id="chatBackdrop" class="chat-backdrop"></div>
   <div id="fullscreenChat" class="fullscreen-chat">
     <div class="fschat-header">
       <div class="fschat-header-left">
@@ -2734,20 +3001,46 @@
         <img id="fullscreenChatAvatar" class="fschat-avatar" src="" alt="avatar">
         <span id="fullscreenChatTitle" class="fschat-title"></span>
       </div>
-      <div class="fschat-header-right">
-        <button class="fschat-balance"><img src="images/logo2.png" style="width:18px;vertical-align:middle;margin-right:4px;">0.0</button>
-        <div class="fschat-menu-wrap">
-          <button class="fschat-menu-btn">⋮</button>
-          <div class="fschat-menu">
-            <div class="fschat-menu-item">Delete chat</div>
-            <div class="fschat-menu-item">Turn on notifications</div>
-            <div class="fschat-menu-item">Pin to top of chat list</div>
-          </div>
+            <div class="fschat-header-right">
+          <button class="fschat-balance" title="Balance"><img src="images/logo2.png"
+              style="width:18px;vertical-align:middle;margin-right:4px;">0.0</button>
+          <div class="fschat-menu-wrap">
+            <button class="fschat-menu-btn" title="Menu">⋮</button>
+                      <div class="fschat-menu">
+              <div class="fschat-menu-item" onclick="window.copyLink()">Copy chat link</div>
+              <div class="fschat-menu-item">Delete chat</div>
+              <div class="fschat-menu-item">Turn on notifications</div>
+              <div class="fschat-menu-item">Pin to top of chat list</div>
+            </div>
+            <script>
+              window.copyLink = function() {
+                if (!currentClubKey) return;
+                const link = window.location.origin + window.location.pathname + '?chat=' + encodeURIComponent(currentClubKey);
+                const el = document.createElement('textarea');
+                el.value = link;
+                el.setAttribute('readonly', '');
+                el.style.position = 'absolute';
+                el.style.left = '-9999px';
+                document.body.appendChild(el);
+                el.select();
+                document.execCommand('copy');
+                document.body.removeChild(el);
+                
+                // Show feedback
+                alert('Link copied to clipboard!');
+                
+                // Close menu
+                const menu = document.querySelector('.fschat-menu');
+                if (menu) menu.style.display = 'none';
+              }
+            </script>
         </div>
       </div>
     </div>
     <div id="fullscreenChatMessages" class="fschat-messages"></div>
-    <div class="fschat-tip">Tip: Chat with your key holders here. They can see your messages and only you can see their messages.</div>
+      <div class="fschat-tip">Tip: Chat with your key holders here. They can see your messages and only you can see
+        their
+        messages.</div>
     <form id="fullscreenChatForm" class="fschat-form" style="position:relative;">
       <button type="button" class="fschat-emoji" style="background: none; border: none; padding: 0; cursor: pointer;">
         <img
@@ -2813,6 +3106,10 @@
   <!-- Firebase Storage -->
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
 
+  <!-- Access codes -->
+  <script src="./access-codes.js"></script>
+
+  <!-- Main app script -->
   <script>
     // Проверяем, не инициализирован ли уже Firebase
     if (!firebase.apps.length) {
@@ -2918,11 +3215,18 @@
       document.querySelectorAll('.sidebar-item').forEach(el => el.classList.remove('active'));
       document.querySelector('.sidebar-item[data-tab="' + tab + '"]').classList.add('active');
       
-      // Remove active class from mobile menu button on mobile screens
+      // Ensure sidebar is visible when switching tabs
+      const sidebar = document.querySelector('.sidebar');
+      if (sidebar) {
+        sidebar.style.display = '';
+      }
+      
+      // Only handle mobile menu state on mobile screens
       if (window.innerWidth < 768) {
         const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
-        mobileMenuBtn.classList.remove('active');
-        document.querySelector('.sidebar').classList.remove('active');
+        if (mobileMenuBtn) {
+          mobileMenuBtn.classList.remove('active');
+        }
       }
     }
     document.querySelectorAll('.sidebar-item').forEach(item => {
@@ -2990,9 +3294,15 @@
     if (accessCodeSubmit) {
       accessCodeSubmit.onclick = function () {
         const code = accessCodeInput.value.trim();
-        if (code === 'oldcode') {
+        // Use the separate AccessCodeHandler
+        const validation = window.AccessCodeHandler ? 
+                         window.AccessCodeHandler.validate(code) : 
+                         { isValid: code === 'newcode' };
+        
+        if (validation.isValid) {
           accessCodeError.style.color = '#0a0';
           accessCodeError.textContent = 'Access granted!';
+          
           setTimeout(() => {
             codeModal.style.display = 'none';
             accessCodeError.textContent = '';
@@ -3017,6 +3327,7 @@
     const discoverRecentBtn = document.getElementById('discoverRecentBtn');
     const discoverRankings = document.getElementById('discover-rankings');
     const discoverRecent = document.getElementById('discover-recent');
+    
     if (discoverRankingsBtn && discoverRecentBtn) {
       discoverRankingsBtn.onclick = function () {
         discoverRankingsBtn.classList.add('active');
@@ -3024,6 +3335,7 @@
         discoverRankings.style.display = '';
         discoverRecent.style.display = 'none';
       };
+      
       discoverRecentBtn.onclick = function () {
         discoverRecentBtn.classList.add('active');
         discoverRankingsBtn.classList.remove('active');
@@ -3254,7 +3566,9 @@
       clubs.push({ name, ticker, desc, avatar });
       saveClubs(clubs);
       renderClubs();
-      document.getElementById('createClubModal').style.display = 'none';
+        // Close the modal
+        const modal = document.querySelector('.modal-content.create-club-modal-content').closest('.modal');
+        if (modal) modal.style.display = 'none';
       // Сброс формы
       document.getElementById('clubNameInput').value = '';
       document.getElementById('clubTickerInput').value = '';
@@ -3278,11 +3592,7 @@
       const club = clubs[idx - 1];
       if (!club) return;
       currentClubKey = club.name + '|' + club.ticker;
-      openFullscreenChat({
-        avatar: club.avatar || 'https://via.placeholder.com/40x40?text=Club',
-        title: club.name + (club.ticker ? ' (' + club.ticker + ')' : ''),
-        clubId: currentClubKey
-      });
+      window.location.href = `/chat.html?chat=${encodeURIComponent(currentClubKey)}`;
     });
 
     // --- Открытие чата из Discover с кодом ---
@@ -3294,11 +3604,7 @@
       const avatar = item.querySelector('.discover-avatar')?.src || '';
       const name = item.querySelector('.discover-title')?.textContent || '';
       const ticker = (item.querySelector('.discover-title')?.textContent.match(/\(([^)]+)\)/) || [])[1] || '';
-      discoverChatData = {
-        avatar,
-        title: name + (ticker ? ' (' + ticker + ')' : ''),
-        clubId: 'discover|' + name + '|' + ticker
-      };
+      const chatId = 'discover|' + name + '|' + ticker;
 
       // Проверяем, есть ли доступ у текущего пользователя к конкретному клубу
       const currentUser = firebase.auth().currentUser;
@@ -3308,7 +3614,7 @@
 
         if (hasAccess) {
           // Если доступ к этому клубу уже есть, сразу открываем чат
-          openFullscreenChat(discoverChatData);
+          window.location.href = `/chat.html?chat=${encodeURIComponent(chatId)}`;
         } else {
           // Если доступа к этому клубу нет, показываем окно для ввода кода
           document.getElementById('discoverCodeModal').style.display = 'flex';
@@ -3343,9 +3649,10 @@
           localStorage.setItem(clubAccessKey, 'true');
         }
 
-        setTimeout(() => {
+                  setTimeout(() => {
           document.getElementById('discoverCodeModal').style.display = 'none';
-          if (discoverChatData) openFullscreenChat(discoverChatData);
+          const chatId = 'discover|' + name + '|' + ticker;
+          window.location.href = `/chat.html?chat=${encodeURIComponent(chatId)}`;
         }, 700);
       } else {
         document.getElementById('discoverCodeError').style.color = '#e00';
@@ -3353,17 +3660,46 @@
       }
     };
 
+    // Copy chat link functionality
+    function copyCurrentChatLink() {
+      if (!currentClubKey) return;
+      
+      // Create the chat link
+      const baseUrl = window.location.origin + window.location.pathname;
+      const chatLink = `${baseUrl}?chat=${encodeURIComponent(currentClubKey)}`;
+      
+      // Copy to clipboard
+      navigator.clipboard.writeText(chatLink).then(() => {
+        // Show success feedback
+        const balanceBtn = document.querySelector('.fschat-balance');
+        const originalContent = balanceBtn.innerHTML;
+        balanceBtn.innerHTML = '✓ Link copied!';
+        
+        // Restore original content after 2 seconds
+        setTimeout(() => {
+          balanceBtn.innerHTML = originalContent;
+        }, 2000);
+      }).catch(err => {
+        console.error('Failed to copy:', err);
+        alert('Failed to copy link. Please try again.');
+      });
+    }
+
     // --- Web3 Chat: меню ---
     (function () {
       const menuBtn = document.querySelector('.fschat-menu-btn');
       const menuWrap = document.querySelector('.fschat-menu-wrap');
+      const menu = document.querySelector('.fschat-menu');
       const menuItems = document.querySelectorAll('.fschat-menu-item');
       
-      if (menuBtn && menuWrap) {
-        menuBtn.onclick = function (e) {
+      if (menuBtn && menuWrap && menu) {
+        menuBtn.addEventListener('click', function(e) {
+          // Якщо це клік для копіювання посилання, не відкриваємо меню
+          if (e.target.hasAttribute('onclick')) return;
+          
           e.stopPropagation();
-          menuWrap.classList.toggle('open');
-        };
+          menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+        });
         
         document.body.addEventListener('click', function () {
           menuWrap.classList.remove('open');
@@ -3371,11 +3707,11 @@
 
         // Handle menu items
         menuItems.forEach(item => {
-          item.onclick = function(e) {
+            item.onclick = function (e) {
             e.stopPropagation();
             const action = this.textContent.trim();
             
-            switch(action) {
+              switch (action) {
               case 'Delete chat':
                 if (confirm('Are you sure you want to delete this chat?')) {
                   // Remove chat from localStorage
@@ -3434,26 +3770,198 @@
       }
     })();
 
-    // --- Web3 Chat: открытие ---
+    // Copy chat link functionality
+    function copyCurrentChatLink() {
+      if (!currentClubKey) return;
+      
+      // Create the chat link
+      const baseUrl = window.location.origin + window.location.pathname;
+      const chatLink = `${baseUrl}?chat=${encodeURIComponent(currentClubKey)}`;
+      
+      // Copy to clipboard
+      navigator.clipboard.writeText(chatLink).then(() => {
+        // Show success feedback
+        const balanceBtn = document.querySelector('.fschat-balance');
+        const originalContent = balanceBtn.innerHTML;
+        balanceBtn.innerHTML = '✓ Link copied!';
+        
+        // Restore original content after 2 seconds
+        setTimeout(() => {
+          balanceBtn.innerHTML = originalContent;
+        }, 2000);
+      }).catch(err => {
+        console.error('Failed to copy:', err);
+        alert('Failed to copy link. Please try again.');
+      });
+    }
+
+    // --- Web3 Chat: открытие и закрытие ---
+    document.getElementById('closeFullscreenChat').onclick = function() {
+      const fullscreenChat = document.getElementById('fullscreenChat');
+      const backdrop = document.getElementById('chatBackdrop');
+      backdrop.style.display = 'none';
+      fullscreenChat.style.display = 'none';
+      document.querySelector('.main-app').style.display = 'flex';
+      currentClubKey = null;
+    };
+
+    // Menu functionality
+    (function() {
+      const menuBtn = document.querySelector('.fschat-menu-btn');
+      const menu = document.querySelector('.fschat-menu');
+      
+      if (menuBtn && menu) {
+        menuBtn.onclick = function(e) {
+          e.stopPropagation();
+          menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+        };
+        
+        document.addEventListener('click', function(e) {
+          if (!menu.contains(e.target) && e.target !== menuBtn) {
+            menu.style.display = 'none';
+          }
+        });
+      }
+    })();
+
+    // Copy chat link functionality
+    function copyCurrentChatLink(event) {
+      event.preventDefault();
+      event.stopPropagation();
+      
+      if (!currentClubKey) return;
+      
+      // Create the chat link
+      const baseUrl = window.location.origin + window.location.pathname;
+      const chatLink = `${baseUrl}?chat=${encodeURIComponent(currentClubKey)}`;
+      
+      // Create temporary input element
+      const tempInput = document.createElement('input');
+      tempInput.style.position = 'fixed';
+      tempInput.style.opacity = 0;
+      tempInput.value = chatLink;
+      document.body.appendChild(tempInput);
+      
+      // Select and copy
+      tempInput.select();
+      tempInput.setSelectionRange(0, 99999); // For mobile devices
+      
+      try {
+        document.execCommand('copy');
+        
+        // Show success message
+        const tooltip = document.createElement('div');
+        tooltip.textContent = 'Link copied!';
+        tooltip.style.cssText = `
+          position: fixed;
+          background: rgba(0, 0, 0, 0.8);
+          color: white;
+          padding: 8px 12px;
+          border-radius: 4px;
+          font-size: 14px;
+          z-index: 10000;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+        `;
+        
+        document.body.appendChild(tooltip);
+        
+        // Remove tooltip after animation
+        setTimeout(() => {
+          tooltip.style.opacity = '0';
+          tooltip.style.transition = 'opacity 0.3s ease';
+          setTimeout(() => document.body.removeChild(tooltip), 300);
+        }, 1500);
+        
+        // Close menu
+        const menu = document.querySelector('.fschat-menu');
+        if (menu) menu.style.display = 'none';
+      } catch (err) {
+        console.error('Copy failed:', err);
+        alert('Failed to copy link. Please try again.');
+      }
+      
+      // Cleanup
+      document.body.removeChild(tempInput);
+    }
+    
+    function showCopySuccess() {
+      // Create and show tooltip
+      const tooltip = document.createElement('div');
+      tooltip.textContent = 'Link copied!';
+      tooltip.style.cssText = `
+        position: fixed;
+        background: rgba(0, 0, 0, 0.8);
+        color: white;
+        padding: 8px 12px;
+        border-radius: 4px;
+        font-size: 14px;
+        z-index: 10000;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+      `;
+      
+      document.body.appendChild(tooltip);
+      
+      // Remove tooltip after animation
+      setTimeout(() => {
+        tooltip.style.opacity = '0';
+        tooltip.style.transition = 'opacity 0.3s ease';
+        setTimeout(() => document.body.removeChild(tooltip), 300);
+      }, 1500);
+    }
+
     function openFullscreenChat({ avatar, title, clubId }) {
       const fullscreenChat = document.getElementById('fullscreenChat');
+      const backdrop = document.getElementById('chatBackdrop');
+      
+      // Set chat data
+      document.getElementById('fullscreenChatAvatar').src = avatar;
+      document.getElementById('fullscreenChatTitle').textContent = title;
+      fullscreenChat.setAttribute('data-club', clubId);
+      
+      // Show chat
+      backdrop.style.display = 'block';
+      fullscreenChat.style.display = 'flex';
+      document.querySelector('.main-app').style.display = 'none';
+      
+      // Load messages
+      currentClubKey = clubId;
+      renderFullscreenChatMessages();
+      updateBalanceDisplay();
+      
+      // Focus input
+      document.getElementById('fullscreenChatInput').focus();
       fullscreenChat.setAttribute('data-club', clubId);
       document.getElementById('fullscreenChatAvatar').src = avatar;
       document.getElementById('fullscreenChatTitle').textContent = title;
       currentClubKey = clubId;
       renderFullscreenChatMessages();
       fullscreenChat.style.display = 'flex';
+        backdrop.style.display = 'block';
       document.querySelector('.main-app').style.display = 'none';
       updateChatBalance(clubId, 0); // Синхронизируем баланс без инкремента
+
+        // Initialize chat if it's a new conversation
+        if (!getClubMessages(clubId).length) {
+          saveClubMessages(clubId, []);
+        }
+
       setTimeout(() => {
         const msgBox = document.getElementById('fullscreenChatMessages');
         msgBox.scrollTop = msgBox.scrollHeight;
       }, 100);
     }
-    document.getElementById('closeFullscreenChat').onclick = function () {
+      function closeChat() {
       document.getElementById('fullscreenChat').style.display = 'none';
+        document.getElementById('chatBackdrop').style.display = 'none';
       document.querySelector('.main-app').style.display = 'flex';
-    };
+      }
+
+      document.getElementById('closeFullscreenChat').onclick = closeChat;
+      document.getElementById('chatBackdrop').onclick = closeChat;
     function getClubMessages(clubId) {
       try {
         return JSON.parse(localStorage.getItem('clubmsg_' + clubId) || '[]');
@@ -3553,7 +4061,7 @@
     }
 
     // Handle chat form submission
-    document.getElementById('fullscreenChatForm').onsubmit = function(e) {
+      document.getElementById('fullscreenChatForm').onsubmit = function (e) {
       e.preventDefault();
       const input = document.getElementById('fullscreenChatInput');
       const text = input.value.trim();
@@ -3616,7 +4124,9 @@
       chatEmojiPanel.style.display = chatEmojiPanel.style.display === 'none' ? 'flex' : 'none';
     };
     document.body.addEventListener('click', function (e) {
-      if (!chatEmojiPanel.contains(e.target) && e.target !== emojiBtn) chatEmojiPanel.style.display = 'none';
+        if (chatEmojiPanel && !chatEmojiPanel.contains(e.target) && e.target !== emojiBtn) {
+          chatEmojiPanel.style.display = 'none';
+        }
     });
 
     // --- Image upload logic ---
@@ -3957,7 +4467,7 @@
         
         const connectBtn = document.getElementById('connectPhantomBtn');
         if (connectBtn) {
-          connectBtn.addEventListener('click', async function() {
+            connectBtn.addEventListener('click', async function () {
             try {
               if (!window.solana || !window.solana.isPhantom) {
                 alert('Please install Phantom wallet');
@@ -3992,15 +4502,15 @@
       } else {
         // Wallet connected - show address, Disconnect and Copy buttons
         walletAddressEl.innerHTML = `
-          ${address.substring(0,6)}...${address.substring(address.length-4)}
-          <button class="wallet-disconnect-btn" title="Disconnect wallet" style="margin-right:2px;padding:1px 5px;font-size:0.85em;">Disconnect</button>
-          <button class="wallet-copy-btn" data-address="Cm4qzi9sB9S6xgLje6kVq447aK4N5XM8DjgJXLJ963mU" title="Copy address" style="padding:1px 4px;"><img src="images/copy-icon.png" style="width:10px;height:10px;vertical-align:middle;"></button>
+          ${address.substring(0, 6)}...${address.substring(address.length - 4)}
+          <button class="wallet-disconnect-btn" title="Disconnect wallet">Disconnect</button>
+            <button class="wallet-copy-btn" data-address="Cm4qzi9sB9S6xgLje6kVq447aK4N5XM8DjgJXLJ963mU" title="Copy address"><img src="images/copy-icon.png" style="width:10px;height:10px;vertical-align:middle;"></button>
         `;
         
         // Disconnect button handler
         const disconnectBtn = walletAddressEl.querySelector('.wallet-disconnect-btn');
         if (disconnectBtn) {
-          disconnectBtn.addEventListener('click', async function() {
+            disconnectBtn.addEventListener('click', async function () {
             try {
               // Disconnect from Phantom wallet
               if (window.solana && window.solana.isPhantom) {
@@ -4028,7 +4538,7 @@
         // Copy button handler
         const copyBtn = walletAddressEl.querySelector('.wallet-copy-btn');
         if (copyBtn) {
-          copyBtn.addEventListener('click', function() {
+            copyBtn.addEventListener('click', function () {
             const addr = this.dataset.address;
             if (addr) {
               navigator.clipboard.writeText(addr)
@@ -4131,7 +4641,7 @@
     }
 
     // Initial price and balance fetch
-    document.addEventListener('DOMContentLoaded', function() {
+      document.addEventListener('DOMContentLoaded', function () {
       fetchPrice();
       fetchPostBalance();
 
@@ -4146,7 +4656,7 @@
 
     // Update wallet connection handler to fetch balance
     if (connectBtn) {
-      connectBtn.addEventListener('click', async function() {
+        connectBtn.addEventListener('click', async function () {
         try {
           if (!window.solana || !window.solana.isPhantom) {
             alert('Please install Phantom wallet');
@@ -4182,7 +4692,7 @@
     // Clear interval when disconnecting wallet
     const disconnectBtn = document.querySelector('.wallet-disconnect-btn');
     if (disconnectBtn) {
-      disconnectBtn.addEventListener('click', function() {
+        disconnectBtn.addEventListener('click', function () {
         const intervalId = localStorage.getItem('balance_update_interval');
         if (intervalId) {
           clearInterval(parseInt(intervalId));
@@ -4192,7 +4702,7 @@
     }
 
     // Initial balance fetch if wallet is connected
-    document.addEventListener('DOMContentLoaded', function() {
+      document.addEventListener('DOMContentLoaded', function () {
       const walletAddress = localStorage.getItem('wallet_address');
       if (walletAddress) {
         fetchPostBalance();
@@ -4226,7 +4736,7 @@
     }
 
     // Initial price and balance fetch
-    document.addEventListener('DOMContentLoaded', function() {
+      document.addEventListener('DOMContentLoaded', function () {
       fetchPrice();
       fetchPostBalance();
 
@@ -4263,18 +4773,30 @@
     function updateClubWalletBalance() {
       const el = document.getElementById('clubWalletBalance');
       const createClubBtn = document.getElementById('createClubBtn');
+      const clubConnectWalletBtn = document.getElementById('clubConnectWalletBtn');
       const address = localStorage.getItem('wallet_address');
       if (!el) return;
       if (!address) {
         el.textContent = 'Connect wallet first';
         el.style.color = '#e00';
-        // Disable the button when wallet is not connected
+        // Show connect wallet button
+        if (clubConnectWalletBtn) {
+          clubConnectWalletBtn.style.display = 'block';
+        }
+        // Disable the create club button
         if (createClubBtn) {
           createClubBtn.disabled = true;
           createClubBtn.style.opacity = '0.5';
           createClubBtn.style.cursor = 'not-allowed';
         }
         return;
+      } else {
+        // Keep connect wallet button visible but update create club button
+        if (createClubBtn) {
+          createClubBtn.disabled = false;
+          createClubBtn.style.opacity = '1';
+          createClubBtn.style.cursor = 'pointer';
+        }
       }
       // Получаем баланс $POST (например, из localStorage или глобальной переменной)
       let balance = 0;
@@ -4294,6 +4816,38 @@
         createClubBtn.style.cursor = 'pointer';
       }
     }
+    // Add event listener for club connect wallet button
+    const clubConnectWalletBtn = document.getElementById('clubConnectWalletBtn');
+    if (clubConnectWalletBtn) {
+        clubConnectWalletBtn.addEventListener('click', async function () {
+        try {
+          if (!window.solana || !window.solana.isPhantom) {
+            alert('Please install Phantom wallet');
+            window.open('https://phantom.app/', '_blank');
+            return;
+          }
+
+          const resp = await window.solana.connect({ onlyIfTrusted: false });
+          if (!resp || !resp.publicKey) {
+            alert('Phantom did not return a publicKey. Did you cancel the connection?');
+            return;
+          }
+
+          const address = resp.publicKey.toString();
+          localStorage.setItem('wallet_address', address);
+          updateClubWalletBalance();
+          
+          // Fetch POST balance after connecting wallet
+          if (typeof fetchPostBalance === 'function') {
+            fetchPostBalance();
+          }
+        } catch (err) {
+          console.error('Error connecting to wallet:', err);
+          alert('Error connecting to wallet: ' + (err?.message || JSON.stringify(err)));
+        }
+      });
+    }
+
     // Вызвать updateClubWalletBalance() при открытии модалки создания клуба и после подключения кошелька/обновления баланса.
   </script>
   <!-- Edit Profile Modal -->
@@ -4326,7 +4880,7 @@
     </div>
   </div>
   <script>
-    document.addEventListener('DOMContentLoaded', function() {
+      document.addEventListener('DOMContentLoaded', function () {
       // Get DOM elements
       const editProfileBtn = document.querySelector('.edit-profile-trigger');
       const editProfileModal = document.getElementById('editProfileModal');
@@ -4343,7 +4897,7 @@
       const profileName = document.querySelector('.wallet-profile-name');
 
       // Open modal
-      editProfileBtn.addEventListener('click', function() {
+        editProfileBtn.addEventListener('click', function () {
         // Set current values
         editProfileAvatar.src = profileAvatar.src;
         editProfileName.value = profileName.textContent.split('@')[0].trim();
@@ -4353,23 +4907,23 @@
       });
 
       // Close modal
-      closeEditProfile.addEventListener('click', function() {
+        closeEditProfile.addEventListener('click', function () {
         editProfileModal.style.display = 'none';
       });
 
       // Close modal when clicking outside
-      window.addEventListener('click', function(event) {
+        window.addEventListener('click', function (event) {
         if (event.target === editProfileModal) {
           editProfileModal.style.display = 'none';
         }
       });
 
       // Handle avatar upload
-      editProfileAvatarInput.addEventListener('change', function(e) {
+        editProfileAvatarInput.addEventListener('change', function (e) {
         const file = e.target.files[0];
         if (file) {
           const reader = new FileReader();
-          reader.onload = function(e) {
+            reader.onload = function (e) {
             editProfileAvatar.src = e.target.result;
           };
           reader.readAsDataURL(file);
@@ -4377,7 +4931,7 @@
       });
 
       // Save profile changes
-      saveProfile.addEventListener('click', async function() {
+        saveProfile.addEventListener('click', async function () {
         const newName = editProfileName.value.trim();
         const newUsername = editProfileUsername.value.trim();
         let newAvatar = editProfileAvatar.src;
@@ -4429,7 +4983,7 @@
     });
   </script>
   <script>
-    document.addEventListener('DOMContentLoaded', function() {
+      document.addEventListener('DOMContentLoaded', function () {
       // ... existing code ...
 
       // Function to fetch price from GeckoTerminal
@@ -4518,10 +5072,10 @@
     // ... existing code ...
 
     // Add Sync Twitter button handler
-    document.addEventListener('DOMContentLoaded', function() {
+      document.addEventListener('DOMContentLoaded', function () {
       const syncTwitterBtn = document.querySelector('.sync-twitter-btn');
       if (syncTwitterBtn) {
-        syncTwitterBtn.addEventListener('click', async function() {
+          syncTwitterBtn.addEventListener('click', async function () {
           try {
             const user = firebase.auth().currentUser;
             if (!user) {
@@ -4574,11 +5128,11 @@
     // ... existing code ...
   </script>
   <script>
-    document.addEventListener('DOMContentLoaded', function() {
+      document.addEventListener('DOMContentLoaded', function () {
       // ... существующий код ...
       const unlinkTwitterBtn = document.querySelector('.wallet-profile-btn:not(.edit-profile-trigger):not(.sync-twitter-btn)');
       if (unlinkTwitterBtn) {
-        unlinkTwitterBtn.addEventListener('click', async function() {
+          unlinkTwitterBtn.addEventListener('click', async function () {
           const user = firebase.auth().currentUser;
           if (!user) {
             alert('Please log in first');
@@ -4597,7 +5151,7 @@
             unlinkTwitterBtn.textContent = 'Link Twitter';
             unlinkTwitterBtn.classList.add('link-twitter-btn');
             // Назначить обработчик для Link Twitter
-            unlinkTwitterBtn.onclick = async function() {
+              unlinkTwitterBtn.onclick = async function () {
               const provider = new firebase.auth.TwitterAuthProvider();
               try {
                 await user.linkWithPopup(provider);
@@ -4637,7 +5191,7 @@
     }
   }
 
-  document.addEventListener('DOMContentLoaded', function() {
+      document.addEventListener('DOMContentLoaded', function () {
     // ... существующий код ...
     const editProfileAvatarInput = document.getElementById('editProfileAvatarInput');
     const editProfileAvatar = document.getElementById('editProfileAvatar');
@@ -4645,7 +5199,7 @@
     const editProfileName = document.getElementById('editProfileName');
     const editProfileUsername = document.getElementById('editProfileUsername');
 
-    saveProfile.addEventListener('click', async function() {
+        saveProfile.addEventListener('click', async function () {
       const newName = editProfileName.value.trim();
       const newUsername = editProfileUsername.value.trim();
       let newAvatar = editProfileAvatar.src;
@@ -4740,20 +5294,22 @@ if (discoverItem) {
     }
   }
 
-  mobileMenuBtn.onclick = function() {
-    sidebar.classList.toggle('mobile-open');
+      mobileMenuBtn.onclick = function () {
+        mobileMenuBtn.classList.toggle('active');
+        sidebar.classList.toggle('active');
+        sidebarDim.classList.toggle('active');
     sidebarDim.classList.toggle('active');
     this.classList.toggle('open');
   };
 
-  sidebarDim.onclick = function() {
+      sidebarDim.onclick = function () {
     sidebar.classList.remove('mobile-open');
     sidebarDim.classList.remove('active');
     mobileMenuBtn.classList.remove('open');
   };
 
   sidebar.querySelectorAll('.sidebar-item').forEach(item => {
-    item.addEventListener('click', function(e) {
+        item.addEventListener('click', function (e) {
       if (this.tagName === 'A') return;
       if (window.innerWidth <= 768) {
         sidebar.classList.remove('mobile-open');
@@ -4820,7 +5376,7 @@ if (discoverItem) {
 
 <!-- ✅ Notification Popup System -->
 <script>
-  (function() {
+      (function () {
     const bellIcon = document.querySelector('.chat-bell');
     const notificationPopup = document.querySelector('.notification-popup');
     let notifications = JSON.parse(localStorage.getItem('notifications') || '[]');
@@ -4845,7 +5401,7 @@ if (discoverItem) {
       `).join('');
 
       document.querySelectorAll('.notification-item').forEach(item => {
-        item.addEventListener('click', function() {
+            item.addEventListener('click', function () {
           const index = parseInt(this.dataset.index);
           notifications[index].read = true;
           localStorage.setItem('notifications', JSON.stringify(notifications));
@@ -4855,7 +5411,7 @@ if (discoverItem) {
       });
     }
 
-    bellIcon.addEventListener('click', function(e) {
+        bellIcon.addEventListener('click', function (e) {
       e.stopPropagation();
       notificationPopup.classList.toggle('active');
       if (notificationPopup.classList.contains('active')) {
@@ -4863,7 +5419,7 @@ if (discoverItem) {
       }
     });
 
-    document.addEventListener('click', function(e) {
+        document.addEventListener('click', function (e) {
       if (!notificationPopup.contains(e.target) && e.target !== bellIcon) {
         notificationPopup.classList.remove('active');
       }
@@ -4872,6 +5428,8 @@ if (discoverItem) {
     updateNotificationBadge();
   })();
 </script>
+
+
 
 </body>
 

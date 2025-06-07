@@ -1,0 +1,33 @@
+{
+  "rules": {
+    "chats": {
+      "$chatId": {
+        ".read": "auth != null",
+        ".write": "auth != null",
+        "messages": {
+          ".read": "auth != null",
+          ".write": "auth != null",
+          "$messageId": {
+            ".validate": "newData.hasChildren(['text', 'uid', 'name', 'timestamp'])",
+            "text": {
+              ".validate": "newData.isString()"
+            },
+            "uid": {
+              ".validate": "newData.val() === auth.uid"
+            },
+            "name": {
+              ".validate": "newData.isString()"
+            },
+            "timestamp": {
+              ".validate": "newData.val() <= now"
+            }
+          }
+        },
+        "typing": {
+          ".read": "auth != null",
+          ".write": "auth != null"
+        }
+      }
+    }
+  }
+} 
