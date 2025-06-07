@@ -41,7 +41,9 @@
       serverTimestamp,
       orderBy,
       query,
-      where
+      where,
+      setDoc,
+      getDoc
     } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
     const firebaseConfig = {
@@ -78,6 +80,27 @@
     const messagesRef = collection(chatDocRef, 'messages');
     const q = query(messagesRef, orderBy('timestamp'));
 
+    // Функция для создания структуры чата
+    async function createChatStructure() {
+      try {
+        const chatDoc = await getDoc(chatDocRef);
+        
+        if (!chatDoc.exists()) {
+          // Создаем документ чата
+          await setDoc(chatDocRef, {
+            createdAt: serverTimestamp(),
+            lastMessageAt: serverTimestamp(),
+            participants: [currentUser.uid],
+            isActive: true
+          });
+          console.log('✅ Chat structure created');
+        }
+      } catch (err) {
+        console.error('Error creating chat structure:', err);
+        errorDiv.textContent = 'Ошибка создания чата: ' + err.message;
+      }
+    }
+
     // Анонимный вход
     signInAnonymously(auth)
       .then(() => {
@@ -89,11 +112,13 @@
         errorDiv.textContent = 'Ошибка аутентификации: ' + err.message;
       });
 
-    onAuthStateChanged(auth, user => {
+    onAuthStateChanged(auth, async user => {
       if (user) {
         currentUser = user;
-        console.log('👤 Authenticated as', user.uid);
+        console.log('�� Authenticated as', user.uid);
         errorDiv.textContent = '';
+        // Создаем структуру чата при первом входе
+        await createChatStructure();
         // Загружаем сообщения только после аутентификации
         loadMessages();
       } else {
@@ -165,12 +190,17 @@
       }
 
       try {
+        // Обновляем время последнего сообщения в чате
+        await setDoc(chatDocRef, {
+          lastMessageAt: serverTimestamp()
+        }, { merge: true });
+
         const docRef = await addDoc(messagesRef, {
           uid: currentUser.uid,
           name: 'Anon',
           text,
           timestamp: serverTimestamp(),
-          chatId: currentChatId // Добавляем ID чата в сообщение
+          chatId: currentChatId
         });
         console.log('Сообщение отправлено, ID:', docRef.id);
 
