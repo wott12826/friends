@@ -3402,6 +3402,7 @@
       renderFullscreenChatMessages();
       fullscreenChat.style.display = 'flex';
       document.querySelector('.main-app').style.display = 'none';
+      updateChatBalance(key, 0); // Синхронизируем баланс без инкремента
       setTimeout(() => {
         const msgBox = document.getElementById('fullscreenChatMessages');
         msgBox.scrollTop = msgBox.scrollHeight;
@@ -4814,6 +4815,21 @@
 
     window.addEventListener('resize', updateSidebarVisibility);
     document.addEventListener('DOMContentLoaded', updateSidebarVisibility);
+  </script>
+  <script>
+    // ... существующий код ...
+    function syncDiscoverPrices() {
+      document.querySelectorAll('.discover-item').forEach(item => {
+        const key = item.getAttribute('data-club');
+        const priceEl = item.querySelector('.discover-price');
+        if (key && priceEl) {
+          const balance = parseFloat(localStorage.getItem('chat_balance_' + key) || '0');
+          priceEl.textContent = `Price: ${balance.toFixed(1)} $POST`;
+        }
+      });
+    }
+    document.addEventListener('DOMContentLoaded', syncDiscoverPrices);
+    // ... существующий код ...
   </script>
 </body>
 
