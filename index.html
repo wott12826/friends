@@ -2306,12 +2306,12 @@
       display: block;
     }
     .sidebar {
-      transition: left 0.25s, box-shadow 0.25s;
+      transition: transform 0.3s ease;
     }
-    @media (max-width: 700px) {
+    @media (max-width: 768px) {
       .sidebar {
         position: fixed;
-        left: -220px;
+        transform: translateX(-100%);
         top: 0;
         height: 100vh;
         z-index: 1000;
@@ -2324,7 +2324,7 @@
         padding-top: 32px;
       }
       .sidebar.mobile-open {
-        left: 0;
+        transform: translateX(0);
       }
       .main-app {
         width: 100vw;
@@ -2332,10 +2332,10 @@
       }
       .main-content {
         padding: 12px 0 0 0;
-        margin-left: -1px !important;
+        margin-left: 0 !important;
       }
-      .sidebar-toggle {
-        display: none;
+      .mobile-menu-btn {
+        display: flex;
         position: fixed;
         left: 16px;
         top: 16px;
@@ -2352,12 +2352,15 @@
         font-size: 2rem;
       }
     }
-    @media (min-width: 701px) {
-      .sidebar-toggle {
+    @media (min-width: 769px) {
+      .mobile-menu-btn {
         display: none;
       }
       .sidebar-dim {
         display: none !important;
+      }
+      .sidebar {
+        transform: none !important;
       }
     }
 
@@ -4952,35 +4955,41 @@
   <script>
     // --- Sidebar drawer logic for mobile ---
     const sidebar = document.getElementById('sidebar');
-    const sidebarToggle = document.getElementById('sidebarToggle');
+    const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
     const sidebarDim = document.getElementById('sidebarDim');
-    function updateSidebarToggleVisibility() {
-      if (window.innerWidth <= 700) {
-        sidebarToggle.style.display = 'flex';
+
+    function updateSidebarVisibility() {
+      if (window.innerWidth <= 768) {
+        mobileMenuBtn.style.display = 'flex';
       } else {
-        sidebarToggle.style.display = 'none';
+        mobileMenuBtn.style.display = 'none';
         sidebar.classList.remove('mobile-open');
+        sidebarDim.style.display = 'none';
       }
     }
-    sidebarToggle.onclick = function() {
+
+    mobileMenuBtn.onclick = function() {
       sidebar.classList.add('mobile-open');
       sidebarDim.style.display = 'block';
     };
+
     sidebarDim.onclick = function() {
       sidebar.classList.remove('mobile-open');
       sidebarDim.style.display = 'none';
     };
-    // Закрытие по клику на пункт меню (на мобильных)
+
+    // Close sidebar when clicking on menu items (mobile only)
     sidebar.querySelectorAll('.sidebar-item').forEach(item => {
-      item.onclick = function() {
-        if (window.innerWidth <= 700) {
+      item.addEventListener('click', function() {
+        if (window.innerWidth <= 768) {
           sidebar.classList.remove('mobile-open');
           sidebarDim.style.display = 'none';
         }
-      };
+      });
     });
-    window.addEventListener('resize', updateSidebarToggleVisibility);
-    document.addEventListener('DOMContentLoaded', updateSidebarToggleVisibility);
+
+    window.addEventListener('resize', updateSidebarVisibility);
+    document.addEventListener('DOMContentLoaded', updateSidebarVisibility);
   </script>
 </body>
 
