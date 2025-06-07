@@ -4628,232 +4628,203 @@
     });
   });
 </script>
-  <!-- ... existing code ...
-    // --- Chat notification toggle ---
-    document.querySelector('.chat-notify-btn').addEventListener('click', function() {
-      if ('Notification' in window) {
-        if (this.textContent === 'Turn on') {
-          Notification.requestPermission().then(permission => {
-            if (permission === 'granted') {
-              localStorage.setItem('notifications_enabled', 'true');
-              this.textContent = 'Turn off';
-            }
+<!-- ✅ Скрипты для управления балансом и синхронизации Discover -->
+<script>
+  // Обновление баланса и Discover
+  function updateClubBalance(clubId, delta) {
+    const chat = document.querySelector(`.fschat[data-club="${clubId}"]`);
+    const discover = document.querySelector(`.discover-item[data-club="${clubId}"]`);
+
+    if (!chat || !discover) return;
+
+    const balanceEl = chat.querySelector('.fschat-balance');
+    const priceEl = discover.querySelector('.discover-price');
+
+    if (!balanceEl || !priceEl) return;
+
+    let balance = parseFloat(balanceEl.textContent) || 0;
+    balance += delta;
+
+    balanceEl.textContent = balance.toFixed(1) + ' $POST';
+    priceEl.textContent = `Price: ${balance.toFixed(1)} $POST`;
+
+    localStorage.setItem('chat_balance_' + clubId, balance.toFixed(1));
+  }
+
+  // Инициализация балансов при загрузке
+  document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.fschat[data-club]').forEach(chat => {
+      const clubId = chat.getAttribute('data-club');
+      const balanceEl = chat.querySelector('.fschat-balance');
+      const savedBalance = parseFloat(localStorage.getItem('chat_balance_' + clubId)) || 0;
+      if (balanceEl) {
+        balanceEl.textContent = savedBalance.toFixed(1) + ' $POST';
+      }
+    });
+
+    document.querySelectorAll('.discover-item[data-club]').forEach(item => {
+      const clubId = item.getAttribute('data-club');
+      const priceEl = item.querySelector('.discover-price');
+      const savedBalance = parseFloat(localStorage.getItem('chat_balance_' + clubId)) || 0;
+      if (priceEl) {
+        priceEl.textContent = `Price: ${savedBalance.toFixed(1)} $POST`;
+      }
+    });
+  });
+</script>
+
+<!-- ✅ Скрытие сайдбара при выборе пункта на мобильной версии -->
+<script>
+  const sidebar = document.getElementById('sidebar');
+  const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
+  const sidebarDim = document.getElementById('sidebarDim');
+
+  function updateSidebarVisibility() {
+    if (window.innerWidth <= 768) {
+      mobileMenuBtn.style.display = 'flex';
+      sidebar.classList.remove('mobile-open');
+      sidebarDim.classList.remove('active');
+      mobileMenuBtn.classList.remove('open');
+    } else {
+      mobileMenuBtn.style.display = 'none';
+      sidebar.classList.remove('mobile-open');
+      sidebarDim.classList.remove('active');
+      mobileMenuBtn.classList.remove('open');
+    }
+  }
+
+  mobileMenuBtn.onclick = function() {
+    sidebar.classList.toggle('mobile-open');
+    sidebarDim.classList.toggle('active');
+    this.classList.toggle('open');
+  };
+
+  sidebarDim.onclick = function() {
+    sidebar.classList.remove('mobile-open');
+    sidebarDim.classList.remove('active');
+    mobileMenuBtn.classList.remove('open');
+  };
+
+  sidebar.querySelectorAll('.sidebar-item').forEach(item => {
+    item.addEventListener('click', function(e) {
+      if (this.tagName === 'A') return;
+      if (window.innerWidth <= 768) {
+        sidebar.classList.remove('mobile-open');
+        sidebarDim.classList.remove('active');
+        mobileMenuBtn.classList.remove('open');
+      }
+    });
+  });
+
+  window.addEventListener('resize', updateSidebarVisibility);
+  document.addEventListener('DOMContentLoaded', updateSidebarVisibility);
+</script>
+
+<!-- ✅ Chat Notification Toggle -->
+<script>
+  (function() {
+    const notifyBtn = document.getElementById('notificationToggleBtn');
+
+    function updateNotificationButtonState() {
+      const isEnabled = localStorage.getItem('notifications_enabled') === 'true';
+      notifyBtn.textContent = isEnabled ? 'Turn off' : 'Turn on';
+    }
+
+    async function handleNotificationPermission() {
+      if (!('Notification' in window)) {
+        alert('This browser does not support notifications');
+        return;
+      }
+
+      try {
+        const permission = await Notification.requestPermission();
+
+        if (permission === 'granted') {
+          localStorage.setItem('notifications_enabled', 'true');
+          updateNotificationButtonState();
+
+          new Notification('Notifications Enabled', {
+            body: 'You will now receive notifications from POST',
+            icon: 'images/logo2.png'
           });
-        } else {
-          localStorage.removeItem('notifications_enabled');
-          this.textContent = 'Turn on';
-        }
-      }
-    });
-
-    // Check notification status on page load
-    document.addEventListener('DOMContentLoaded', function() {
-      const notifyBtn = document.querySelector('.chat-notify-btn');
-      if (localStorage.getItem('notifications_enabled') === 'true') {
-        notifyBtn.textContent = 'Turn off';
-      }
-    });
-  // ... existing code ...
-
-    // --- Chat notification toggle ---
-    (function() {
-      const notifyBtn = document.getElementById('notificationToggleBtn');
-      
-      // Function to update button state
-      function updateNotificationButtonState() {
-        const isEnabled = localStorage.getItem('notifications_enabled') === 'true';
-        notifyBtn.textContent = isEnabled ? 'Turn off' : 'Turn on';
-      }
-
-      // Function to handle notification permission
-      async function handleNotificationPermission() {
-        if (!('Notification' in window)) {
-          alert('This browser does not support notifications');
-          return;
-        }
-
-        try {
-          const permission = await Notification.requestPermission();
-          
-          if (permission === 'granted') {
-            localStorage.setItem('notifications_enabled', 'true');
-            updateNotificationButtonState();
-            
-            // Show a test notification
-            new Notification('Notifications Enabled', {
-              body: 'You will now receive notifications from POST',
-              icon: 'images/logo2.png'
-            });
-          } else {
-            localStorage.removeItem('notifications_enabled');
-            updateNotificationButtonState();
-          }
-        } catch (error) {
-          console.error('Error requesting notification permission:', error);
-          alert('Error enabling notifications. Please try again.');
-        }
-      }
-
-      // Add click event listener
-      notifyBtn.addEventListener('click', function() {
-        if (this.textContent === 'Turn on') {
-          handleNotificationPermission();
         } else {
           localStorage.removeItem('notifications_enabled');
           updateNotificationButtonState();
         }
-      });
-
-      // Initialize button state on page load
-      document.addEventListener('DOMContentLoaded', updateNotificationButtonState);
-    })();
-
-    // Notification system
-    (function() {
-      const bellIcon = document.querySelector('.chat-bell');
-      const notificationPopup = document.querySelector('.notification-popup');
-      let notifications = JSON.parse(localStorage.getItem('notifications') || '[]');
-
-      // Function to update notification badge
-      function updateNotificationBadge() {
-        const unreadCount = notifications.filter(n => !n.read).length;
-        bellIcon.classList.toggle('has-notifications', unreadCount > 0);
-      }
-
-      // Function to render notifications
-      function renderNotifications() {
-        const notificationList = document.querySelector('.notification-list');
-        if (notifications.length === 0) {
-          notificationList.innerHTML = '<div class="notification-empty">No notifications</div>';
-          return;
-        }
-
-        notificationList.innerHTML = notifications.map((notification, index) => `
-          <div class="notification-item ${notification.read ? '' : 'unread'}" data-index="${index}">
-            <div style="font-weight: ${notification.read ? 'normal' : '600'}">${notification.message}</div>
-            <div style="font-size: 0.85rem; color: #888; margin-top: 4px;">${notification.time}</div>
-          </div>
-        `).join('');
-
-        // Add click handlers for notifications
-        document.querySelectorAll('.notification-item').forEach(item => {
-          item.addEventListener('click', function() {
-            const index = parseInt(this.dataset.index);
-            notifications[index].read = true;
-            localStorage.setItem('notifications', JSON.stringify(notifications));
-            updateNotificationBadge();
-            renderNotifications();
-          });
-        });
-      }
-
-      // Toggle notification popup
-      bellIcon.addEventListener('click', function(e) {
-        e.stopPropagation();
-        notificationPopup.classList.toggle('active');
-        if (notificationPopup.classList.contains('active')) {
-          renderNotifications();
-        }
-      });
-
-      // Close popup when clicking outside
-      document.addEventListener('click', function(e) {
-        if (!notificationPopup.contains(e.target) && e.target !== bellIcon) {
-          notificationPopup.classList.remove('active');
-        }
-      });
-
-      // Initialize notification badge
-      updateNotificationBadge();
-    })();
-  </script>
-  <script>
-    // --- Sidebar drawer logic for mobile ---
-    const sidebar = document.getElementById('sidebar');
-    const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
-    const sidebarDim = document.getElementById('sidebarDim');
-
-    function updateSidebarVisibility() {
-      if (window.innerWidth <= 768) {
-        mobileMenuBtn.style.display = 'flex';
-        sidebar.classList.remove('mobile-open');
-        sidebarDim.classList.remove('active');
-        mobileMenuBtn.classList.remove('open');
-      } else {
-        mobileMenuBtn.style.display = 'none';
-        sidebar.classList.remove('mobile-open');
-        sidebarDim.classList.remove('active');
-        mobileMenuBtn.classList.remove('open');
+      } catch (error) {
+        console.error('Error requesting notification permission:', error);
+        alert('Error enabling notifications. Please try again.');
       }
     }
 
-    mobileMenuBtn.onclick = function() {
-      sidebar.classList.toggle('mobile-open');
-      sidebarDim.classList.toggle('active');
-      this.classList.toggle('open');
-    };
-
-    sidebarDim.onclick = function() {
-      sidebar.classList.remove('mobile-open');
-      sidebarDim.classList.remove('active');
-      mobileMenuBtn.classList.remove('open');
-    };
-
-    // Close sidebar when clicking on menu items (mobile only)
-    sidebar.querySelectorAll('.sidebar-item').forEach(item => {
-      item.addEventListener('click', function(e) {
-        // Don't close for external links (Twitter, Telegram)
-        if (this.tagName === 'A') return;
-        
-        if (window.innerWidth <= 768) {
-          sidebar.classList.remove('mobile-open');
-          sidebarDim.classList.remove('active');
-          mobileMenuBtn.classList.remove('open');
-        }
-      });
+    notifyBtn.addEventListener('click', function() {
+      if (this.textContent === 'Turn on') {
+        handleNotificationPermission();
+      } else {
+        localStorage.removeItem('notifications_enabled');
+        updateNotificationButtonState();
+      }
     });
 
-    window.addEventListener('resize', updateSidebarVisibility);
-    document.addEventListener('DOMContentLoaded', updateSidebarVisibility);
-  </script>
-  <script>
-    // ... существующий код ...
-    function syncDiscoverPrices() {
-      document.querySelectorAll('.discover-item').forEach(item => {
-        const key = item.getAttribute('data-club');
-        const priceEl = item.querySelector('.discover-price');
-        if (key && priceEl) {
-          const balance = parseFloat(localStorage.getItem('chat_balance_' + key) || '0');
-          priceEl.textContent = `Price: ${balance.toFixed(1)} $POST`;
-        }
-      });
-    }
-    document.addEventListener('DOMContentLoaded', syncDiscoverPrices);
-    // ... существующий код ...
-  </script>
-  <script>
-    // ... существующий код ...
-    function syncDiscoverWithChat(key) {
-      const fschat = document.querySelector(`.fschat[data-club="${key}"]`);
-      const discoverItem = document.querySelector(`.discover-item[data-club="${key}"]`);
-      if (fschat && discoverItem) {
-        const chatBalance = fschat.querySelector('.fschat-balance');
-        const discoverPrice = discoverItem.querySelector('.discover-price');
-        if (chatBalance && discoverPrice) {
-          discoverPrice.innerHTML = chatBalance.innerHTML;
-        }
-      }
+    document.addEventListener('DOMContentLoaded', updateNotificationButtonState);
+  })();
+</script>
+
+<!-- ✅ Notification Popup System -->
+<script>
+  (function() {
+    const bellIcon = document.querySelector('.chat-bell');
+    const notificationPopup = document.querySelector('.notification-popup');
+    let notifications = JSON.parse(localStorage.getItem('notifications') || '[]');
+
+    function updateNotificationBadge() {
+      const unreadCount = notifications.filter(n => !n.read).length;
+      bellIcon.classList.toggle('has-notifications', unreadCount > 0);
     }
 
-    function syncAllDiscoverWithChats() {
-      document.querySelectorAll('.discover-item').forEach(item => {
-        const key = item.getAttribute('data-club');
-        syncDiscoverWithChat(key);
+    function renderNotifications() {
+      const notificationList = document.querySelector('.notification-list');
+      if (notifications.length === 0) {
+        notificationList.innerHTML = '<div class="notification-empty">No notifications</div>';
+        return;
+      }
+
+      notificationList.innerHTML = notifications.map((notification, index) => `
+        <div class="notification-item ${notification.read ? '' : 'unread'}" data-index="${index}">
+          <div style="font-weight: ${notification.read ? 'normal' : '600'}">${notification.message}</div>
+          <div style="font-size: 0.85rem; color: #888; margin-top: 4px;">${notification.time}</div>
+        </div>
+      `).join('');
+
+      document.querySelectorAll('.notification-item').forEach(item => {
+        item.addEventListener('click', function() {
+          const index = parseInt(this.dataset.index);
+          notifications[index].read = true;
+          localStorage.setItem('notifications', JSON.stringify(notifications));
+          updateNotificationBadge();
+          renderNotifications();
+        });
       });
     }
-    document.addEventListener('DOMContentLoaded', syncAllDiscoverWithChats);
-    // ... существующий код ...
-  </script>
+
+    bellIcon.addEventListener('click', function(e) {
+      e.stopPropagation();
+      notificationPopup.classList.toggle('active');
+      if (notificationPopup.classList.contains('active')) {
+        renderNotifications();
+      }
+    });
+
+    document.addEventListener('click', function(e) {
+      if (!notificationPopup.contains(e.target) && e.target !== bellIcon) {
+        notificationPopup.classList.remove('active');
+      }
+    });
+
+    updateNotificationBadge();
+  })();
+</script>
+
 </body>
 
 </html>
