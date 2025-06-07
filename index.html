@@ -2262,10 +2262,12 @@
       left: 0; top: 0;
       width: 100vw; height: 100vh;
       background: rgba(0,0,0,0.25);
-      transition: opacity 0.2s;
+      transition: opacity 0.3s ease;
+      opacity: 0;
     }
-    .sidebar.mobile-open + .sidebar-dim {
+    .sidebar-dim.active {
       display: block;
+      opacity: 1;
     }
     .sidebar {
       transition: transform 0.3s ease;
@@ -2312,6 +2314,10 @@
         align-items: center;
         justify-content: center;
         font-size: 2rem;
+        transition: transform 0.3s ease;
+      }
+      .mobile-menu-btn.open {
+        transform: rotate(90deg);
       }
     }
     @media (min-width: 769px) {
@@ -2323,6 +2329,10 @@
       }
       .sidebar {
         transform: none !important;
+        position: relative;
+        width: 180px;
+        height: auto;
+        box-shadow: none;
       }
     }
   </style>
@@ -4708,22 +4718,26 @@
       if (window.innerWidth <= 768) {
         mobileMenuBtn.style.display = 'flex';
         sidebar.classList.remove('mobile-open');
-        sidebarDim.style.display = 'none';
+        sidebarDim.classList.remove('active');
+        mobileMenuBtn.classList.remove('open');
       } else {
         mobileMenuBtn.style.display = 'none';
         sidebar.classList.remove('mobile-open');
-        sidebarDim.style.display = 'none';
+        sidebarDim.classList.remove('active');
+        mobileMenuBtn.classList.remove('open');
       }
     }
 
     mobileMenuBtn.onclick = function() {
       sidebar.classList.toggle('mobile-open');
-      sidebarDim.style.display = sidebar.classList.contains('mobile-open') ? 'block' : 'none';
+      sidebarDim.classList.toggle('active');
+      this.classList.toggle('open');
     };
 
     sidebarDim.onclick = function() {
       sidebar.classList.remove('mobile-open');
-      sidebarDim.style.display = 'none';
+      sidebarDim.classList.remove('active');
+      mobileMenuBtn.classList.remove('open');
     };
 
     // Close sidebar when clicking on menu items (mobile only)
@@ -4734,7 +4748,8 @@
         
         if (window.innerWidth <= 768) {
           sidebar.classList.remove('mobile-open');
-          sidebarDim.style.display = 'none';
+          sidebarDim.classList.remove('active');
+          mobileMenuBtn.classList.remove('open');
         }
       });
     });
