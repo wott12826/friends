@@ -244,13 +244,10 @@
         <div class="fschat-menu-wrap">
           <button class="fschat-menu-btn" title="Menu" aria-haspopup="true" aria-expanded="false">⋮</button>
           <div class="fschat-menu" role="menu">
-            <div class="fschat-menu-item" role="menuitem" onclick="copyInviteLink()">
-              <img src="https://cdn-icons-png.flaticon.com/512/1828/1828270.png" alt="copy" style="width:16px;height:16px;margin-right:8px;vertical-align:middle;">
-              Скопировать ссылку-приглашение
-            </div>
-            <div class="fschat-menu-item" role="menuitem">Удалить чат</div>
-            <div class="fschat-menu-item" role="menuitem">Включить уведомления</div>
-            <div class="fschat-menu-item" role="menuitem">Закрепить чат</div>
+            <div class="fschat-menu-item" role="menuitem" onclick="window.copyLink()">Copy chat link</div>
+            <div class="fschat-menu-item" role="menuitem">Delete chat</div>
+            <div class="fschat-menu-item" role="menuitem">Turn on notifications</div>
+            <div class="fschat-menu-item" role="menuitem">Pin to top of chat list</div>
           </div>
         </div>
       </div>
@@ -292,14 +289,6 @@
     const menu = fullscreenChat.querySelector('.fschat-menu');
     const balanceDisplay = document.getElementById('balance-display');
 
-    // Получаем данные пользователя из localStorage
-    const userData = JSON.parse(localStorage.getItem('userData') || '{}');
-    const currentUser = {
-      uid: userData.uid,
-      name: `${userData.name || ''} ${userData.surname || ''}`.trim() || 'User',
-      avatarUrl: userData.profilePhoto || 'https://via.placeholder.com/32'
-    };
-
     // Заглушка баланса (пример)
     let balance = 0.0;
     function updateBalance() {
@@ -314,58 +303,52 @@
       input.focus();
       scrollToBottom();
     }
-
     // Закрыть чат
     function closeChat() {
       chatBackdrop.classList.remove('active');
       fullscreenChat.classList.remove('active');
-      // Перенаправляем на главную страницу
-      window.location.href = 'https://www.postcoin.space/';
     }
 
     closeBtn.addEventListener('click', closeChat);
     chatBackdrop.addEventListener('click', closeChat);
 
-    function renderMessage(msg) {
-      const div = document.createElement('div');
-      div.className = 'chat-message ' + (msg.uid === currentUser.uid ? 'own' : 'other');
-      
-      const time = msg.timestamp ? new Date(msg.timestamp.toDate()).toLocaleTimeString() : 'Just now';
-      
-      div.innerHTML = `
-        <strong>${msg.name || 'User'}:</strong> ${msg.text}
-        <small style="display:block;font-size:11px;color:${msg.uid === currentUser.uid ? 'rgba(255,255,255,0.7)' : '#999'}">${time}</small>
-      `;
-      
-      if(msg.img) {
-        const img = document.createElement('img');
-        img.src = msg.img;
-        img.alt = "image";
-        div.appendChild(img);
+    // Эмуляция загрузки сообщений
+    let messages = [
+      {text: "Привет! Добро пожаловать в чат.", own: false},
+      {text: "Спасибо! Рад быть здесь.", own: true},
+      {text: "Это тестовое сообщение с картинкой.", own: false, img: "https://via.placeholder.com/150"},
+    ];
+
+    function renderMessages() {
+      messagesContainer.innerHTML = "";
+      for(let msg of messages) {
+        const div = document.createElement('div');
+        div.className = 'chat-message ' + (msg.own ? 'own' : 'other');
+        div.innerHTML = `<strong>${msg.own ? 'Вы' : 'Друг'}:</strong> ${msg.text}`;
+        if(msg.img){
+          const img = document.createElement('img');
+          img.src = msg.img;
+          img.alt = "image";
+          div.appendChild(img);
+        }
+        messagesContainer.appendChild(div);
       }
-      
-      messagesContainer.appendChild(div);
+      scrollToBottom();
     }
 
     function scrollToBottom() {
       messagesContainer.scrollTop = messagesContainer.scrollHeight;
     }
 
+    renderMessages();
+
     // Отправка сообщения
     form.addEventListener('submit', e => {
       e.preventDefault();
       const text = input.value.trim();
       if(!text) return;
-
-      const message = {
-        text,
-        uid: currentUser.uid,
-        name: currentUser.name,
-        timestamp: new Date(),
-        avatarUrl: currentUser.avatarUrl
-      };
-
-      renderMessage(message);
+      messages.push({text, own: true});
+      renderMessages();
       input.value = '';
       input.focus();
 
@@ -410,70 +393,15 @@
       }
     });
 
-    // Функция для копирования ссылки-приглашения
-    function copyInviteLink() {
-      const urlParams = new URLSearchParams(window.location.search);
-      const chatId = urlParams.get('chat');
-      
-      if (!chatId) {
-        alert('Ошибка: ID чата не найден');
-        return;
-      }
-
-      const inviteLink = `${window.location.origin}${window.location.pathname}?chat=${encodeURIComponent(chatId)}`;
-      
-      navigator.clipboard.writeText(inviteLink).then(() => {
-        // Показываем уведомление об успешном копировании
-        const notification = document.createElement('div');
-        notification.style.cssText = `
-          position: fixed;
-          top: 20px;
-          left: 50%;
-          transform: translateX(-50%);
-          background: rgba(0, 0, 0, 0.8);
-          color: white;
-          padding: 12px 24px;
-          border-radius: 4px;
-          z-index: 10000;
-          font-size: 14px;
-        `;
-        notification.textContent = 'Ссылка-приглашение скопирована в буфер обмена!';
-        document.body.appendChild(notification);
-        
-        // Удаляем уведомление через 2 секунды
-        setTimeout(() => {
-          notification.remove();
-        }, 2000);
-        
-        // Закрываем меню
-        menu.style.display = 'none';
-        menuBtn.setAttribute('aria-expanded', 'false');
-      }).catch(err => {
-        console.error('Ошибка при копировании ссылки:', err);
-        alert('Не удалось скопировать ссылку. Попробуйте еще раз.');
+    // Заглушка функции копирования ссылки
+    window.copyLink = function() {
+      const link = window.location.href;
+      navigator.clipboard.writeText(link).then(() => {
+        alert('Ссылка на чат скопирована в буфер обмена!');
       });
-    }
+    };
 
-    // Обновляем стили для пунктов меню
-    const menuItems = document.querySelectorAll('.fschat-menu-item');
-    menuItems.forEach(item => {
-      item.style.display = 'flex';
-      item.style.alignItems = 'center';
-      item.style.padding = '8px 12px';
-      item.style.cursor = 'pointer';
-      item.style.transition = 'background-color 0.2s';
-    });
-
-    menuItems.forEach(item => {
-      item.addEventListener('mouseover', () => {
-        item.style.backgroundColor = '#f5f5f5';
-      });
-      item.addEventListener('mouseout', () => {
-        item.style.backgroundColor = '';
-      });
-    });
-
-    // Открываем чат по умолчанию
+    // Чтобы чат был открыт по умолчанию для теста:
     openChat();
   </script>
 
