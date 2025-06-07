@@ -3239,7 +3239,7 @@
       openFullscreenChat({
         avatar: club.avatar || 'https://via.placeholder.com/40x40?text=Club',
         title: club.name + (club.ticker ? ' (' + club.ticker + ')' : ''),
-        key: currentClubKey
+        clubId: currentClubKey
       });
     });
 
@@ -3255,7 +3255,7 @@
       discoverChatData = {
         avatar,
         title: name + (ticker ? ' (' + ticker + ')' : ''),
-        key: 'discover|' + name + '|' + ticker
+        clubId: 'discover|' + name + '|' + ticker
       };
 
       // Проверяем, есть ли доступ у текущего пользователя к конкретному клубу
@@ -3393,16 +3393,16 @@
     })();
 
     // --- Web3 Chat: открытие ---
-    function openFullscreenChat({ avatar, title, key }) {
+    function openFullscreenChat({ avatar, title, clubId }) {
       const fullscreenChat = document.getElementById('fullscreenChat');
-      fullscreenChat.setAttribute('data-club', key);
+      fullscreenChat.setAttribute('data-club', clubId);
       document.getElementById('fullscreenChatAvatar').src = avatar;
       document.getElementById('fullscreenChatTitle').textContent = title;
-      currentClubKey = key;
+      currentClubKey = clubId;
       renderFullscreenChatMessages();
       fullscreenChat.style.display = 'flex';
       document.querySelector('.main-app').style.display = 'none';
-      updateChatBalance(key, 0); // Синхронизируем баланс без инкремента
+      updateChatBalance(clubId, 0); // Синхронизируем баланс без инкремента
       setTimeout(() => {
         const msgBox = document.getElementById('fullscreenChatMessages');
         msgBox.scrollTop = msgBox.scrollHeight;
@@ -3412,13 +3412,13 @@
       document.getElementById('fullscreenChat').style.display = 'none';
       document.querySelector('.main-app').style.display = 'flex';
     };
-    function getClubMessages(key) {
+    function getClubMessages(clubId) {
       try {
-        return JSON.parse(localStorage.getItem('clubmsg_' + key) || '[]');
+        return JSON.parse(localStorage.getItem('clubmsg_' + clubId) || '[]');
       } catch { return []; }
     }
-    function saveClubMessages(key, msgs) {
-      localStorage.setItem('clubmsg_' + key, JSON.stringify(msgs));
+    function saveClubMessages(clubId, msgs) {
+      localStorage.setItem('clubmsg_' + clubId, JSON.stringify(msgs));
     }
     // --- Web3 Chat: сообщения ---
     const demoUsers = [
@@ -3429,21 +3429,21 @@
     ];
 
     // Chat balance management
-    function getChatBalance(key) {
+    function getChatBalance(clubId) {
       try {
-        return parseFloat(localStorage.getItem('chat_balance_' + key) || '0');
+        return parseFloat(localStorage.getItem('chat_balance_' + clubId) || '0');
       } catch { return 0; }
     }
 
-    function updateChatBalance(key, increment = 0.1) {
-      console.log('🔁 Updating club:', key);
+    function updateChatBalance(clubId, increment = 0.1) {
+      console.log('🔁 Updating club:', clubId);
       
-      const currentBalance = getChatBalance(key);
+      const currentBalance = getChatBalance(clubId);
       const newBalance = currentBalance + increment;
-      localStorage.setItem('chat_balance_' + key, newBalance.toString());
+      localStorage.setItem('chat_balance_' + clubId, newBalance.toString());
       
       // Update discover item price if it exists
-      const discoverItem = document.querySelector(`.discover-item[data-club="${key}"]`);
+      const discoverItem = document.querySelector(`.discover-item[data-club="${clubId}"]`);
       if (discoverItem) {
         const priceEl = discoverItem.querySelector('.discover-price');
         if (priceEl) {
@@ -3453,7 +3453,7 @@
       }
 
       // Update fschat-balance if it exists
-      const fschat = document.querySelector(`.fschat[data-club="${key}"]`);
+      const fschat = document.querySelector(`.fschat[data-club="${clubId}"]`);
       if (fschat) {
         const balanceEl = fschat.querySelector('.fschat-balance');
         if (balanceEl) {
@@ -4664,11 +4664,16 @@
 
     document.querySelectorAll('.discover-item[data-club]').forEach(item => {
       const clubId = item.getAttribute('data-club');
-      const priceEl = item.querySelector('.discover-price');
-      const savedBalance = parseFloat(localStorage.getItem('chat_balance_' + clubId)) || 0;
-      if (priceEl) {
-        priceEl.textContent = `Price: ${savedBalance.toFixed(1)} $POST`;
-      }
+const discoverItem = document.querySelector(`.discover-item[data-club="${clubId}"]`);
+if (discoverItem) {
+  const priceEl = discoverItem.querySelector('.discover-price');
+  const savedBalance = parseFloat(localStorage.getItem('chat_balance_' + clubId)) || 0;
+  if (priceEl) {
+    priceEl.textContent = `Price: ${savedBalance.toFixed(1)} $POST`;
+    console.log('✅ Updated discover-price:', priceEl.textContent);
+  }
+}
+
     });
   });
 </script>
@@ -4722,52 +4727,53 @@
 
 <!-- ✅ Chat Notification Toggle -->
 <script>
-  (function() {
-    const notifyBtn = document.getElementById('notificationToggleBtn');
+  (function () {
+  const notifyBtn = document.getElementById('notificationToggleBtn');
 
-    function updateNotificationButtonState() {
-      const isEnabled = localStorage.getItem('notifications_enabled') === 'true';
-      notifyBtn.textContent = isEnabled ? 'Turn off' : 'Turn on';
+  function updateNotificationButtonState() {
+    const isEnabled = localStorage.getItem('notifications_enabled') === 'true';
+    notifyBtn.textContent = isEnabled ? 'Turn off' : 'Turn on';
+  }
+
+  async function handleNotificationPermission() {
+    if (!('Notification' in window)) {
+      alert('This browser does not support notifications');
+      return;
     }
 
-    async function handleNotificationPermission() {
-      if (!('Notification' in window)) {
-        alert('This browser does not support notifications');
-        return;
-      }
+    try {
+      const permission = await Notification.requestPermission();
 
-      try {
-        const permission = await Notification.requestPermission();
+      if (permission === 'granted') {
+        localStorage.setItem('notifications_enabled', 'true');
+        updateNotificationButtonState();
 
-        if (permission === 'granted') {
-          localStorage.setItem('notifications_enabled', 'true');
-          updateNotificationButtonState();
-
-          new Notification('Notifications Enabled', {
-            body: 'You will now receive notifications from POST',
-            icon: 'images/logo2.png'
-          });
-        } else {
-          localStorage.removeItem('notifications_enabled');
-          updateNotificationButtonState();
-        }
-      } catch (error) {
-        console.error('Error requesting notification permission:', error);
-        alert('Error enabling notifications. Please try again.');
-      }
-    }
-
-    notifyBtn.addEventListener('click', function() {
-      if (this.textContent === 'Turn on') {
-        handleNotificationPermission();
+        new Notification('Notifications Enabled', {
+          body: 'You will now receive notifications from POST',
+          icon: 'images/logo2.png'
+        });
       } else {
         localStorage.removeItem('notifications_enabled');
         updateNotificationButtonState();
       }
-    });
+    } catch (error) {
+      console.error('Error requesting notification permission:', error);
+      alert('Error enabling notifications. Please try again.');
+    }
+  }
 
-    document.addEventListener('DOMContentLoaded', updateNotificationButtonState);
-  })();
+  notifyBtn.addEventListener('click', function () {
+    if (this.textContent === 'Turn on') {
+      handleNotificationPermission();
+    } else {
+      localStorage.removeItem('notifications_enabled');
+      updateNotificationButtonState();
+    }
+  });
+
+  document.addEventListener('DOMContentLoaded', updateNotificationButtonState);
+})();
+
 </script>
 
 <!-- ✅ Notification Popup System -->
