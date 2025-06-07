@@ -4707,6 +4707,8 @@
     function updateSidebarVisibility() {
       if (window.innerWidth <= 768) {
         mobileMenuBtn.style.display = 'flex';
+        sidebar.classList.remove('mobile-open');
+        sidebarDim.style.display = 'none';
       } else {
         mobileMenuBtn.style.display = 'none';
         sidebar.classList.remove('mobile-open');
@@ -4715,8 +4717,8 @@
     }
 
     mobileMenuBtn.onclick = function() {
-      sidebar.classList.add('mobile-open');
-      sidebarDim.style.display = 'block';
+      sidebar.classList.toggle('mobile-open');
+      sidebarDim.style.display = sidebar.classList.contains('mobile-open') ? 'block' : 'none';
     };
 
     sidebarDim.onclick = function() {
@@ -4726,7 +4728,10 @@
 
     // Close sidebar when clicking on menu items (mobile only)
     sidebar.querySelectorAll('.sidebar-item').forEach(item => {
-      item.addEventListener('click', function() {
+      item.addEventListener('click', function(e) {
+        // Don't close for external links (Twitter, Telegram)
+        if (this.tagName === 'A') return;
+        
         if (window.innerWidth <= 768) {
           sidebar.classList.remove('mobile-open');
           sidebarDim.style.display = 'none';
