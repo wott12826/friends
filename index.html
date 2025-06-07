@@ -2878,6 +2878,13 @@
       document.getElementById('tab-' + tab).style.display = 'block';
       document.querySelectorAll('.sidebar-item').forEach(el => el.classList.remove('active'));
       document.querySelector('.sidebar-item[data-tab="' + tab + '"]').classList.add('active');
+      
+      // Remove active class from mobile menu button on mobile screens
+      if (window.innerWidth < 768) {
+        const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
+        mobileMenuBtn.classList.remove('active');
+        document.querySelector('.sidebar').classList.remove('active');
+      }
     }
     document.querySelectorAll('.sidebar-item').forEach(item => {
       item.onclick = function () {
