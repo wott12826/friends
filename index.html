@@ -2695,7 +2695,7 @@
       </div>
       <div class="fschat-header-right">
         <button class="fschat-balance"><img src="images/logo2.png"
-            style="width:18px;vertical-align:middle;margin-right:4px;">0.0000</button>
+            style="width:18px;vertical-align:middle;margin-right:4px;">0.0</button>
         <div class="fschat-menu-wrap">
           <button class="fschat-menu-btn">⋮</button>
           <div class="fschat-menu">
@@ -3420,6 +3420,30 @@
       { nick: 'Gamb', avatar: 'https://randomuser.me/api/portraits/men/34.jpg' },
       { nick: 'Smiroff', avatar: 'https://randomuser.me/api/portraits/men/35.jpg' }
     ];
+
+    // Chat balance management
+    function getChatBalance(key) {
+      try {
+        return parseFloat(localStorage.getItem('chat_balance_' + key) || '0');
+      } catch { return 0; }
+    }
+
+    function updateChatBalance(key, increment = 0.1) {
+      const currentBalance = getChatBalance(key);
+      const newBalance = currentBalance + increment;
+      localStorage.setItem('chat_balance_' + key, newBalance.toString());
+      return newBalance;
+    }
+
+    function updateBalanceDisplay() {
+      if (!currentClubKey) return;
+      const balance = getChatBalance(currentClubKey);
+      const balanceEl = document.querySelector('.fschat-balance');
+      if (balanceEl) {
+        balanceEl.innerHTML = `<img src="images/logo2.png" style="width:18px;vertical-align:middle;margin-right:4px;">${balance.toFixed(1)}`;
+      }
+    }
+
     function renderFullscreenChatMessages() {
       const box = document.getElementById('fullscreenChatMessages');
       box.innerHTML = '';
@@ -3458,7 +3482,9 @@
         box.appendChild(row);
       });
       setTimeout(() => { box.scrollTop = box.scrollHeight; }, 50);
+      updateBalanceDisplay();
     }
+
     document.getElementById('fullscreenChatForm').onsubmit = function (e) {
       e.preventDefault();
       const input = document.getElementById('fullscreenChatInput');
@@ -3484,6 +3510,12 @@
 
       msgs.push(newMessage);
       saveClubMessages(currentClubKey, msgs);
+      
+      // Update balance for user messages
+      if (currentUser) {
+        updateChatBalance(currentClubKey);
+      }
+      
       input.value = '';
       clearImgPreview();
       renderFullscreenChatMessages();
