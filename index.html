@@ -2693,8 +2693,7 @@
         <span id="fullscreenChatTitle" class="fschat-title"></span>
       </div>
       <div class="fschat-header-right">
-        <button class="fschat-balance"><img src="images/logo2.png"
-            style="width:18px;vertical-align:middle;margin-right:4px;">0.0</button>
+        <button class="fschat-balance"><img src="images/logo2.png" style="width:18px;vertical-align:middle;margin-right:4px;">0.0</button>
         <div class="fschat-menu-wrap">
           <button class="fschat-menu-btn">⋮</button>
           <div class="fschat-menu">
@@ -2706,8 +2705,7 @@
       </div>
     </div>
     <div id="fullscreenChatMessages" class="fschat-messages"></div>
-    <div class="fschat-tip">Tip: Chat with your key holders here. They can see your messages and only you can see their
-      messages, unless you reply</div>
+    <div class="fschat-tip">Tip: Chat with your key holders here. They can see your messages and only you can see their messages.</div>
     <form id="fullscreenChatForm" class="fschat-form" style="position:relative;">
       <button type="button" class="fschat-emoji" style="background: none; border: none; padding: 0; cursor: pointer;">
         <img
@@ -3396,11 +3394,13 @@
 
     // --- Web3 Chat: открытие ---
     function openFullscreenChat({ avatar, title, key }) {
+      const fullscreenChat = document.getElementById('fullscreenChat');
+      fullscreenChat.setAttribute('data-club', key);
       document.getElementById('fullscreenChatAvatar').src = avatar;
       document.getElementById('fullscreenChatTitle').textContent = title;
       currentClubKey = key;
       renderFullscreenChatMessages();
-      document.getElementById('fullscreenChat').style.display = 'flex';
+      fullscreenChat.style.display = 'flex';
       document.querySelector('.main-app').style.display = 'none';
       setTimeout(() => {
         const msgBox = document.getElementById('fullscreenChatMessages');
@@ -3435,18 +3435,27 @@
     }
 
     function updateChatBalance(key, increment = 0.1) {
+      console.log('🔁 Updating club:', key);
+      
       const currentBalance = getChatBalance(key);
       const newBalance = currentBalance + increment;
       localStorage.setItem('chat_balance_' + key, newBalance.toString());
       
       // Update discover item price if it exists
       const discoverItem = document.querySelector(`.discover-item[data-club="${key}"]`);
-      if (discoverItem) {
-        const priceEl = discoverItem.querySelector('.discover-price');
-        if (priceEl) {
-          priceEl.textContent = `Price: ${newBalance.toFixed(1)} $POST`;
-        }
+      if (!discoverItem) {
+        console.warn('discover-item не знайдено для:', key);
+        return newBalance;
       }
+
+      const priceEl = discoverItem.querySelector('.discover-price');
+      if (!priceEl) {
+        console.warn('Не знайдено .discover-price для:', key);
+        return newBalance;
+      }
+
+      priceEl.textContent = `Price: ${newBalance.toFixed(4)} $POST`;
+      console.log('✅ Updated priceEl:', priceEl.textContent);
       
       return newBalance;
     }
