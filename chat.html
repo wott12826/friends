@@ -310,6 +310,14 @@
   const urlParams = new URLSearchParams(window.location.search);
   const currentChatId = urlParams.get('chat');
 
+  // Получаем данные пользователя из localStorage
+  const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+  const currentUser = {
+    uid: userData.uid,
+    name: `${userData.name || ''} ${userData.surname || ''}`.trim() || 'User',
+    avatarUrl: userData.profilePhoto || 'https://via.placeholder.com/32'
+  };
+
   // Отображаем ID чата
   const chatIdDisplay = document.getElementById('chatIdDisplay');
   if (currentChatId) {
@@ -411,7 +419,7 @@
   function displayMessage({ text, uid, name, timestamp, avatarUrl }) {
     const chatBox = document.getElementById('fullscreenChatMessages');
     const div = document.createElement('div');
-    const isSent = uid === currentUser?.uid;
+    const isSent = uid === currentUser.uid;
     
     div.className = `chat-message ${isSent ? 'sent' : 'received'}`;
     
@@ -442,10 +450,10 @@
     
     const message = {
       text: input.value,
-      uid: 'current-user-id', // В реальном приложении это будет ID текущего пользователя
-      name: 'Your Name', // В реальном приложении это будет имя текущего пользователя
+      uid: currentUser.uid,
+      name: currentUser.name,
       timestamp: new Date(),
-      avatarUrl: 'https://via.placeholder.com/32' // В реальном приложении это будет аватар пользователя
+      avatarUrl: currentUser.avatarUrl
     };
     
     displayMessage(message);
