@@ -4831,6 +4831,29 @@
     document.addEventListener('DOMContentLoaded', syncDiscoverPrices);
     // ... существующий код ...
   </script>
+  <script>
+    // ... существующий код ...
+    function syncDiscoverWithChat(key) {
+      const fschat = document.querySelector(`.fschat[data-club="${key}"]`);
+      const discoverItem = document.querySelector(`.discover-item[data-club="${key}"]`);
+      if (fschat && discoverItem) {
+        const chatBalance = fschat.querySelector('.fschat-balance');
+        const discoverPrice = discoverItem.querySelector('.discover-price');
+        if (chatBalance && discoverPrice) {
+          discoverPrice.innerHTML = chatBalance.innerHTML;
+        }
+      }
+    }
+
+    function syncAllDiscoverWithChats() {
+      document.querySelectorAll('.discover-item').forEach(item => {
+        const key = item.getAttribute('data-club');
+        syncDiscoverWithChat(key);
+      });
+    }
+    document.addEventListener('DOMContentLoaded', syncAllDiscoverWithChats);
+    // ... существующий код ...
+  </script>
 </body>
 
 </html>
