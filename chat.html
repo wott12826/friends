@@ -10,11 +10,64 @@
     #msg-input { width: 80%; padding: 6px; }
     #msg-form { margin-top: 10px; }
     #error-message { color: red; margin-top: 10px; }
+    .chat-header { 
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .chat-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .participants {
+      font-size: 12px;
+      color: #666;
+    }
+    .invite-link {
+      display: flex;
+      gap: 5px;
+      align-items: center;
+    }
+    .invite-link input {
+      padding: 4px;
+      width: 200px;
+    }
+    .copy-btn {
+      padding: 4px 8px;
+      background: #8b5cf6;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .copy-btn:hover {
+      background: #7c3aed;
+    }
+    .user-status {
+      font-size: 12px;
+      color: #666;
+      margin-top: 5px;
+    }
+    .online {
+      color: #10b981;
+    }
   </style>
 </head>
 <body>
 
-  <h2>🔥 Firestore Chat</h2>
+  <div class="chat-header">
+    <div class="chat-info">
+      <h2>🔥 Firestore Chat</h2>
+      <span class="participants" id="participants-count">0 участников</span>
+    </div>
+    <div class="invite-link">
+      <input type="text" id="invite-link" readonly>
+      <button class="copy-btn" onclick="copyInviteLink()">Копировать</button>
+    </div>
+  </div>
+
   <div id="chat-box"></div>
 
   <form id="msg-form">
@@ -42,7 +95,10 @@
       orderBy,
       query,
       setDoc,
-      getDoc
+      getDoc,
+      updateDoc,
+      arrayUnion,
+      arrayRemove
     } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
     const firebaseConfig = {
@@ -71,8 +127,11 @@
 
     if (!currentChatId) {
       errorDiv.textContent = 'ID чата не указан в URL. Добавьте параметр ?chat=ID_чата';
-      // Блокируем отправку сообщений
       document.getElementById('msg-form').style.display = 'none';
+    } else {
+      // Устанавливаем ссылку для приглашения
+      const inviteLink = `${window.location.origin}${window.location.pathname}?chat=${currentChatId}`;
+      document.getElementById('invite-link').value = inviteLink;
     }
 
     // Ссылки на коллекцию сообщений текущего чата
@@ -90,15 +149,29 @@
             createdAt: serverTimestamp(),
             lastMessageAt: serverTimestamp(),
             participants: [currentUser.uid],
-            isActive: true
+            isActive: true,
+            title: `Чат ${currentChatId}`,
+            createdBy: currentUser.uid
           });
-          console.log('✅ Chat structure created');
+        } else {
+          // Добавляем пользователя в список участников, если его там еще нет
+          await updateDoc(chatDocRef, {
+            participants: arrayUnion(currentUser.uid)
+          });
         }
       } catch (err) {
         console.error('Error creating chat structure:', err);
         errorDiv.textContent = 'Ошибка создания чата: ' + err.message;
       }
     }
+
+    // Функция для копирования ссылки приглашения
+    window.copyInviteLink = function() {
+      const inviteInput = document.getElementById('invite-link');
+      inviteInput.select();
+      document.execCommand('copy');
+      alert('Ссылка скопирована!');
+    };
 
     // Анонимный вход
     signInAnonymously(auth)
@@ -109,7 +182,6 @@
       .catch(err => {
         console.error('Ошибка анонимного входа:', err);
         errorDiv.textContent = 'Ошибка аутентификации: ' + err.message;
-        // Блокируем отправку сообщений
         document.getElementById('msg-form').style.display = 'none';
       });
 
@@ -126,12 +198,25 @@
 
         await createChatStructure();
         loadMessages();
+        loadChatInfo();
       } else {
         currentUser = null;
         errorDiv.textContent = 'Пользователь не авторизован';
         document.getElementById('msg-form').style.display = 'none';
       }
     });
+
+    // Загрузка информации о чате
+    function loadChatInfo() {
+      onSnapshot(chatDocRef, (doc) => {
+        if (doc.exists()) {
+          const data = doc.data();
+          const participantsCount = data.participants?.length || 0;
+          document.getElementById('participants-count').textContent = 
+            `${participantsCount} участник${participantsCount !== 1 ? 'ов' : ''}`;
+        }
+      });
+    }
 
     // Экранирование текста
     function escapeHtml(text) {
@@ -200,9 +285,9 @@
 
       try {
         // Обновляем время последнего сообщения
-        await setDoc(chatDocRef, {
+        await updateDoc(chatDocRef, {
           lastMessageAt: serverTimestamp()
-        }, { merge: true });
+        });
 
         await addDoc(messagesRef, {
           uid: currentUser.uid,
