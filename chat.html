@@ -173,6 +173,24 @@
     width: 24px;
     height: 24px;
   }
+  .fschat-title-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .fschat-chat-id {
+    font-size: 12px;
+    color: rgba(255,255,255,0.7);
+    font-family: monospace;
+    cursor: pointer;
+    padding: 2px 6px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 4px;
+    transition: background 0.2s;
+  }
+  .fschat-chat-id:hover {
+    background: rgba(255,255,255,0.2);
+  }
 </style>
 </head>
 <body>
@@ -184,7 +202,10 @@
     <div class="fschat-header-left">
       <button id="closeFullscreenChat" class="fschat-back" aria-label="Close chat">&#8592;</button>
       <img id="fullscreenChatAvatar" class="fschat-avatar" src="https://via.placeholder.com/32" alt="avatar">
-      <span id="fullscreenChatTitle" class="fschat-title">Chat Title</span>
+      <div class="fschat-title-wrap">
+        <span id="fullscreenChatTitle" class="fschat-title">Chat Title</span>
+        <span id="chatIdDisplay" class="fschat-chat-id"></span>
+      </div>
     </div>
     <div class="fschat-header-right">
       <button class="fschat-balance" title="Balance">
@@ -226,23 +247,39 @@
 </div>
 
 <script>
-  // Копирование ссылки
+  // Получаем ID чата из URL
+  const urlParams = new URLSearchParams(window.location.search);
+  const currentChatId = urlParams.get('chat');
+
+  // Отображаем ID чата
+  const chatIdDisplay = document.getElementById('chatIdDisplay');
+  if (currentChatId) {
+    chatIdDisplay.textContent = `ID: ${currentChatId}`;
+    chatIdDisplay.title = 'Click to copy chat ID';
+    
+    // Добавляем обработчик клика для копирования ID
+    chatIdDisplay.addEventListener('click', () => {
+      navigator.clipboard.writeText(currentChatId).then(() => {
+        const originalText = chatIdDisplay.textContent;
+        chatIdDisplay.textContent = 'Copied!';
+        setTimeout(() => {
+          chatIdDisplay.textContent = originalText;
+        }, 2000);
+      });
+    });
+  } else {
+    chatIdDisplay.textContent = 'No chat ID';
+    chatIdDisplay.style.opacity = '0.5';
+  }
+
+  // Обновляем функцию копирования ссылки
   window.copyLink = function() {
-    // пример ключа
-    const currentClubKey = 'exampleKey123';
-    if (!currentClubKey) return;
-    const link = window.location.origin + window.location.pathname + '?chat=' + encodeURIComponent(currentClubKey);
-    const el = document.createElement('textarea');
-    el.value = link;
-    el.setAttribute('readonly', '');
-    el.style.position = 'absolute';
-    el.style.left = '-9999px';
-    document.body.appendChild(el);
-    el.select();
-    document.execCommand('copy');
-    document.body.removeChild(el);
-    alert('Link copied to clipboard!');
-    document.querySelector('.fschat-menu').style.display = 'none';
+    if (!currentChatId) return;
+    const link = window.location.origin + window.location.pathname + '?chat=' + encodeURIComponent(currentChatId);
+    navigator.clipboard.writeText(link).then(() => {
+      alert('Chat link copied to clipboard!');
+      document.querySelector('.fschat-menu').style.display = 'none';
+    });
   };
 
   // Открытие / закрытие меню
