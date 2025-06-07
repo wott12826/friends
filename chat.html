@@ -1,673 +1,117 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chat</title>
-    <style>
-        /* Reset and base styles */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-        }
-
-        body {
-            background: #f0f2f5;
-        }
-
-        /* Chat container */
-        .chat-container {
-            max-width: 100%;
-            height: 100vh;
-            margin: 0;
-            display: flex;
-            flex-direction: column;
-            background: white;
-        }
-
-        /* Chat header */
-        .chat-header {
-            background: #ffffff;
-            padding: 12px 16px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            border-bottom: 1px solid #e4e4e4;
-        }
-
-        .header-block {
-            background: #8b5cf6;
-            color: white;
-            padding: 12px 16px;
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            position: relative;
-            justify-content: space-between
-        }
-
-        .header-block .menu-dots {
-            font-size: 24px;
-            cursor: pointer;
-            padding: 4px 8px;
-        }
-
-        .back-btn {
-            background: none;
-            border: none;
-            padding: 0;
-            cursor: pointer;
-            font-size: 24px;
-            color: white;
-            display: flex;
-            align-items: center;
-        }
-
-        #chatTitle {
-            margin: 0;
-            font-size: 16px;
-            font-weight: 600;
-            color: white;
-        }
-
-        .chat-actions {
-            position: relative;
-        }
-
-        .chat-menu-btn {
-            background: none;
-            border: none;
-            padding: 8px;
-            cursor: pointer;
-            font-size: 20px;
-            color: #000;
-        }
-
-        .chat-menu {
-            display: none;
-            position: absolute;
-            right: 8px;
-            top: 40px;
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            z-index: 1000;
-            min-width: 180px;
-        }
-
-        .chat-menu.active {
-            display: block;
-        }
-
-        .chat-menu-item {
-            padding: 12px 16px;
-            cursor: pointer;
-            font-size: 14px;
-            color: #000;
-        }
-
-        .chat-menu-item:hover {
-            background: #f0f2f5;
-        }
-
-        /* Chat messages area */
-        .chat-messages {
-            flex: 1;
-            overflow-y: auto;
-            padding: 16px;
-            background: #fff;
-        }
-
-        .message {
-            margin: 8px 0;
-            max-width: 80%;
-        }
-
-        .message.sent {
-            margin-left: auto;
-            background: #8b5cf6;
-            color: white;
-            border-radius: 18px 18px 4px 18px;
-            padding: 8px 12px;
-        }
-
-        .message.received {
-            margin-right: auto;
-            background: #f0f2f5;
-            color: #000;
-            border-radius: 18px 18px 18px 4px;
-            padding: 8px 12px;
-        }
-
-        .message-info {
-            font-size: 12px;
-            margin-top: 4px;
-            opacity: 0.7;
-        }
-
-        .message.sent .message-info {
-            color: rgba(255, 255, 255, 0.8);
-        }
-
-        .message.received .message-info {
-            color: #65676b;
-        }
-
-        /* Chat input area */
-        .chat-input-container {
-            padding: 12px 16px;
-            background: #fff;
-            border-top: 1px solid #e4e4e4;
-        }
-
-        .chat-input-wrapper {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            background: #f0f2f5;
-            border-radius: 24px;
-            padding: 8px 12px;
-            margin: 0 auto;
-        }
-
-        .chat-actions-left {
-            display: flex;
-            gap: 12px;
-        }
-
-        .chat-input-wrapper input {
-            flex: 1;
-            border: none;
-            background: none;
-            outline: none;
-            padding: 0;
-            font-size: 15px;
-            min-height: 24px;
-        }
-
-        .chat-input-wrapper input::placeholder {
-            color: #65676b;
-        }
-
-        .chat-input-wrapper button {
-            background: none;
-            border: none;
-            padding: 4px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .chat-input-wrapper button img {
-            width: 24px;
-            height: 24px;
-            opacity: 0.7;
-            transition: opacity 0.2s;
-        }
-
-        .chat-input-wrapper button:hover img {
-            opacity: 1;
-        }
-
-        .emoji-panel {
-            display: none;
-            position: fixed;
-            bottom: 80px;
-            left: 16px;
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            padding: 8px;
-            grid-template-columns: repeat(8, 1fr);
-            gap: 4px;
-            z-index: 1000;
-            width: 320px;
-        }
-
-        @media (min-width: 768px) {
-            .emoji-panel {
-                position: absolute;
-            }
-        }
-
-        .emoji-panel.active {
-            display: grid;
-        }
-
-        @media (min-width: 768px) {
-            .emoji-panel {
-                position: absolute;
-                bottom: 100%;
-                left: 0;
-            }
-        }
-
-        .emoji-btn {
-            cursor: pointer;
-            padding: 4px;
-            text-align: center;
-            font-size: 20px;
-            transition: background-color 0.2s;
-            user-select: none;
-        }
-
-        .emoji-btn:hover {
-            background: #f0f2f5;
-            border-radius: 4px;
-        }
-
-        .message img {
-            max-width: 200px;
-            border-radius: 8px;
-            margin: 4px 0;
-        }
-
-        .tip-message {
-            text-align: center;
-            color: #65676b;
-            font-size: 12px;
-            padding: 12px 16px;
-            background: #f0f2f5;
-            border-radius: 8px;
-            margin: 8px auto;
-            max-width: 90%;
-        }
-
-        /* Menu styles */
-        .chat-menu-btn {
-            background: none;
-            border: none;
-            font-size: 20px;
-            cursor: pointer;
-            padding: 5px 10px;
-        }
-
-        .chat-menu {
-            display: none;
-            position: absolute;
-            right: 8px;
-            top: 40px;
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            z-index: 1000;
-            min-width: 180px;
-        }
-
-        .chat-menu.active {
-            display: block;
-        }
-
-        .chat-menu-item {
-            padding: 12px 16px;
-            cursor: pointer;
-            font-size: 14px;
-            color: #000;
-        }
-
-        .chat-menu-item:hover {
-            background: #f0f2f5;
-        }
-
-        /* Back button */
-        .back-btn {
-            padding: 8px 15px;
-            border: none;
-            background: none;
-            color: white;
-            cursor: pointer;
-        }
-
-        .back-btn:hover {
-            opacity: 0.8;
-        }
-
-        .user-typing {
-            font-size: 12px;
-            color: #65676b;
-            padding: 4px 16px;
-            height: 20px;
-        }
-
-        /* Balance display */
-        .balance {
-            color: white;
-            font-size: 14px;
-            font-weight: 600;
-        }
-
-        @media (min-width: 768px) {
-            .chat-container {
-                max-width: 600px;
-                margin: 0 auto;
-                border-radius: 12px;
-                overflow: hidden;
-                height: 90vh;
-                margin-top: 5vh;
-                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <title>Firestore Chat</title>
+  <style>
+    body { font-family: Arial; max-width: 600px; margin: 40px auto; }
+    #chat-box { height: 300px; overflow-y: auto; border: 1px solid #ccc; padding: 8px; }
+    .chat-message { margin-bottom: 10px; }
+    #msg-input { width: 80%; padding: 6px; }
+    #msg-form { margin-top: 10px; }
+  </style>
 </head>
-
 <body>
-    <div class="chat-container">
-        <div class="header-block">
-            <button class="back-btn" onclick="window.location.href='/'">←</button>
-            <h2 id="chatTitle">Loading...</h2>
-            <span class="balance" id="userBalance">⚡ 0.0</span>
-            <span class="menu-dots" onclick="toggleMenu()">⋮</span>
-            <div class="chat-menu">
-                <div class="chat-menu-item" onclick="copyLink()">Copy chat link</div>
-                <div class="chat-menu-item">Delete chat</div>
-                <div class="chat-menu-item">Turn on notifications</div>
-                <div class="chat-menu-item">Pin to top</div>
-            </div>
-        </div>
 
-        <div class="chat-messages" id="messages">
-            <div class="tip-message">
-                Tip: Chat with your key holders here. They can see your messages and only you can see their messages.
-            </div>
-        </div>
+  <h2>🔥 Firestore Chat</h2>
+  <div id="chat-box"></div>
 
-        <div class="user-typing" id="typingIndicator"></div>
+  <form id="msg-form">
+    <input id="msg-input" type="text" placeholder="Введите сообщение..." />
+    <button type="submit">Отправить</button>
+  </form>
 
-        <div class="chat-input-container">
-            <div class="chat-input-wrapper">
-                <div class="chat-actions-left">
-                    <button class="emoji-btn" onclick="toggleEmojiPanel()">
-                        😊
-                    </button>
-                    <button class="image-btn" onclick="document.getElementById('imageInput').click()">
-                        <img src="https://static.thenounproject.com/png/1034957-200.png" alt="add image">
-                    </button>
-                </div>
-                <input type="file" id="imageInput" accept="image/*" style="display: none">
-                <input type="text" id="messageInput" placeholder="Write something..." autocomplete="off">
-                <button onclick="sendMessage()">
-                    <img src="https://static-00.iconduck.com/assets.00/send-icon-2048x2048-h9h456ci.png" alt="send">
-                </button>
-            </div>
-            <div class="emoji-panel" id="emojiPanel">
-                <!-- Emoji buttons will be added here -->
-            </div>
-        </div>
-    </div>
+  <div style="margin-top: 10px;">
+    💰 Баланс: <span id="balance-display">0.0</span> $POST
+  </div>
 
-    <!-- Firebase -->
-    <script type="module">
-        // Import Firebase modules
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { 
-            getFirestore, 
-            collection, 
-            addDoc, 
-            query, 
-            orderBy, 
-            onSnapshot,
-            serverTimestamp 
-        } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-        import { 
-            getStorage, 
-            ref as storageRef, 
-            uploadBytes, 
-            getDownloadURL 
-        } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js";
+  <!-- Firebase SDK -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import {
+      getFirestore,
+      collection,
+      addDoc,
+      onSnapshot,
+      serverTimestamp,
+      orderBy,
+      query
+    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-        // Initialize Firebase
-        const firebaseConfig = {
-            apiKey: "AIzaSyCuL4tpaSsw1ylXf2VZrQ1b_2t_Kxd97cI",
-            authDomain: "post-ad037.firebaseapp.com",
-            projectId: "post-ad037",
-            storageBucket: "post-ad037.firebasestorage.app",
-            messagingSenderId: "377312187432",
-            appId: "1:377312187432:web:565f47c145e0e73ac0911d",
-            measurementId: "G-T48NR3B9VW",
-            databaseURL: "https://post-ad037-default-rtdb.europe-west1.firebasedatabase.app"
-        };
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_PROJECT_ID.appspot.com",
+      messagingSenderId: "YOUR_SENDER_ID",
+      appId: "YOUR_APP_ID"
+    };
 
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-        const storage = getStorage(app);
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
 
-        let currentChatId = null;
-        let currentUser = null;
-        let typingTimeout = null;
+    const messagesRef = collection(db, 'chats/global/messages');
+    const q = query(messagesRef, orderBy('timestamp'));
 
-        // Emoji list
-        const emojis = ['😊', '😂', '❤️', '👍', '😍', '🎉', '🌟', '💡', '🔥', '👋', '🤝', '💪', '🙏', '✨', '💯', '🎈', '🎁', '🌈', '☀️', '🌙', '⭐', '💫', '🍀', '🌺', '🌸', '🍂', '🍁', '🌊', '🏔️', '🗺️', '🎵', '🎮', '📱', '💻', '📚', '✏️', '📌', '💭', '💬', '📢'];
+    let currentUser = null;
+    let userBalance = 0.0;
 
-        // Initialize emoji panel
-        function initializeEmojiPanel() {
-            const panel = document.getElementById('emojiPanel');
-            panel.innerHTML = ''; // Clear existing emojis
-            emojis.forEach(emoji => {
-                const btn = document.createElement('div');
-                btn.className = 'emoji-btn';
-                btn.textContent = emoji;
-                btn.onclick = () => {
-                    addEmoji(emoji);
-                    toggleEmojiPanel(); // Close panel after selecting emoji
-                };
-                panel.appendChild(btn);
-            });
+    // Вход анонимно
+    signInAnonymously(auth).then(() => {
+      console.log('✅ Anonymous sign-in');
+    });
+
+    onAuthStateChanged(auth, user => {
+      if (user) {
+        currentUser = user;
+        console.log('👤 Authenticated as', user.uid);
+      }
+    });
+
+    // Слушаем новые сообщения
+    onSnapshot(q, snapshot => {
+      snapshot.docChanges().forEach(change => {
+        if (change.type === 'added') {
+          const msg = change.doc.data();
+          displayMessage(msg);
         }
+      });
+    });
 
-        function toggleEmojiPanel() {
-            const panel = document.getElementById('emojiPanel');
-            panel.classList.toggle('active');
-        }
+    function displayMessage({ text, uid, name, imageUrl }) {
+      const chatBox = document.getElementById('chat-box');
+      const div = document.createElement('div');
+      div.className = 'chat-message';
+      div.innerHTML = `<strong>${name || 'User'}:</strong> ${text || ''}`;
+      if (imageUrl) {
+        div.innerHTML += `<br><img src="${imageUrl}" style="max-width:150px;">`;
+      }
+      chatBox.appendChild(div);
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
 
-        function addEmoji(emoji) {
-            const input = document.getElementById('messageInput');
-            const start = input.selectionStart;
-            const end = input.selectionEnd;
-            const text = input.value;
-            const before = text.substring(0, start);
-            const after = text.substring(end);
-            input.value = before + emoji + after;
-            input.selectionStart = input.selectionEnd = start + emoji.length;
-            input.focus();
-        }
+    const msgForm = document.getElementById('msg-form');
+    const msgInput = document.getElementById('msg-input');
 
-        // Initialize chat when page loads
-        window.onload = function () {
-            const urlParams = new URLSearchParams(window.location.search);
-            currentChatId = urlParams.get('chat');
+    msgForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const text = msgInput.value.trim();
+      if (!text || !currentUser) return;
 
-            if (!currentChatId) {
-                window.location.href = '/';
-                return;
-            }
+      await addDoc(messagesRef, {
+        uid: currentUser.uid,
+        name: 'Anon',
+        text,
+        timestamp: serverTimestamp()
+      });
 
-            // Update chat title
-            document.getElementById('chatTitle').textContent = `Chat ${currentChatId}`;
+      userBalance += 0.1;
+      document.getElementById('balance-display').textContent = userBalance.toFixed(1);
+      msgInput.value = '';
+    });
+  </script>
 
-            // Initialize emoji panel
-            initializeEmojiPanel();
-
-            // Auth state observer
-            onAuthStateChanged(auth, (user) => {
-                if (user) {
-                    currentUser = user;
-                    initializeChat();
-                } else {
-                    window.location.href = '/?login=required';
-                }
-            });
-
-            // Setup image upload
-            document.getElementById('imageInput').addEventListener('change', handleImageUpload);
-        }
-
-        async function handleImageUpload(e) {
-            const file = e.target.files[0];
-            if (!file) return;
-
-            try {
-                const imageRef = storageRef(storage, `chat_images/${currentChatId}/${Date.now()}_${file.name}`);
-                await uploadBytes(imageRef, file);
-                const imageUrl = await getDownloadURL(imageRef);
-
-                // Send message with image
-                const messagesRef = collection(db, `chats/${currentChatId}/messages`);
-                await addDoc(messagesRef, {
-                    type: 'image',
-                    imageUrl: imageUrl,
-                    uid: currentUser.uid,
-                    name: currentUser.displayName || 'Anonymous',
-                    timestamp: serverTimestamp()
-                });
-
-                // Clear input
-                e.target.value = '';
-                updateBalance();
-            } catch (error) {
-                console.error('Error uploading image:', error);
-                alert('Failed to upload image. Please try again.');
-            }
-        }
-
-        function initializeChat() {
-            const messagesRef = collection(db, `chats/${currentChatId}/messages`);
-            const q = query(messagesRef, orderBy('timestamp', 'asc'));
-
-            // Listen for new messages
-            onSnapshot(q, (snapshot) => {
-                snapshot.docChanges().forEach((change) => {
-                    if (change.type === 'added') {
-                        const message = change.doc.data();
-                        displayMessage(message);
-                        scrollToBottom();
-                    }
-                });
-            });
-
-            const messageInput = document.getElementById('messageInput');
-            messageInput.addEventListener('input', () => {
-                if (typingTimeout) clearTimeout(typingTimeout);
-
-                // Note: Typing indicator is removed as it's not directly supported in Firestore
-                // You would need to implement this using a separate collection if needed
-
-                typingTimeout = setTimeout(() => {
-                    // Clear typing indicator
-                }, 1500);
-            });
-        }
-
-        function displayMessage(message) {
-            const container = document.getElementById('messages');
-            const div = document.createElement('div');
-            const isSent = message.uid === currentUser.uid;
-
-            div.className = `message ${isSent ? 'sent' : 'received'}`;
-
-            if (message.type === 'image') {
-                div.innerHTML = `
-                    <img src="${message.imageUrl}" alt="Shared image">
-                    <div class="message-info">
-                        ${message.name} • ${message.timestamp ? new Date(message.timestamp.toDate()).toLocaleTimeString() : 'Just now'}
-                    </div>
-                `;
-            } else {
-                div.innerHTML = `
-                    <div class="message-text">${message.text}</div>
-                    <div class="message-info">
-                        ${message.name} • ${message.timestamp ? new Date(message.timestamp.toDate()).toLocaleTimeString() : 'Just now'}
-                    </div>
-                `;
-            }
-
-            container.appendChild(div);
-        }
-
-        let currentBalance = 0.0;
-
-        function updateBalance() {
-            currentBalance += 0.1;
-            document.getElementById('userBalance').textContent = `⚡ ${currentBalance.toFixed(1)}`;
-        }
-
-        async function sendMessage() {
-            const input = document.getElementById('messageInput');
-            const text = input.value.trim();
-
-            if (text && currentUser) {
-                const messagesRef = collection(db, `chats/${currentChatId}/messages`);
-
-                try {
-                    await addDoc(messagesRef, {
-                        type: 'text',
-                        text: text,
-                        uid: currentUser.uid,
-                        name: currentUser.displayName || 'Anonymous',
-                        timestamp: serverTimestamp()
-                    });
-
-                    input.value = '';
-                    scrollToBottom();
-                    updateBalance();
-                } catch (error) {
-                    console.error('Error sending message:', error);
-                    alert('Failed to send message. Please try again.');
-                }
-            }
-        }
-
-        function scrollToBottom() {
-            const container = document.getElementById('messages');
-            container.scrollTop = container.scrollHeight;
-        }
-
-        function toggleMenu() {
-            const menu = document.querySelector('.chat-menu');
-            menu.classList.toggle('active');
-        }
-
-        function copyLink() {
-            const chatLink = window.location.href;
-            navigator.clipboard.writeText(chatLink).then(() => {
-                alert('Chat link copied to clipboard!');
-            });
-        }
-
-        // Handle Enter key
-        document.getElementById('messageInput').addEventListener('keypress', function (e) {
-            if (e.key === 'Enter') {
-                sendMessage();
-            }
-        });
-
-        // Close panels when clicking outside
-        window.addEventListener('click', function (e) {
-            const emojiPanel = document.getElementById('emojiPanel');
-            const emojiBtn = document.querySelector('.emoji-btn');
-            const menu = document.querySelector('.chat-menu');
-            const menuBtn = document.querySelector('.menu-dots');
-
-            if (!e.target.closest('.emoji-btn') && !emojiPanel.contains(e.target)) {
-                emojiPanel.classList.remove('active');
-            }
-
-            if (!menuBtn.contains(e.target) && !menu.contains(e.target)) {
-                menu.classList.remove('active');
-            }
-        });
-
-        // Make functions available globally
-        window.sendMessage = sendMessage;
-        window.toggleMenu = toggleMenu;
-        window.copyLink = copyLink;
-        window.toggleEmojiPanel = toggleEmojiPanel;
-    </script>
 </body>
-
 </html>
