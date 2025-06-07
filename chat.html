@@ -1,134 +1,408 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <title>Firestore Chat</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Firestore Fullscreen Chat</title>
   <style>
-    body { font-family: Arial; max-width: 600px; margin: 40px auto; }
-    #chat-box { height: 300px; overflow-y: auto; border: 1px solid #ccc; padding: 8px; }
-    .chat-message { margin-bottom: 10px; }
-    #msg-input { width: 80%; padding: 6px; }
-    #msg-form { margin-top: 10px; }
+    /* Базовые стили для фуллскрин */
+    body, html {
+      margin: 0; padding: 0; height: 100%;
+      font-family: Arial, sans-serif;
+      background: #f0f0f0;
+    }
+    #chatBackdrop {
+      position: fixed;
+      top:0; left:0; right:0; bottom:0;
+      background: rgba(0,0,0,0.5);
+      display: none;
+      z-index: 998;
+    }
+    .fullscreen-chat {
+      position: fixed;
+      top: 0; right: 0; bottom: 0; left: 0;
+      background: white;
+      display: none;
+      flex-direction: column;
+      z-index: 999;
+      max-width: 600px;
+      margin: auto;
+      box-shadow: 0 0 20px rgba(0,0,0,0.3);
+      height: 90vh;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .fullscreen-chat.active,
+    #chatBackdrop.active {
+      display: flex;
+    }
+    .fschat-header {
+      background: #2c3e50;
+      color: white;
+      padding: 10px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      user-select: none;
+    }
+    .fschat-header-left {
+      display: flex;
+      align-items: center;
+    }
+    .fschat-back {
+      font-size: 24px;
+      background: none;
+      border: none;
+      color: white;
+      cursor: pointer;
+      margin-right: 10px;
+      padding: 0;
+      line-height: 1;
+      user-select: none;
+    }
+    .fschat-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin-right: 10px;
+      background: #888;
+    }
+    .fschat-title {
+      font-weight: bold;
+      font-size: 18px;
+    }
+    .fschat-header-right {
+      display: flex;
+      align-items: center;
+    }
+    .fschat-balance {
+      background: #34495e;
+      border: none;
+      color: white;
+      font-size: 14px;
+      padding: 5px 10px;
+      margin-right: 10px;
+      border-radius: 4px;
+      cursor: default;
+      display: flex;
+      align-items: center;
+      user-select: none;
+    }
+    .fschat-balance img {
+      margin-right: 5px;
+      height: 18px;
+    }
+    .fschat-menu-wrap {
+      position: relative;
+    }
+    .fschat-menu-btn {
+      font-size: 24px;
+      background: none;
+      border: none;
+      color: white;
+      cursor: pointer;
+      user-select: none;
+      padding: 0;
+      line-height: 1;
+    }
+    .fschat-menu {
+      position: absolute;
+      right: 0;
+      top: 30px;
+      background: white;
+      border: 1px solid #ccc;
+      min-width: 180px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+      display: none;
+      flex-direction: column;
+      z-index: 1000;
+      border-radius: 4px;
+    }
+    .fschat-menu-item {
+      padding: 8px 12px;
+      cursor: pointer;
+      font-size: 14px;
+      user-select: none;
+    }
+    .fschat-menu-item:hover {
+      background: #eee;
+    }
+    .fschat-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 10px 16px;
+      background: #fafafa;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .chat-message {
+      max-width: 80%;
+      padding: 8px 12px;
+      border-radius: 12px;
+      word-break: break-word;
+    }
+    .chat-message.own {
+      background: #3498db;
+      color: white;
+      align-self: flex-end;
+      border-bottom-right-radius: 2px;
+    }
+    .chat-message.other {
+      background: #e1e1e1;
+      color: #333;
+      align-self: flex-start;
+      border-bottom-left-radius: 2px;
+    }
+    .chat-message img {
+      max-width: 150px;
+      margin-top: 6px;
+      border-radius: 8px;
+      display: block;
+    }
+    .fschat-tip {
+      font-size: 12px;
+      color: #888;
+      padding: 5px 16px;
+      background: #eee;
+      text-align: center;
+      user-select: none;
+    }
+    .fschat-form {
+      display: flex;
+      align-items: center;
+      padding: 10px 16px;
+      background: #fff;
+      border-top: 1px solid #ddd;
+    }
+    .fschat-emoji, .fschat-img-btn, .fschat-send {
+      cursor: pointer;
+      margin-right: 8px;
+      background: none;
+      border: none;
+      padding: 0;
+      user-select: none;
+    }
+    .fschat-emoji img, .fschat-img-btn img, .fschat-send img {
+      width: 24px;
+      height: 24px;
+      opacity: 0.7;
+      display: block;
+    }
+    #fullscreenChatInput {
+      flex: 1;
+      padding: 8px 12px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    .emoji-panel {
+      position: absolute;
+      bottom: 60px;
+      left: 16px;
+      background: white;
+      border: 1px solid #ccc;
+      padding: 5px;
+      display: none;
+      flex-wrap: wrap;
+      width: 220px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+      z-index: 10000;
+      border-radius: 6px;
+    }
+    .emoji-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      margin: 2px;
+      padding: 0;
+    }
+    .emoji-btn img {
+      width: 24px;
+      height: 24px;
+      display: block;
+    }
   </style>
 </head>
 <body>
 
-  <h2>🔥 Firestore Chat</h2>
-  <div id="chat-box"></div>
+  <div id="chatBackdrop" class="chat-backdrop"></div>
 
-  <form id="msg-form">
-    <input id="msg-input" type="text" placeholder="Введите сообщение..." autocomplete="off" />
-    <button type="submit">Отправить</button>
-  </form>
-
-  <div style="margin-top: 10px;">
-    💰 Баланс: <span id="balance-display">0.0</span> $POST
+  <div id="fullscreenChat" class="fullscreen-chat" role="dialog" aria-modal="true" aria-labelledby="fullscreenChatTitle">
+    <div class="fschat-header">
+      <div class="fschat-header-left">
+        <button id="closeFullscreenChat" class="fschat-back" aria-label="Close chat">&#8592;</button>
+        <img id="fullscreenChatAvatar" class="fschat-avatar" src="https://via.placeholder.com/32" alt="avatar">
+        <span id="fullscreenChatTitle" class="fschat-title">Firestore Chat</span>
+      </div>
+      <div class="fschat-header-right">
+        <button class="fschat-balance" title="Balance">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/Dollar_sign.svg/1024px-Dollar_sign.svg.png" alt="logo" style="width:18px;vertical-align:middle;margin-right:4px;"> 
+          <span id="balance-display">0.0</span> $POST
+        </button>
+        <div class="fschat-menu-wrap">
+          <button class="fschat-menu-btn" title="Menu" aria-haspopup="true" aria-expanded="false">⋮</button>
+          <div class="fschat-menu" role="menu">
+            <div class="fschat-menu-item" role="menuitem" onclick="window.copyLink()">Copy chat link</div>
+            <div class="fschat-menu-item" role="menuitem">Delete chat</div>
+            <div class="fschat-menu-item" role="menuitem">Turn on notifications</div>
+            <div class="fschat-menu-item" role="menuitem">Pin to top of chat list</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div id="fullscreenChatMessages" class="fschat-messages" aria-live="polite" aria-relevant="additions"></div>
+    
+    <div class="fschat-tip">Tip: Chat with your key holders here. They can see your messages and only you can see their messages.</div>
+    
+    <form id="fullscreenChatForm" class="fschat-form" style="position:relative;">
+      <button type="button" class="fschat-emoji" aria-label="Emoji picker" title="Emoji picker" style="background: none; border: none; padding: 0; cursor: pointer;">
+        <img src="https://toppng.com/uploads/preview/font-emoji-svg-png-icon-free-download-389350-onlinewebfonts-play-button-image-11563230644rbzu7hlann.png" alt="emoji" style="width: 24px; height: 24px; opacity: 0.7;">
+      </button>
+      <div class="emoji-panel" role="list">
+        <button type="button" class="emoji-btn" role="option" aria-label="Smile emoji">😃</button>
+        <button type="button" class="emoji-btn" role="option" aria-label="Thumbs up emoji">👍</button>
+        <button type="button" class="emoji-btn" role="option" aria-label="Heart emoji">❤️</button>
+        <button type="button" class="emoji-btn" role="option" aria-label="Fire emoji">🔥</button>
+        <button type="button" class="emoji-btn" role="option" aria-label="Star emoji">⭐</button>
+      </div>
+      <input id="fullscreenChatInput" name="msg" type="text" placeholder="Введите сообщение..." autocomplete="off" aria-label="Message input" required />
+      <button type="submit" class="fschat-send" aria-label="Send message" title="Send message">
+        <img src="https://cdn-icons-png.flaticon.com/512/786/786407.png" alt="send" style="width: 24px; height: 24px; opacity: 0.7;">
+      </button>
+    </form>
   </div>
 
-  <!-- Firebase SDK -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getAuth, onAuthStateChanged, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-    import {
-      getFirestore,
-      doc,
-      collection,
-      addDoc,
-      onSnapshot,
-      serverTimestamp,
-      orderBy,
-      query
-    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+  <script>
+    // Элементы
+    const chatBackdrop = document.getElementById('chatBackdrop');
+    const fullscreenChat = document.getElementById('fullscreenChat');
+    const closeBtn = document.getElementById('closeFullscreenChat');
+    const messagesContainer = document.getElementById('fullscreenChatMessages');
+    const form = document.getElementById('fullscreenChatForm');
+    const input = document.getElementById('fullscreenChatInput');
+    const emojiBtn = fullscreenChat.querySelector('.fschat-emoji');
+    const emojiPanel = fullscreenChat.querySelector('.emoji-panel');
+    const menuBtn = fullscreenChat.querySelector('.fschat-menu-btn');
+    const menu = fullscreenChat.querySelector('.fschat-menu');
+    const balanceDisplay = document.getElementById('balance-display');
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyCuL4tpaSsw1ylXf2VZrQ1b_2t_Kxd97cI",
-      authDomain: "post-ad037.firebaseapp.com",
-      projectId: "post-ad037",
-      storageBucket: "post-ad037.firebasestorage.app",
-      messagingSenderId: "377312187432",
-      appId: "1:377312187432:web:565f47c145e0e73ac0911d",
-      measurementId: "G-T48NR3B9VW"
-    };
+    // Заглушка баланса (пример)
+    let balance = 0.0;
+    function updateBalance() {
+      balanceDisplay.textContent = balance.toFixed(1);
+    }
+    updateBalance();
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
+    // Открыть чат (можно вызвать из другого кода)
+    function openChat() {
+      chatBackdrop.classList.add('active');
+      fullscreenChat.classList.add('active');
+      input.focus();
+      scrollToBottom();
+    }
+    // Закрыть чат
+    function closeChat() {
+      chatBackdrop.classList.remove('active');
+      fullscreenChat.classList.remove('active');
+    }
 
-    // Правильный путь к коллекции сообщений: сначала документ, потом коллекция
-    const globalDocRef = doc(db, 'chats', 'global');
-    const messagesRef = collection(globalDocRef, 'messages');
-    const q = query(messagesRef, orderBy('timestamp'));
+    closeBtn.addEventListener('click', closeChat);
+    chatBackdrop.addEventListener('click', closeChat);
 
-    let currentUser = null;
-    let userBalance = 0.0;
+    // Эмуляция загрузки сообщений
+    let messages = [
+      {text: "Привет! Добро пожаловать в чат.", own: false},
+      {text: "Спасибо! Рад быть здесь.", own: true},
+      {text: "Это тестовое сообщение с картинкой.", own: false, img: "https://via.placeholder.com/150"},
+    ];
 
-    // Анонимный вход
-    signInAnonymously(auth).then(() => {
-      console.log('✅ Anonymous sign-in');
-    }).catch(console.error);
+    function renderMessages() {
+      messagesContainer.innerHTML = "";
+      for(let msg of messages) {
+        const div = document.createElement('div');
+        div.className = 'chat-message ' + (msg.own ? 'own' : 'other');
+        div.innerHTML = `<strong>${msg.own ? 'Вы' : 'Друг'}:</strong> ${msg.text}`;
+        if(msg.img){
+          const img = document.createElement('img');
+          img.src = msg.img;
+          img.alt = "image";
+          div.appendChild(img);
+        }
+        messagesContainer.appendChild(div);
+      }
+      scrollToBottom();
+    }
 
-    onAuthStateChanged(auth, user => {
-      if (user) {
-        currentUser = user;
-        console.log('👤 Authenticated as', user.uid);
+    function scrollToBottom() {
+      messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+
+    renderMessages();
+
+    // Отправка сообщения
+    form.addEventListener('submit', e => {
+      e.preventDefault();
+      const text = input.value.trim();
+      if(!text) return;
+      messages.push({text, own: true});
+      renderMessages();
+      input.value = '';
+      input.focus();
+
+      // Пример: увеличить баланс за каждое сообщение
+      balance += 0.1;
+      updateBalance();
+    });
+
+    // Emoji picker
+    emojiBtn.addEventListener('click', () => {
+      if(emojiPanel.style.display === 'flex'){
+        emojiPanel.style.display = 'none';
       } else {
-        currentUser = null;
+        emojiPanel.style.display = 'flex';
       }
     });
 
-    // Вывод сообщений
-    function escapeHtml(text) {
-      const div = document.createElement('div');
-      div.textContent = text;
-      return div.innerHTML;
-    }
-
-    function displayMessage({ text, uid, name, imageUrl }) {
-      const chatBox = document.getElementById('chat-box');
-      const div = document.createElement('div');
-      div.className = 'chat-message';
-      div.innerHTML = `<strong>${escapeHtml(name || 'User')}:</strong> ${escapeHtml(text || '')}`;
-      if (imageUrl) {
-        div.innerHTML += `<br><img src="${escapeHtml(imageUrl)}" style="max-width:150px;">`;
-      }
-      chatBox.appendChild(div);
-      chatBox.scrollTop = chatBox.scrollHeight;
-    }
-
-    // Слушаем новые сообщения
-    onSnapshot(q, snapshot => {
-      snapshot.docChanges().forEach(change => {
-        if (change.type === 'added') {
-          const msg = change.doc.data();
-          displayMessage(msg);
-        }
+    emojiPanel.querySelectorAll('.emoji-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        input.value += btn.textContent;
+        input.focus();
+        emojiPanel.style.display = 'none';
       });
     });
 
-    // Отправка сообщений
-    const msgForm = document.getElementById('msg-form');
-    const msgInput = document.getElementById('msg-input');
+    // Меню
+    menuBtn.addEventListener('click', () => {
+      const expanded = menuBtn.getAttribute('aria-expanded') === 'true';
+      menuBtn.setAttribute('aria-expanded', !expanded);
+      menu.style.display = expanded ? 'none' : 'flex';
+    });
 
-    msgForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const text = msgInput.value.trim();
-      if (!text || !currentUser) return;
-
-      try {
-        await addDoc(messagesRef, {
-          uid: currentUser.uid,
-          name: 'Anon',
-          text,
-          timestamp: serverTimestamp()
-        });
-
-        userBalance += 0.1;
-        document.getElementById('balance-display').textContent = userBalance.toFixed(1);
-        msgInput.value = '';
-      } catch (err) {
-        console.error('Ошибка отправки сообщения:', err);
+    // Клик вне меню - закрыть меню
+    document.addEventListener('click', (e) => {
+      if(!menu.contains(e.target) && e.target !== menuBtn) {
+        menu.style.display = 'none';
+        menuBtn.setAttribute('aria-expanded', false);
+      }
+      // И закрываем emoji если клик вне emoji
+      if(!emojiPanel.contains(e.target) && e.target !== emojiBtn) {
+        emojiPanel.style.display = 'none';
       }
     });
+
+    // Заглушка функции копирования ссылки
+    window.copyLink = function() {
+      const link = window.location.href;
+      navigator.clipboard.writeText(link).then(() => {
+        alert('Ссылка на чат скопирована в буфер обмена!');
+      });
+    };
+
+    // Чтобы чат был открыт по умолчанию для теста:
+    openChat();
   </script>
 
 </body>
