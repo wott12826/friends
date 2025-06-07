@@ -400,12 +400,26 @@
     </div>
 
     <!-- Firebase -->
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
+    <script type="module">
+        // Import Firebase modules
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { 
+            getFirestore, 
+            collection, 
+            addDoc, 
+            query, 
+            orderBy, 
+            onSnapshot,
+            serverTimestamp 
+        } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { 
+            getStorage, 
+            ref as storageRef, 
+            uploadBytes, 
+            getDownloadURL 
+        } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js";
 
-    <script>
         // Initialize Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyCuL4tpaSsw1ylXf2VZrQ1b_2t_Kxd97cI",
@@ -418,15 +432,14 @@
             databaseURL: "https://post-ad037-default-rtdb.europe-west1.firebasedatabase.app"
         };
 
-        if (!firebase.apps.length) {
-            firebase.initializeApp(firebaseConfig);
-        }
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const storage = getStorage(app);
 
         let currentChatId = null;
         let currentUser = null;
         let typingTimeout = null;
-        const db = firebase.database();
-        const storage = firebase.storage();
 
         // Emoji list
         const emojis = ['😊', '😂', '❤️', '👍', '😍', '🎉', '🌟', '💡', '🔥', '👋', '🤝', '💪', '🙏', '✨', '💯', '🎈', '🎁', '🌈', '☀️', '🌙', '⭐', '💫', '🍀', '🌺', '🌸', '🍂', '🍁', '🌊', '🏔️', '🗺️', '🎵', '🎮', '📱', '💻', '📚', '✏️', '📌', '💭', '💬', '📢'];
@@ -481,7 +494,7 @@
             initializeEmojiPanel();
 
             // Auth state observer
-            firebase.auth().onAuthStateChanged((user) => {
+            onAuthStateChanged(auth, (user) => {
                 if (user) {
                     currentUser = user;
                     initializeChat();
@@ -499,23 +512,23 @@
             if (!file) return;
 
             try {
-                const storageRef = storage.ref(`chat_images/${currentChatId}/${Date.now()}_${file.name}`);
-                await storageRef.put(file);
-                const imageUrl = await storageRef.getDownloadURL();
+                const imageRef = storageRef(storage, `chat_images/${currentChatId}/${Date.now()}_${file.name}`);
+                await uploadBytes(imageRef, file);
+                const imageUrl = await getDownloadURL(imageRef);
 
                 // Send message with image
-                const messagesRef = db.ref('chats/' + currentChatId + '/messages');
-                await messagesRef.push({
+                const messagesRef = collection(db, `chats/${currentChatId}/messages`);
+                await addDoc(messagesRef, {
                     type: 'image',
                     imageUrl: imageUrl,
                     uid: currentUser.uid,
                     name: currentUser.displayName || 'Anonymous',
-                    timestamp: firebase.database.ServerValue.TIMESTAMP
+                    timestamp: serverTimestamp()
                 });
 
                 // Clear input
                 e.target.value = '';
-                updateBalance(); // Збільшуємо баланс при відправці зображення
+                updateBalance();
             } catch (error) {
                 console.error('Error uploading image:', error);
                 alert('Failed to upload image. Please try again.');
@@ -523,49 +536,30 @@
         }
 
         function initializeChat() {
-            const messagesRef = db.ref('chats/' + currentChatId + '/messages');
-            const typingRef = db.ref('chats/' + currentChatId + '/typing');
+            const messagesRef = collection(db, `chats/${currentChatId}/messages`);
+            const q = query(messagesRef, orderBy('timestamp', 'asc'));
 
-            messagesRef.on('child_added', (snapshot) => {
-                const message = snapshot.val();
-                displayMessage(message);
-                scrollToBottom();
-            });
-
-            typingRef.on('value', (snapshot) => {
-                const typing = snapshot.val();
-                const typingIndicator = document.getElementById('typingIndicator');
-
-                if (typing && typing.uid !== currentUser.uid) {
-                    typingIndicator.textContent = `${typing.name} is typing...`;
-                } else {
-                    typingIndicator.textContent = '';
-                }
+            // Listen for new messages
+            onSnapshot(q, (snapshot) => {
+                snapshot.docChanges().forEach((change) => {
+                    if (change.type === 'added') {
+                        const message = change.doc.data();
+                        displayMessage(message);
+                        scrollToBottom();
+                    }
+                });
             });
 
             const messageInput = document.getElementById('messageInput');
             messageInput.addEventListener('input', () => {
                 if (typingTimeout) clearTimeout(typingTimeout);
 
-                typingRef.set({
-                    uid: currentUser.uid,
-                    name: currentUser.displayName || 'Someone'
-                });
+                // Note: Typing indicator is removed as it's not directly supported in Firestore
+                // You would need to implement this using a separate collection if needed
 
                 typingTimeout = setTimeout(() => {
-                    typingRef.remove();
+                    // Clear typing indicator
                 }, 1500);
-            });
-
-            // Load existing messages
-            messagesRef.once('value', (snapshot) => {
-                const messages = snapshot.val();
-                if (messages) {
-                    Object.values(messages).forEach(message => {
-                        displayMessage(message);
-                    });
-                    scrollToBottom();
-                }
             });
         }
 
@@ -580,14 +574,14 @@
                 div.innerHTML = `
                     <img src="${message.imageUrl}" alt="Shared image">
                     <div class="message-info">
-                        ${message.name} • ${new Date(message.timestamp).toLocaleTimeString()}
+                        ${message.name} • ${message.timestamp ? new Date(message.timestamp.toDate()).toLocaleTimeString() : 'Just now'}
                     </div>
                 `;
             } else {
                 div.innerHTML = `
                     <div class="message-text">${message.text}</div>
                     <div class="message-info">
-                        ${message.name} • ${new Date(message.timestamp).toLocaleTimeString()}
+                        ${message.name} • ${message.timestamp ? new Date(message.timestamp.toDate()).toLocaleTimeString() : 'Just now'}
                     </div>
                 `;
             }
@@ -602,24 +596,29 @@
             document.getElementById('userBalance').textContent = `⚡ ${currentBalance.toFixed(1)}`;
         }
 
-        function sendMessage() {
+        async function sendMessage() {
             const input = document.getElementById('messageInput');
             const text = input.value.trim();
 
             if (text && currentUser) {
-                const messagesRef = db.ref('chats/' + currentChatId + '/messages');
+                const messagesRef = collection(db, `chats/${currentChatId}/messages`);
 
-                messagesRef.push({
-                    type: 'text',
-                    text: text,
-                    uid: currentUser.uid,
-                    name: currentUser.displayName || 'Anonymous',
-                    timestamp: firebase.database.ServerValue.TIMESTAMP
-                });
+                try {
+                    await addDoc(messagesRef, {
+                        type: 'text',
+                        text: text,
+                        uid: currentUser.uid,
+                        name: currentUser.displayName || 'Anonymous',
+                        timestamp: serverTimestamp()
+                    });
 
-                input.value = '';
-                scrollToBottom();
-                updateBalance(); // Збільшуємо баланс при відправці повідомлення
+                    input.value = '';
+                    scrollToBottom();
+                    updateBalance();
+                } catch (error) {
+                    console.error('Error sending message:', error);
+                    alert('Failed to send message. Please try again.');
+                }
             }
         }
 
@@ -662,6 +661,12 @@
                 menu.classList.remove('active');
             }
         });
+
+        // Make functions available globally
+        window.sendMessage = sendMessage;
+        window.toggleMenu = toggleMenu;
+        window.copyLink = copyLink;
+        window.toggleEmojiPanel = toggleEmojiPanel;
     </script>
 </body>
 
