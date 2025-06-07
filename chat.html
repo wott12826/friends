@@ -1,429 +1,135 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Fullscreen Chat</title>
-<style>
-  /* Базовые стили для фуллскрин */
-  body, html {
-    margin: 0; padding: 0; height: 100%;
-    font-family: Arial, sans-serif;
-    background: #f0f0f0;
-  }
-
-  /* Стили для .wallet-profile */
-  .wallet-profile {
-    display: flex;
-    align-items: center;
-    padding: 10px 20px;
-    background: #2c3e50;
-    color: white;
-  }
-  .wallet-profile-avatar {
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
-    object-fit: cover;
-    margin-right: 12px;
-    border: 2px solid #3498db;
-  }
-  .wallet-profile-name {
-    font-size: 18px;
-    font-weight: 600;
-  }
-
-  #chatBackdrop {
-    position: fixed;
-    top:0; left:0; right:0; bottom:0;
-    background: rgba(0,0,0,0.5);
-    display: none;
-    z-index: 998;
-  }
-  .fullscreen-chat {
-    position: fixed;
-    top: 0; right: 0; bottom: 0; left: 0;
-    background: white;
-    display: none;
-    flex-direction: column;
-    z-index: 999;
-    max-width: 600px;
-    margin: auto;
-    box-shadow: 0 0 20px rgba(0,0,0,0.3);
-  }
-  .fullscreen-chat.active,
-  #chatBackdrop.active {
-    display: flex;
-  }
-  .fschat-header {
-    background: #2c3e50;
-    color: white;
-    padding: 10px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  .fschat-header-left {
-    display: flex;
-    align-items: center;
-  }
-  .fschat-back {
-    font-size: 24px;
-    background: none;
-    border: none;
-    color: white;
-    cursor: pointer;
-    margin-right: 10px;
-  }
-  .fschat-avatar {
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    object-fit: cover;
-    margin-right: 10px;
-  }
-  .fschat-title {
-    font-weight: bold;
-    font-size: 18px;
-  }
-  .fschat-header-right {
-    display: flex;
-    align-items: center;
-  }
-  .fschat-balance {
-    background: #34495e;
-    border: none;
-    color: white;
-    font-size: 14px;
-    padding: 5px 10px;
-    margin-right: 10px;
-    border-radius: 4px;
-    cursor: default;
-    display: flex;
-    align-items: center;
-  }
-  .fschat-balance img {
-    margin-right: 5px;
-  }
-  .fschat-menu-wrap {
-    position: relative;
-  }
-  .fschat-menu-btn {
-    font-size: 24px;
-    background: none;
-    border: none;
-    color: white;
-    cursor: pointer;
-    user-select: none;
-  }
-  .fschat-menu {
-    position: absolute;
-    right: 0;
-    top: 30px;
-    background: white;
-    border: 1px solid #ccc;
-    min-width: 180px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-    display: none;
-    flex-direction: column;
-    z-index: 1000;
-  }
-  .fschat-menu-item {
-    padding: 8px 12px;
-    cursor: pointer;
-    font-size: 14px;
-  }
-  .fschat-menu-item:hover {
-    background: #eee;
-  }
-  .fschat-messages {
-    flex: 1;
-    overflow-y: auto;
-    padding: 10px;
-    background: #fafafa;
-  }
-  .fschat-tip {
-    font-size: 12px;
-    color: #888;
-    padding: 5px 10px;
-    background: #eee;
-    text-align: center;
-  }
-  .fschat-form {
-    display: flex;
-    align-items: center;
-    padding: 10px;
-    background: #fff;
-    border-top: 1px solid #ddd;
-    position: relative;
-  }
-  .fschat-emoji, .fschat-img-btn, .fschat-send {
-    cursor: pointer;
-    margin-right: 8px;
-    background: none;
-    border: none;
-    padding: 0;
-  }
-  .fschat-emoji img, .fschat-img-btn img, .fschat-send img {
-    width: 24px;
-    height: 24px;
-    opacity: 0.7;
-  }
-  #fullscreenChatInput {
-    flex: 1;
-    padding: 8px 12px;
-    font-size: 16px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-  }
-  .emoji-panel {
-    position: absolute;
-    bottom: 60px;
-    left: 10px;
-    background: white;
-    border: 1px solid #ccc;
-    padding: 5px;
-    display: none;
-    flex-wrap: wrap;
-    width: 200px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-    z-index: 10000;
-  }
-  .emoji-btn {
-    background: none;
-    border: none;
-    cursor: pointer;
-    margin: 2px;
-  }
-  .emoji-btn img {
-    width: 24px;
-    height: 24px;
-  }
-  .fschat-title-wrap {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-  }
-  .fschat-chat-id {
-    font-size: 12px;
-    color: rgba(255,255,255,0.7);
-    font-family: monospace;
-    cursor: pointer;
-    padding: 2px 6px;
-    background: rgba(255,255,255,0.1);
-    border-radius: 4px;
-    transition: background 0.2s;
-  }
-  .fschat-chat-id:hover {
-    background: rgba(255,255,255,0.2);
-  }
-  .chat-message {
-    display: flex;
-    margin-bottom: 16px;
-    gap: 8px;
-    max-width: 80%;
-  }
-  .chat-message.sent {
-    margin-left: auto;
-    flex-direction: row-reverse;
-  }
-  .message-avatar {
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    object-fit: cover;
-  }
-  .message-content-wrap {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-  }
-  .message-header {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    margin-bottom: 2px;
-  }
-  .message-sender {
-    font-size: 12px;
-    font-weight: 600;
-    color: #666;
-  }
-  .chat-message.sent .message-sender {
-    color: rgba(255,255,255,0.9);
-  }
-  .message-time {
-    font-size: 11px;
-    color: #999;
-  }
-  .chat-message.sent .message-time {
-    color: rgba(255,255,255,0.7);
-  }
-  .message-content {
-    background: white;
-    padding: 8px 12px;
-    border-radius: 12px;
-    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
-    font-size: 14px;
-    line-height: 1.4;
-  }
-  .chat-message.sent .message-content {
-    background: #3498db;
-    color: white;
-  }
-  .message-content img {
-    max-width: 200px;
-    border-radius: 8px;
-    margin-top: 4px;
-  }
-</style>
+  <meta charset="UTF-8" />
+  <title>Firestore Chat</title>
+  <style>
+    body { font-family: Arial; max-width: 600px; margin: 40px auto; }
+    #chat-box { height: 300px; overflow-y: auto; border: 1px solid #ccc; padding: 8px; }
+    .chat-message { margin-bottom: 10px; }
+    #msg-input { width: 80%; padding: 6px; }
+    #msg-form { margin-top: 10px; }
+  </style>
 </head>
 <body>
 
-<!-- Вставим wallet-profile куда-нибудь в index.html -->
-<div class="wallet-profile">
-  <img class="wallet-profile-avatar" src="https://via.placeholder.com/48" alt="User Avatar">
-  <div class="wallet-profile-name">User Name</div>
-</div>
+  <h2>🔥 Firestore Chat</h2>
+  <div id="chat-box"></div>
 
-<div id="chatBackdrop" class="chat-backdrop"></div>
-<div id="fullscreenChat" class="fullscreen-chat" role="dialog" aria-modal="true" aria-labelledby="fullscreenChatTitle">
-  <div class="fschat-header">
-    <div class="fschat-header-left">
-      <button id="closeFullscreenChat" class="fschat-back" aria-label="Close chat">&#8592;</button>
-      <img id="fullscreenChatAvatar" class="fschat-avatar" src="https://via.placeholder.com/32" alt="avatar">
-      <div class="fschat-title-wrap">
-        <span id="fullscreenChatTitle" class="fschat-title">Chat Title</span>
-        <span id="chatIdDisplay" class="fschat-chat-id"></span>
-      </div>
-    </div>
-    <div class="fschat-header-right">
-      <button class="fschat-balance" title="Balance">
-        <img src="images/logo2.png" alt="logo" style="width:18px;vertical-align:middle;margin-right:4px;">0.0
-      </button>
-      <div class="fschat-menu-wrap">
-        <button id="fschatMenuBtn" class="fschat-menu-btn" aria-haspopup="true" aria-expanded="false" aria-label="Menu">&#8942;</button>
-        <div id="fschatMenu" class="fschat-menu" role="menu" aria-hidden="true">
-          <div class="fschat-menu-item" role="menuitem" id="menuRefresh">Refresh Chat</div>
-          <div class="fschat-menu-item" role="menuitem" id="menuDeleteMessages">Delete Messages</div>
-          <div class="fschat-menu-item" role="menuitem" id="menuExitChat">Exit Chat</div>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div id="chatMessages" class="fschat-messages" role="log" aria-live="polite" aria-relevant="additions">
-    <!-- сообщения чата -->
-  </div>
-  <div class="fschat-tip">Текст сообщений хранится только локально в браузере и не передаётся на сервер</div>
-  <form id="chatForm" class="fschat-form" autocomplete="off">
-    <button type="button" id="emojiToggle" class="fschat-emoji" aria-label="Toggle emojis">&#128512;</button>
-    <button type="button" id="imageUploadBtn" class="fschat-img-btn" aria-label="Attach image">&#128247;</button>
-    <input id="fullscreenChatInput" type="text" placeholder="Напишите сообщение…" aria-label="Message input" />
-    <button type="submit" id="sendMessageBtn" class="fschat-send" aria-label="Send message">&#10148;</button>
-    <input id="imageUploadInput" type="file" accept="image/*" style="display:none" aria-hidden="true" />
+  <form id="msg-form">
+    <input id="msg-input" type="text" placeholder="Введите сообщение..." autocomplete="off" />
+    <button type="submit">Отправить</button>
   </form>
 
-  <div id="emojiPanel" class="emoji-panel" aria-hidden="true">
-    <!-- Простые emoji -->
-    <button class="emoji-btn" type="button" title="Smile">&#128515;</button>
-    <button class="emoji-btn" type="button" title="Laugh">&#128518;</button>
-    <button class="emoji-btn" type="button" title="Wink">&#128521;</button>
-    <button class="emoji-btn" type="button" title="Thumbs Up">&#128077;</button>
-    <button class="emoji-btn" type="button" title="Heart">&#10084;&#65039;</button>
-    <button class="emoji-btn" type="button" title="Clap">&#128079;</button>
+  <div style="margin-top: 10px;">
+    💰 Баланс: <span id="balance-display">0.0</span> $POST
   </div>
-</div>
 
-<script>
-  // Пример userData с localStorage или можно заменить на реальные данные
-  let userData = JSON.parse(localStorage.getItem('userData')) || {
-    uid: 'user123',
-    name: 'User Name',
-    avatarUrl: 'https://via.placeholder.com/48'
-  };
+  <!-- Firebase SDK -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import {
+      getFirestore,
+      doc,
+      collection,
+      addDoc,
+      onSnapshot,
+      serverTimestamp,
+      orderBy,
+      query
+    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-  // При загрузке страницы синхронизируем .wallet-profile с localStorage (или наоборот)
-  function syncProfileWithLocalStorage() {
-    const profileAvatarElem = document.querySelector('.wallet-profile-avatar');
-    const profileNameElem = document.querySelector('.wallet-profile-name');
+    const firebaseConfig = {
+      apiKey: "AIzaSyCuL4tpaSsw1ylXf2VZrQ1b_2t_Kxd97cI",
+      authDomain: "post-ad037.firebaseapp.com",
+      projectId: "post-ad037",
+      storageBucket: "post-ad037.firebasestorage.app",
+      messagingSenderId: "377312187432",
+      appId: "1:377312187432:web:565f47c145e0e73ac0911d",
+      measurementId: "G-T48NR3B9VW"
+    };
 
-    if(profileAvatarElem) {
-      // Если в localStorage нет аватара, возьмём из DOM и запишем в localStorage
-      if(!userData.avatarUrl) {
-        // Если это img
-        userData.avatarUrl = profileAvatarElem.src || getComputedStyle(profileAvatarElem).backgroundImage.slice(5,-2);
-        localStorage.setItem('userData', JSON.stringify(userData));
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    // Правильный путь к коллекции сообщений: сначала документ, потом коллекция
+    const globalDocRef = doc(db, 'chats', 'global');
+    const messagesRef = collection(globalDocRef, 'messages');
+    const q = query(messagesRef, orderBy('timestamp'));
+
+    let currentUser = null;
+    let userBalance = 0.0;
+
+    // Анонимный вход
+    signInAnonymously(auth).then(() => {
+      console.log('✅ Anonymous sign-in');
+    }).catch(console.error);
+
+    onAuthStateChanged(auth, user => {
+      if (user) {
+        currentUser = user;
+        console.log('👤 Authenticated as', user.uid);
       } else {
-        // Подставляем аватар из localStorage в DOM
-        profileAvatarElem.src = userData.avatarUrl;
-      }
-    }
-    if(profileNameElem) {
-      if(!userData.name) {
-        userData.name = profileNameElem.textContent.trim() || 'User Name';
-        localStorage.setItem('userData', JSON.stringify(userData));
-      } else {
-        profileNameElem.textContent = userData.name;
-      }
-    }
-  }
-
-  // Обновить аватар и имя в шапке чата
-  function updateChatHeader() {
-    const avatarImg = document.getElementById('fullscreenChatAvatar');
-    const titleSpan = document.getElementById('fullscreenChatTitle');
-    avatarImg.src = userData.avatarUrl || 'https://via.placeholder.com/32';
-    titleSpan.textContent = userData.name || 'User Name';
-
-    // Можно вывести chatId или uid
-    const chatIdDisplay = document.getElementById('chatIdDisplay');
-    chatIdDisplay.textContent = userData.uid ? `ID: ${userData.uid}` : '';
-  }
-
-  // Показать чат
-  function openChat() {
-    document.getElementById('fullscreenChat').classList.add('active');
-    document.getElementById('chatBackdrop').classList.add('active');
-  }
-  // Закрыть чат
-  function closeChat() {
-    document.getElementById('fullscreenChat').classList.remove('active');
-    document.getElementById('chatBackdrop').classList.remove('active');
-  }
-
-  // Инициализация
-  window.addEventListener('DOMContentLoaded', () => {
-    syncProfileWithLocalStorage();
-    updateChatHeader();
-
-    // Открываем чат для демонстрации
-    openChat();
-
-    // Закрытие по кнопке
-    document.getElementById('closeFullscreenChat').addEventListener('click', closeChat);
-    document.getElementById('chatBackdrop').addEventListener('click', closeChat);
-
-    // Меню
-    const menuBtn = document.getElementById('fschatMenuBtn');
-    const menu = document.getElementById('fschatMenu');
-    menuBtn.addEventListener('click', () => {
-      const expanded = menuBtn.getAttribute('aria-expanded') === 'true';
-      menuBtn.setAttribute('aria-expanded', String(!expanded));
-      menu.style.display = expanded ? 'none' : 'flex';
-      menu.setAttribute('aria-hidden', String(expanded));
-    });
-    // Закрываем меню при клике вне
-    document.addEventListener('click', e => {
-      if (!menu.contains(e.target) && e.target !== menuBtn) {
-        menu.style.display = 'none';
-        menuBtn.setAttribute('aria-expanded', 'false');
-        menu.setAttribute('aria-hidden', 'true');
+        currentUser = null;
       }
     });
 
-    // Здесь можешь продолжать с обработкой сообщений и остальным функционалом чата...
-  });
-</script>
+    // Вывод сообщений
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    function displayMessage({ text, uid, name, imageUrl }) {
+      const chatBox = document.getElementById('chat-box');
+      const div = document.createElement('div');
+      div.className = 'chat-message';
+      div.innerHTML = `<strong>${escapeHtml(name || 'User')}:</strong> ${escapeHtml(text || '')}`;
+      if (imageUrl) {
+        div.innerHTML += `<br><img src="${escapeHtml(imageUrl)}" style="max-width:150px;">`;
+      }
+      chatBox.appendChild(div);
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    // Слушаем новые сообщения
+    onSnapshot(q, snapshot => {
+      snapshot.docChanges().forEach(change => {
+        if (change.type === 'added') {
+          const msg = change.doc.data();
+          displayMessage(msg);
+        }
+      });
+    });
+
+    // Отправка сообщений
+    const msgForm = document.getElementById('msg-form');
+    const msgInput = document.getElementById('msg-input');
+
+    msgForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const text = msgInput.value.trim();
+      if (!text || !currentUser) return;
+
+      try {
+        await addDoc(messagesRef, {
+          uid: currentUser.uid,
+          name: 'Anon',
+          text,
+          timestamp: serverTimestamp()
+        });
+
+        userBalance += 0.1;
+        document.getElementById('balance-display').textContent = userBalance.toFixed(1);
+        msgInput.value = '';
+      } catch (err) {
+        console.error('Ошибка отправки сообщения:', err);
+      }
+    });
+  </script>
 
 </body>
 </html>
