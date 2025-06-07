@@ -1466,53 +1466,53 @@
       padding: 32px 0 0 0;
     }
 
-    .fschat-message-row {
-      width: 100%;
-      display: flex;
-      margin-bottom: 32px;
-    }
-
-    .fschat-message-row.me {
-      justify-content: flex-end;
-    }
-
     .fschat-message {
       display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-      max-width: 420px;
+      gap: 12px;
       width: 100%;
-      padding: 0 16px;
+      max-width: 800px;
+      padding: 8px 16px;
+      margin-bottom: 8px;
     }
 
-    .fschat-message.me {
-      align-items: flex-end;
+    .fschat-message-me {
+      flex-direction: row-reverse;
     }
 
-    .fschat-msg-header {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 2px;
-    }
-
-    .fschat-msg-avatar {
+    .fschat-message-avatar {
       width: 36px;
       height: 36px;
       border-radius: 50%;
       object-fit: cover;
     }
 
-    .fschat-msg-nick {
-      font-weight: 600;
-      font-size: 1rem;
-      color: #222;
+    .fschat-message-content {
+      background: #f5f5f5;
+      padding: 8px 12px;
+      border-radius: 12px;
+      max-width: 70%;
     }
 
-    .fschat-msg-time {
-      color: #aaa;
-      font-size: 0.92rem;
-      margin-left: 4px;
+    .fschat-message-me .fschat-message-content {
+      background: #a020f0;
+      color: #fff;
+    }
+
+    .fschat-message-nick {
+      font-size: 0.9rem;
+      font-weight: 600;
+      margin-bottom: 4px;
+      color: #666;
+    }
+
+    .fschat-message-me .fschat-message-nick {
+      color: #fff;
+    }
+
+    .fschat-message-text {
+      font-size: 1rem;
+      line-height: 1.4;
+      word-break: break-word;
     }
 
     .fschat-bubble {
@@ -2549,50 +2549,50 @@
         </div>
         <div id="discover-rankings" class="discover-list">
           <!-- Примерные данные, можно расширить -->
-          <div class="discover-item">
+          <div class="discover-item" data-club="wlm">
             <div class="discover-rank">1</div>
             <img class="discover-avatar" src="https://randomuser.me/api/portraits/men/1.jpg" alt="club">
             <div class="discover-info">
               <div class="discover-title">WLM CLUB</div>
               <div class="discover-desc">Public club</div>
             </div>
-            <div class="discover-price">Price: 0.0029 $POST</div>
+            <div class="discover-price">Price: 0.0 $POST</div>
           </div>
-          <div class="discover-item">
+          <div class="discover-item" data-club="bwo">
             <div class="discover-rank">2</div>
             <img class="discover-avatar" src="https://randomuser.me/api/portraits/men/2.jpg" alt="club">
             <div class="discover-info">
               <div class="discover-title">Brutalist World Order</div>
               <div class="discover-desc">Public club</div>
             </div>
-            <div class="discover-price">Price: 0.0027 $POST</div>
+            <div class="discover-price">Price: 0.0 $POST</div>
           </div>
-          <div class="discover-item">
+          <div class="discover-item" data-club="inf">
             <div class="discover-rank">3</div>
             <img class="discover-avatar" src="https://randomuser.me/api/portraits/men/3.jpg" alt="club">
             <div class="discover-info">
               <div class="discover-title">infinite</div>
               <div class="discover-desc">Public club</div>
             </div>
-            <div class="discover-price">Price: 0.0025 $POST</div>
+            <div class="discover-price">Price: 0.0 $POST</div>
           </div>
-          <div class="discover-item">
+          <div class="discover-item" data-club="agf">
             <div class="discover-rank">4</div>
             <img class="discover-avatar" src="https://randomuser.me/api/portraits/men/4.jpg" alt="club">
             <div class="discover-info">
               <div class="discover-title">Auto Giveaways by F...</div>
               <div class="discover-desc">Public club</div>
             </div>
-            <div class="discover-price">Price: 0.0023 $POST</div>
+            <div class="discover-price">Price: 0.0 $POST</div>
           </div>
-          <div class="discover-item">
+          <div class="discover-item" data-club="ocf">
             <div class="discover-rank">5</div>
             <img class="discover-avatar" src="https://randomuser.me/api/portraits/men/5.jpg" alt="club">
             <div class="discover-info">
               <div class="discover-title">Onchain Friends</div>
               <div class="discover-desc">Public club</div>
             </div>
-            <div class="discover-price">Price: 0.0021 $POST</div>
+            <div class="discover-price">Price: 0.0 $POST</div>
           </div>
           <!-- ... ещё элементы ... -->
         </div>
@@ -3438,6 +3438,16 @@
       const currentBalance = getChatBalance(key);
       const newBalance = currentBalance + increment;
       localStorage.setItem('chat_balance_' + key, newBalance.toString());
+      
+      // Update discover item price if it exists
+      const discoverItem = document.querySelector(`.discover-item[data-club="${key}"]`);
+      if (discoverItem) {
+        const priceEl = discoverItem.querySelector('.discover-price');
+        if (priceEl) {
+          priceEl.textContent = `Price: ${newBalance.toFixed(1)} $POST`;
+        }
+      }
+      
       return newBalance;
     }
 
@@ -3448,21 +3458,6 @@
       if (balanceEl) {
         balanceEl.innerHTML = `<img src="images/logo2.png" style="width:18px;vertical-align:middle;margin-right:4px;">${balance.toFixed(1)}`;
       }
-      
-      // Update corresponding discover-price element
-      const discoverItems = document.querySelectorAll('.discover-item');
-      discoverItems.forEach(item => {
-        const itemTitle = item.querySelector('.discover-title')?.textContent || '';
-        const itemTicker = (itemTitle.match(/\(([^)]+)\)/) || [])[1] || '';
-        const itemKey = itemTitle.split('(')[0].trim() + '|' + itemTicker;
-        
-        if (itemKey === currentClubKey) {
-          const priceEl = item.querySelector('.discover-price');
-          if (priceEl) {
-            priceEl.textContent = `Price: ${balance.toFixed(1)} $POST`;
-          }
-        }
-      });
     }
 
     function renderFullscreenChatMessages() {
@@ -3478,68 +3473,65 @@
         const currentUser = firebase.auth().currentUser;
         const isMe = (m.user === 3) || (!m.user && m.nick === 'Smiroff') || (m.uid === currentUser?.uid);
         let userAvatar, userNick;
-
-        if (isMe) {
+        
+        if (m.user === 3 || m.uid === currentUser?.uid) {
           userAvatar = currentUser?.photoURL || 'https://e7.pngegg.com/pngimages/178/595/png-clipart-user-profile-computer-icons-login-user-avatars-monochrome-black-thumbnail.png';
-          userNick = currentUser?.displayName || 'User';
+          userNick = currentUser?.displayName || 'You';
         } else {
-          const demoUser = demoUsers[m.user ?? 0] || demoUsers[0];
-          userAvatar = m.avatar || demoUser.avatar;
-          userNick = m.nick || demoUser.nick;
+          const demoUser = demoUsers[m.user % demoUsers.length];
+          userAvatar = demoUser.avatar;
+          userNick = demoUser.nick;
         }
-
-        const row = document.createElement('div');
-        row.className = 'fschat-message-row' + (isMe ? ' me' : '');
-        row.innerHTML = `
-          <div class="fschat-message${isMe ? ' me' : ''}">
-            <div class="fschat-msg-header">
-              <img class="fschat-msg-avatar" src="${userAvatar}" alt="avatar">
-              <span class="fschat-msg-nick">${userNick}</span>
-              <span class="fschat-msg-time">${m.time || ''}</span>
-            </div>
-            <div class="fschat-bubble">${m.text || ''}${m.img ? `<br><img src='${m.img}' style='max-width:180px;max-height:120px;border-radius:10px;margin-top:6px;'>` : ''}</div>
+        
+        const div = document.createElement('div');
+        div.className = `fschat-message ${isMe ? 'fschat-message-me' : ''}`;
+        div.innerHTML = `
+          <img src="${userAvatar}" class="fschat-message-avatar" alt="avatar">
+          <div class="fschat-message-content">
+            <div class="fschat-message-nick">${userNick}</div>
+            <div class="fschat-message-text">${m.text}</div>
           </div>
         `;
-        box.appendChild(row);
+        box.appendChild(div);
       });
-      setTimeout(() => { box.scrollTop = box.scrollHeight; }, 50);
-      updateBalanceDisplay();
     }
 
-    document.getElementById('fullscreenChatForm').onsubmit = function (e) {
+    // Handle chat form submission
+    document.getElementById('fullscreenChatForm').onsubmit = function(e) {
       e.preventDefault();
       const input = document.getElementById('fullscreenChatInput');
       const text = input.value.trim();
-      if ((!text && !imgToSend) || !currentClubKey) return;
-
+      if (!text || !currentClubKey) return;
+      
+      // Get current messages
+      let msgs = getClubMessages(currentClubKey);
+      
+      // Add new message
       const currentUser = firebase.auth().currentUser;
-      const msgs = getClubMessages(currentClubKey);
-      const now = new Date();
-      const time = now.toLocaleDateString() + ' ' + now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + (now.getHours() >= 12 ? 'PM' : 'AM');
-
-      const newMessage = {
-        uid: currentUser?.uid,
-        nick: currentUser?.displayName || 'User',
-        avatar: currentUser?.photoURL,
+      msgs.push({
         text,
-        time
-      };
-
-      if (imgToSend) {
-        newMessage.img = imgToSend;
-      }
-
-      msgs.push(newMessage);
+        user: 3,
+        uid: currentUser?.uid,
+        nick: currentUser?.displayName,
+        time: new Date().toISOString()
+      });
+      
+      // Save messages
       saveClubMessages(currentClubKey, msgs);
       
-      // Update balance for user messages
-      if (currentUser) {
-        updateChatBalance(currentClubKey);
-      }
+      // Update balance
+      updateChatBalance(currentClubKey);
       
-      input.value = '';
-      clearImgPreview();
+      // Update display
       renderFullscreenChatMessages();
+      updateBalanceDisplay();
+      
+      // Clear input
+      input.value = '';
+      
+      // Scroll to bottom
+      const msgBox = document.getElementById('fullscreenChatMessages');
+      msgBox.scrollTop = msgBox.scrollHeight;
     };
 
     // --- Emoji panel logic ---
