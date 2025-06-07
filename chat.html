@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Firestore Chat</title>
   <style>
     body { font-family: Arial; max-width: 600px; margin: 40px auto; }
@@ -17,7 +17,7 @@
   <div id="chat-box"></div>
 
   <form id="msg-form">
-    <input id="msg-input" type="text" placeholder="Введите сообщение..." />
+    <input id="msg-input" type="text" placeholder="Введите сообщение..." autocomplete="off" />
     <button type="submit">Отправить</button>
   </form>
 
@@ -31,6 +31,7 @@
     import { getAuth, onAuthStateChanged, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
     import {
       getFirestore,
+      doc,
       collection,
       addDoc,
       onSnapshot,
@@ -39,45 +40,60 @@
       query
     } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-   const firebaseConfig = {
-
+    const firebaseConfig = {
       apiKey: "AIzaSyCuL4tpaSsw1ylXf2VZrQ1b_2t_Kxd97cI",
-
       authDomain: "post-ad037.firebaseapp.com",
-
       projectId: "post-ad037",
-
       storageBucket: "post-ad037.firebasestorage.app",
-
       messagingSenderId: "377312187432",
-
       appId: "1:377312187432:web:565f47c145e0e73ac0911d",
-
       measurementId: "G-T48NR3B9VW"
-
     };
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    const messagesRef = collection(db, 'chats/global/messages');
+    // Правильный путь к коллекции сообщений: сначала документ, потом коллекция
+    const globalDocRef = doc(db, 'chats', 'global');
+    const messagesRef = collection(globalDocRef, 'messages');
     const q = query(messagesRef, orderBy('timestamp'));
 
     let currentUser = null;
     let userBalance = 0.0;
 
-    // Вход анонимно
+    // Анонимный вход
     signInAnonymously(auth).then(() => {
       console.log('✅ Anonymous sign-in');
-    });
+    }).catch(console.error);
 
     onAuthStateChanged(auth, user => {
       if (user) {
         currentUser = user;
         console.log('👤 Authenticated as', user.uid);
+      } else {
+        currentUser = null;
       }
     });
+
+    // Вывод сообщений
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    function displayMessage({ text, uid, name, imageUrl }) {
+      const chatBox = document.getElementById('chat-box');
+      const div = document.createElement('div');
+      div.className = 'chat-message';
+      div.innerHTML = `<strong>${escapeHtml(name || 'User')}:</strong> ${escapeHtml(text || '')}`;
+      if (imageUrl) {
+        div.innerHTML += `<br><img src="${escapeHtml(imageUrl)}" style="max-width:150px;">`;
+      }
+      chatBox.appendChild(div);
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
 
     // Слушаем новые сообщения
     onSnapshot(q, snapshot => {
@@ -89,18 +105,7 @@
       });
     });
 
-    function displayMessage({ text, uid, name, imageUrl }) {
-      const chatBox = document.getElementById('chat-box');
-      const div = document.createElement('div');
-      div.className = 'chat-message';
-      div.innerHTML = `<strong>${name || 'User'}:</strong> ${text || ''}`;
-      if (imageUrl) {
-        div.innerHTML += `<br><img src="${imageUrl}" style="max-width:150px;">`;
-      }
-      chatBox.appendChild(div);
-      chatBox.scrollTop = chatBox.scrollHeight;
-    }
-
+    // Отправка сообщений
     const msgForm = document.getElementById('msg-form');
     const msgInput = document.getElementById('msg-input');
 
@@ -109,16 +114,20 @@
       const text = msgInput.value.trim();
       if (!text || !currentUser) return;
 
-      await addDoc(messagesRef, {
-        uid: currentUser.uid,
-        name: 'Anon',
-        text,
-        timestamp: serverTimestamp()
-      });
+      try {
+        await addDoc(messagesRef, {
+          uid: currentUser.uid,
+          name: 'Anon',
+          text,
+          timestamp: serverTimestamp()
+        });
 
-      userBalance += 0.1;
-      document.getElementById('balance-display').textContent = userBalance.toFixed(1);
-      msgInput.value = '';
+        userBalance += 0.1;
+        document.getElementById('balance-display').textContent = userBalance.toFixed(1);
+        msgInput.value = '';
+      } catch (err) {
+        console.error('Ошибка отправки сообщения:', err);
+      }
     });
   </script>
 
