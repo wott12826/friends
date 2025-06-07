@@ -3634,9 +3634,9 @@
 
     document.getElementById('discoverCodeSubmit').onclick = function () {
       const code = document.getElementById('discoverCodeInput').value.trim();
-      if (code === 'oldcode') {
-        document.getElementById('discoverCodeError').style.color = '#0a0';
-        document.getElementById('discoverCodeError').textContent = 'Access granted!';
+      if (code) {
+        document.getElementById('discoverCodeError').style.color = 'red';
+        document.getElementById('discoverCodeError').textContent = 'Access denied!';
 
         // Сохраняем информацию о доступе для текущего пользователя к конкретному клубу
         const currentUser = firebase.auth().currentUser;
