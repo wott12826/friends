@@ -18,8 +18,21 @@
     }
     .chat-info {
       display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+    .chat-title {
+      display: flex;
       align-items: center;
       gap: 10px;
+    }
+    .chat-id {
+      font-size: 14px;
+      color: #666;
+      background: #f3f4f6;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-family: monospace;
     }
     .participants {
       font-size: 12px;
@@ -59,7 +72,10 @@
 
   <div class="chat-header">
     <div class="chat-info">
-      <h2>🔥 Firestore Chat</h2>
+      <div class="chat-title">
+        <h2>🔥 Firestore Chat</h2>
+        <span class="chat-id" id="chat-id-display">ID: loading...</span>
+      </div>
       <span class="participants" id="participants-count">0 участников</span>
     </div>
     <div class="invite-link">
@@ -125,13 +141,17 @@
     const urlParams = new URLSearchParams(window.location.search);
     currentChatId = urlParams.get('chat');
 
-    if (!currentChatId) {
-      errorDiv.textContent = 'ID чата не указан в URL. Добавьте параметр ?chat=ID_чата';
-      document.getElementById('msg-form').style.display = 'none';
-    } else {
+    // Отображаем ID чата
+    const chatIdDisplay = document.getElementById('chat-id-display');
+    if (currentChatId) {
+      chatIdDisplay.textContent = `ID: ${currentChatId}`;
       // Устанавливаем ссылку для приглашения
       const inviteLink = `${window.location.origin}${window.location.pathname}?chat=${currentChatId}`;
       document.getElementById('invite-link').value = inviteLink;
+    } else {
+      chatIdDisplay.textContent = 'ID: не указан';
+      errorDiv.textContent = 'ID чата не указан в URL. Добавьте параметр ?chat=ID_чата';
+      document.getElementById('msg-form').style.display = 'none';
     }
 
     // Ссылки на коллекцию сообщений текущего чата
@@ -151,7 +171,8 @@
             participants: [currentUser.uid],
             isActive: true,
             title: `Чат ${currentChatId}`,
-            createdBy: currentUser.uid
+            createdBy: currentUser.uid,
+            chatId: currentChatId // Добавляем ID чата в документ
           });
         } else {
           // Добавляем пользователя в список участников, если его там еще нет
