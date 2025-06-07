@@ -3448,6 +3448,21 @@
       if (balanceEl) {
         balanceEl.innerHTML = `<img src="images/logo2.png" style="width:18px;vertical-align:middle;margin-right:4px;">${balance.toFixed(1)}`;
       }
+      
+      // Update corresponding discover-price element
+      const discoverItems = document.querySelectorAll('.discover-item');
+      discoverItems.forEach(item => {
+        const itemTitle = item.querySelector('.discover-title')?.textContent || '';
+        const itemTicker = (itemTitle.match(/\(([^)]+)\)/) || [])[1] || '';
+        const itemKey = itemTitle.split('(')[0].trim() + '|' + itemTicker;
+        
+        if (itemKey === currentClubKey) {
+          const priceEl = item.querySelector('.discover-price');
+          if (priceEl) {
+            priceEl.textContent = `Price: ${balance.toFixed(1)} $POST`;
+          }
+        }
+      });
     }
 
     function renderFullscreenChatMessages() {
