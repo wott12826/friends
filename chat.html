@@ -191,6 +191,65 @@
   .fschat-chat-id:hover {
     background: rgba(255,255,255,0.2);
   }
+  .chat-message {
+    display: flex;
+    margin-bottom: 16px;
+    gap: 8px;
+    max-width: 80%;
+  }
+  .chat-message.sent {
+    margin-left: auto;
+    flex-direction: row-reverse;
+  }
+  .message-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+  .message-content-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .message-header {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 2px;
+  }
+  .message-sender {
+    font-size: 12px;
+    font-weight: 600;
+    color: #666;
+  }
+  .chat-message.sent .message-sender {
+    color: rgba(255,255,255,0.9);
+  }
+  .message-time {
+    font-size: 11px;
+    color: #999;
+  }
+  .chat-message.sent .message-time {
+    color: rgba(255,255,255,0.7);
+  }
+  .message-content {
+    background: white;
+    padding: 8px 12px;
+    border-radius: 12px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+    font-size: 14px;
+    line-height: 1.4;
+  }
+  .chat-message.sent .message-content {
+    background: #3498db;
+    color: white;
+  }
+  .message-content img {
+    max-width: 200px;
+    border-radius: 8px;
+    margin-top: 4px;
+  }
 </style>
 </head>
 <body>
@@ -348,25 +407,57 @@
     imgInput.value = '';
   });
 
-  // Обработка отправки сообщения
+  // Обновляем функцию отображения сообщения
+  function displayMessage({ text, uid, name, timestamp, avatarUrl }) {
+    const chatBox = document.getElementById('fullscreenChatMessages');
+    const div = document.createElement('div');
+    const isSent = uid === currentUser?.uid;
+    
+    div.className = `chat-message ${isSent ? 'sent' : 'received'}`;
+    
+    const time = timestamp ? new Date(timestamp.toDate()).toLocaleTimeString() : 'Just now';
+    const avatar = avatarUrl || 'https://via.placeholder.com/32';
+    
+    div.innerHTML = `
+      <img src="${escapeHtml(avatar)}" alt="avatar" class="message-avatar">
+      <div class="message-content-wrap">
+        <div class="message-header">
+          <span class="message-sender">${escapeHtml(name || 'User')}</span>
+          <span class="message-time">${time}</span>
+        </div>
+        <div class="message-content">${escapeHtml(text || '')}</div>
+      </div>
+    `;
+    
+    chatBox.appendChild(div);
+    chatBox.scrollTop = chatBox.scrollHeight;
+  }
+
+  // Обновляем обработчик отправки сообщения
   const form = document.getElementById('fullscreenChatForm');
   form.addEventListener('submit', e => {
     e.preventDefault();
     const input = document.getElementById('fullscreenChatInput');
     if (!input.value.trim()) return;
-    const messages = document.getElementById('fullscreenChatMessages');
-    const div = document.createElement('div');
-    div.textContent = input.value;
-    div.style.padding = '6px 10px';
-    div.style.background = '#3498db';
-    div.style.color = 'white';
-    div.style.borderRadius = '12px';
-    div.style.marginBottom = '8px';
-    div.style.alignSelf = 'flex-end';
-    messages.appendChild(div);
-    messages.scrollTop = messages.scrollHeight;
+    
+    const message = {
+      text: input.value,
+      uid: 'current-user-id', // В реальном приложении это будет ID текущего пользователя
+      name: 'Your Name', // В реальном приложении это будет имя текущего пользователя
+      timestamp: new Date(),
+      avatarUrl: 'https://via.placeholder.com/32' // В реальном приложении это будет аватар пользователя
+    };
+    
+    displayMessage(message);
     input.value = '';
   });
+
+  // Функция для экранирования HTML
+  function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  }
 
   // Кнопка назад - закрытие чата
   const closeBtn = document.getElementById('closeFullscreenChat');
