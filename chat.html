@@ -247,9 +247,13 @@
         <button class="fschat-menu-btn" title="Menu" aria-haspopup="true" aria-expanded="false">⋮</button>
         <div class="fschat-menu" role="menu">
           <div class="fschat-menu-item" role="menuitem" onclick="window.copyLink()">Copy chat link</div>
-          <div class="fschat-menu-item" role="menuitem">Delete chat</div>
-          <div class="fschat-menu-item" role="menuitem">Turn on notifications</div>
-          <div class="fschat-menu-item" role="menuitem">Pin to top of chat list</div>
+          <div class="fschat-menu-item" role="menuitem" onclick="window.deleteChat()">Delete chat</div>
+          <div class="fschat-menu-item" role="menuitem" onclick="window.toggleNotifications()" id="notificationsToggle">
+            <span id="notificationsText">Turn on notifications</span>
+          </div>
+          <div class="fschat-menu-item" role="menuitem" onclick="window.pinChat()" id="pinChatToggle">
+            <span id="pinChatText">Pin to top of chat list</span>
+          </div>
         </div>
       </div>
     </div>
@@ -380,12 +384,116 @@
     imgInput.value = '';
   });
 
-  // Обработка отправки сообщения
+  // Функция для удаления чата
+  window.deleteChat = function() {
+    if (!currentChatId) return;
+    
+    if (confirm('Are you sure you want to delete this chat? This action cannot be undone.')) {
+      // Здесь должна быть логика удаления чата из Firestore
+      // После успешного удаления перенаправляем на главную страницу
+      window.location.href = 'https://www.postcoin.space/';
+    }
+  };
+
+  // Функция для включения/выключения уведомлений
+  window.toggleNotifications = function() {
+    const notificationsText = document.getElementById('notificationsText');
+    const isEnabled = notificationsText.textContent.includes('Turn off');
+    
+    if (!isEnabled) {
+      // Запрашиваем разрешение на уведомления
+      if (Notification.permission !== 'granted') {
+        Notification.requestPermission().then(permission => {
+          if (permission === 'granted') {
+            enableNotifications();
+          }
+        });
+      } else {
+        enableNotifications();
+      }
+    } else {
+      disableNotifications();
+    }
+  };
+
+  function enableNotifications() {
+    const notificationsText = document.getElementById('notificationsText');
+    notificationsText.textContent = 'Turn off notifications';
+    localStorage.setItem(`notifications_${currentChatId}`, 'enabled');
+    
+    // Подписываемся на новые сообщения
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.ready.then(registration => {
+        registration.showNotification('Notifications enabled', {
+          body: 'You will now receive notifications for new messages',
+          icon: '/images/logo2.png'
+        });
+      });
+    }
+  }
+
+  function disableNotifications() {
+    const notificationsText = document.getElementById('notificationsText');
+    notificationsText.textContent = 'Turn on notifications';
+    localStorage.removeItem(`notifications_${currentChatId}`);
+  }
+
+  // Функция для закрепления чата
+  window.pinChat = function() {
+    const pinChatText = document.getElementById('pinChatText');
+    const isPinned = pinChatText.textContent.includes('Unpin');
+    
+    if (!isPinned) {
+      pinChatText.textContent = 'Unpin from top';
+      localStorage.setItem(`pinned_${currentChatId}`, 'true');
+    } else {
+      pinChatText.textContent = 'Pin to top of chat list';
+      localStorage.removeItem(`pinned_${currentChatId}`);
+    }
+  };
+
+  // Проверяем состояние уведомлений и закрепления при загрузке
+  window.addEventListener('load', () => {
+    // Проверяем состояние уведомлений
+    const notificationsEnabled = localStorage.getItem(`notifications_${currentChatId}`);
+    if (notificationsEnabled) {
+      const notificationsText = document.getElementById('notificationsText');
+      notificationsText.textContent = 'Turn off notifications';
+    }
+
+    // Проверяем состояние закрепления
+    const isPinned = localStorage.getItem(`pinned_${currentChatId}`);
+    if (isPinned) {
+      const pinChatText = document.getElementById('pinChatText');
+      pinChatText.textContent = 'Unpin from top';
+    }
+  });
+
+  // Функция для отправки уведомлений
+  function sendNotification(message) {
+    if (Notification.permission === 'granted' && localStorage.getItem(`notifications_${currentChatId}`)) {
+      const notification = new Notification('New message', {
+        body: message.text,
+        icon: '/images/logo2.png'
+      });
+    }
+  }
+
+  // Модифицируем обработчик отправки сообщения для поддержки уведомлений
   const form = document.getElementById('fullscreenChatForm');
   form.addEventListener('submit', e => {
     e.preventDefault();
     const input = document.getElementById('fullscreenChatInput');
     if (!input.value.trim()) return;
+    
+    const message = {
+      text: input.value,
+      timestamp: new Date()
+    };
+
+    // Отправляем уведомление другим участникам чата
+    sendNotification(message);
+
     const messages = document.getElementById('fullscreenChatMessages');
     const div = document.createElement('div');
     div.textContent = input.value;
