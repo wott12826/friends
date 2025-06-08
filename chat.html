@@ -389,8 +389,16 @@
     if (!currentChatId) return;
     
     if (confirm('Are you sure you want to delete this chat? This action cannot be undone.')) {
-      // Здесь должна быть логика удаления чата из Firestore
-      // После успешного удаления перенаправляем на главную страницу
+      // Получаем текущий список чатов
+      const chatList = JSON.parse(localStorage.getItem('chatList') || '[]');
+      
+      // Удаляем чат из списка
+      const updatedChatList = chatList.filter(chat => chat.id !== currentChatId);
+      
+      // Сохраняем обновленный список
+      localStorage.setItem('chatList', JSON.stringify(updatedChatList));
+      
+      // Перенаправляем на главную страницу
       window.location.href = 'https://www.postcoin.space/';
     }
   };
@@ -443,12 +451,37 @@
     const pinChatText = document.getElementById('pinChatText');
     const isPinned = pinChatText.textContent.includes('Unpin');
     
+    // Получаем текущий список чатов
+    const chatList = JSON.parse(localStorage.getItem('chatList') || '[]');
+    
+    // Находим текущий чат
+    const currentChat = chatList.find(chat => chat.id === currentChatId);
+    if (!currentChat) return;
+    
     if (!isPinned) {
+      // Закрепляем чат
+      currentChat.pinned = true;
       pinChatText.textContent = 'Unpin from top';
-      localStorage.setItem(`pinned_${currentChatId}`, 'true');
+      
+      // Перемещаем чат в начало списка
+      const updatedChatList = [
+        currentChat,
+        ...chatList.filter(chat => chat.id !== currentChatId)
+      ];
+      
+      localStorage.setItem('chatList', JSON.stringify(updatedChatList));
     } else {
+      // Открепляем чат
+      currentChat.pinned = false;
       pinChatText.textContent = 'Pin to top of chat list';
-      localStorage.removeItem(`pinned_${currentChatId}`);
+      
+      // Перемещаем чат в конец списка
+      const updatedChatList = [
+        ...chatList.filter(chat => chat.id !== currentChatId),
+        currentChat
+      ];
+      
+      localStorage.setItem('chatList', JSON.stringify(updatedChatList));
     }
   };
 
@@ -461,9 +494,10 @@
       notificationsText.textContent = 'Turn off notifications';
     }
 
-    // Проверяем состояние закрепления
-    const isPinned = localStorage.getItem(`pinned_${currentChatId}`);
-    if (isPinned) {
+    // Проверяем состояние закрепления из chatList
+    const chatList = JSON.parse(localStorage.getItem('chatList') || '[]');
+    const currentChat = chatList.find(chat => chat.id === currentChatId);
+    if (currentChat && currentChat.pinned) {
       const pinChatText = document.getElementById('pinChatText');
       pinChatText.textContent = 'Unpin from top';
     }
