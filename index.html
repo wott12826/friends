@@ -4983,7 +4983,13 @@
   <script>
       document.addEventListener('DOMContentLoaded', function () {
       // ... existing code ...
-
+      function setMeshPrice(value) {
+  const priceElements = document.querySelectorAll('.wallet-post-price');
+  let price = parseFloat(value);
+  priceElements.forEach(element => {
+    element.textContent = isNaN(price) ? '0.0' : price.toFixed(4);
+  });
+}
       // Function to fetch price from GeckoTerminal
       async function fetchPrice() {
         try {
@@ -4992,10 +4998,7 @@
           
           if (data && data.data && data.data.attributes) {
             const price = data.data.attributes.price_usd;
-            const priceElements = document.querySelectorAll('.wallet-post-price');
-            priceElements.forEach(element => {
-              element.textContent = `$${parseFloat(price).toFixed(4)}`;
-            });
+setMeshPrice(price);
             
             // Update wallet value after price update
             updateWalletValue();
