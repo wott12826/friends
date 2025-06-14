@@ -5492,6 +5492,14 @@ if (discoverItem) {
                   el.textContent = `@${screenName}`;
                 });
 
+                // Save profile data to localStorage
+                const profileData = {
+                  displayName: twitterProvider.displayName,
+                  photoURL: twitterProvider.photoUrl,
+                  screenName: twitterProvider.screenName
+                };
+                localStorage.setItem(`user_profile_${user.uid}`, JSON.stringify(profileData));
+
                 // Update user profile in Firebase
                 await updatedUser.updateProfile({
                   displayName: twitterProvider.displayName,
@@ -5503,6 +5511,41 @@ if (discoverItem) {
             } catch (error) {
               console.error('Error syncing Twitter profile:', error);
               alert('Error syncing Twitter profile: ' + error.message);
+            }
+          });
+        }
+
+        if (unlinkBtn) {
+          unlinkBtn.addEventListener('click', async function() {
+            try {
+              await user.unlink('twitter.com');
+              
+              // Clear Twitter-related data from localStorage
+              localStorage.removeItem(`user_profile_${user.uid}`);
+              
+              // Update UI
+              const twitterInfo = document.querySelector('.wallet-profile-twitter');
+              if (twitterInfo) twitterInfo.style.display = 'none';
+              
+              // Update profile name to default
+              const profileName = document.querySelector('.wallet-profile-name');
+              if (profileName) {
+                profileName.innerHTML = `User<span class="wallet-profile-handle">@user_${Math.floor(Math.random() * 10000)}</span>`;
+              }
+              
+              // Update avatar to default
+              const profileAvatar = document.querySelector('.wallet-profile-avatar');
+              if (profileAvatar) {
+                profileAvatar.src = 'https://e7.pngegg.com/pngimages/178/595/png-clipart-user-profile-computer-icons-login-user-avatars-monochrome-black-thumbnail.png';
+              }
+              
+              // Update buttons
+              updateTwitterButtons();
+              
+              alert('Twitter account unlinked successfully!');
+            } catch (error) {
+              console.error('Error unlinking Twitter:', error);
+              alert('Error unlinking Twitter: ' + error.message);
             }
           });
         }
