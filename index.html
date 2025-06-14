@@ -5458,58 +5458,121 @@ if (discoverItem) {
         if (syncBtn) {
           syncBtn.addEventListener('click', async function() {
             try {
+              console.log('Starting Twitter sync process...');
+              
               // Reload user data to get fresh Twitter info
+              console.log('Reloading user data...');
               await user.reload();
               const updatedUser = firebase.auth().currentUser;
               
+              if (!updatedUser) {
+                throw new Error('No user found after reload');
+              }
+              
+              console.log('Current user data:', {
+                uid: updatedUser.uid,
+                displayName: updatedUser.displayName,
+                photoURL: updatedUser.photoURL
+              });
+              
               // Get Twitter info from providerUserInfo
+              console.log('Looking for Twitter provider data...');
               const twitterProvider = updatedUser.providerData.find(provider => provider.providerId === 'twitter.com');
-              if (twitterProvider) {
-                // Update profile avatar
-                const profileAvatar = document.querySelector('.wallet-profile-avatar');
-                if (profileAvatar && twitterProvider.photoUrl) {
+              
+              if (!twitterProvider) {
+                throw new Error('Twitter provider data not found. Provider data available: ' + 
+                  JSON.stringify(updatedUser.providerData.map(p => p.providerId)));
+              }
+              
+              console.log('Twitter provider data found:', {
+                displayName: twitterProvider.displayName,
+                photoUrl: twitterProvider.photoUrl,
+                screenName: twitterProvider.screenName
+              });
+              
+              // Update profile avatar
+              const profileAvatar = document.querySelector('.wallet-profile-avatar');
+              if (profileAvatar) {
+                if (!twitterProvider.photoUrl) {
+                  console.warn('No photoUrl available from Twitter provider');
+                } else {
+                  console.log('Updating profile avatar with URL:', twitterProvider.photoUrl);
                   profileAvatar.src = twitterProvider.photoUrl;
                 }
-                
-                // Update profile name and handle
-                const profileName = document.querySelector('.wallet-profile-name');
-                if (profileName) {
-                  const screenName = twitterProvider.screenName;
-                  profileName.innerHTML = `${twitterProvider.displayName}<span class="wallet-profile-handle">@${screenName}</span>`;
+              } else {
+                console.warn('Profile avatar element not found in DOM');
+              }
+              
+              // Update profile name and handle
+              const profileName = document.querySelector('.wallet-profile-name');
+              if (profileName) {
+                if (!twitterProvider.screenName) {
+                  console.warn('No screenName available from Twitter provider');
+                } else {
+                  console.log('Updating profile name with:', {
+                    displayName: twitterProvider.displayName,
+                    screenName: twitterProvider.screenName
+                  });
+                  profileName.innerHTML = `${twitterProvider.displayName}<span class="wallet-profile-handle">@${twitterProvider.screenName}</span>`;
                 }
-                
-                // Update Twitter info
-                const twitterInfo = document.querySelector('.wallet-profile-twitter');
-                if (twitterInfo) {
-                  const screenName = twitterProvider.screenName;
-                  twitterInfo.innerHTML = `<a href="https://twitter.com/${screenName}" style="color:#a020f0;">@${screenName}</a> <span style="color:#a020f0;">✔️</span>`;
+              } else {
+                console.warn('Profile name element not found in DOM');
+              }
+              
+              // Update Twitter info
+              const twitterInfo = document.querySelector('.wallet-profile-twitter');
+              if (twitterInfo) {
+                if (!twitterProvider.screenName) {
+                  console.warn('No screenName available for Twitter info update');
+                } else {
+                  console.log('Updating Twitter info with screenName:', twitterProvider.screenName);
+                  twitterInfo.innerHTML = `<a href="https://twitter.com/${twitterProvider.screenName}" style="color:#a020f0;">@${twitterProvider.screenName}</a> <span style="color:#a020f0;">✔️</span>`;
                   twitterInfo.style.display = '';
                 }
-                
-                // Update all wallet-profile-handle elements
-                document.querySelectorAll('.wallet-profile-handle').forEach(el => {
-                  const screenName = twitterProvider.screenName;
-                  el.textContent = `@${screenName}`;
-                });
-
-                // Save profile data to localStorage
-                const profileData = {
-                  displayName: twitterProvider.displayName,
-                  photoURL: twitterProvider.photoUrl,
-                  screenName: twitterProvider.screenName
-                };
-                localStorage.setItem(`user_profile_${user.uid}`, JSON.stringify(profileData));
-
-                // Update user profile in Firebase
-                await updatedUser.updateProfile({
-                  displayName: twitterProvider.displayName,
-                  photoURL: twitterProvider.photoUrl
-                });
-                
-                alert('Twitter profile synced successfully!');
+              } else {
+                console.warn('Twitter info element not found in DOM');
               }
+              
+              // Update all wallet-profile-handle elements
+              const handleElements = document.querySelectorAll('.wallet-profile-handle');
+              if (handleElements.length === 0) {
+                console.warn('No wallet-profile-handle elements found in DOM');
+              } else {
+                console.log('Updating', handleElements.length, 'wallet-profile-handle elements');
+                handleElements.forEach(el => {
+                  if (twitterProvider.screenName) {
+                    el.textContent = `@${twitterProvider.screenName}`;
+                  }
+                });
+              }
+
+              // Save profile data to localStorage
+              const profileData = {
+                displayName: twitterProvider.displayName,
+                photoURL: twitterProvider.photoUrl,
+                screenName: twitterProvider.screenName
+              };
+              console.log('Saving profile data to localStorage:', profileData);
+              localStorage.setItem(`user_profile_${user.uid}`, JSON.stringify(profileData));
+
+              // Update user profile in Firebase
+              console.log('Updating Firebase user profile...');
+              await updatedUser.updateProfile({
+                displayName: twitterProvider.displayName,
+                photoURL: twitterProvider.photoUrl
+              });
+              
+              console.log('Twitter profile sync completed successfully');
+              alert('Twitter profile synced successfully!');
             } catch (error) {
-              console.error('Error syncing Twitter profile:', error);
+              console.error('Detailed error in Twitter sync:', {
+                message: error.message,
+                stack: error.stack,
+                user: user ? {
+                  uid: user.uid,
+                  providerData: user.providerData
+                } : 'No user object'
+              });
               alert('Error syncing Twitter profile: ' + error.message);
             }
           });
