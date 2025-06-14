@@ -2703,8 +2703,9 @@
             </div>
             <div class="wallet-profile-actions">
               <button class="wallet-profile-btn edit-profile-trigger">Edit profile</button>
-              <button class="wallet-profile-btn sync-twitter-btn">Sync Twitter</button>
-              <button class="wallet-profile-btn">Unlink Twitter</button>
+              <div id="twitterButtons">
+                <!-- Twitter buttons will be dynamically inserted here -->
+              </div>
             </div>
           </div>
           <div class="wallet-profile-balances">
@@ -5421,7 +5422,103 @@ if (discoverItem) {
   })();
 </script>
 
+<script>
+// ... existing code ...
+    // Update Twitter buttons based on auth method
+    function updateTwitterButtons() {
+      const user = firebase.auth().currentUser;
+      const twitterButtonsContainer = document.getElementById('twitterButtons');
+      
+      if (!user) return;
+      
+      if (user.providerData && user.providerData[0]?.providerId === 'twitter.com') {
+        // User registered with Twitter
+        twitterButtonsContainer.innerHTML = `
+          <button class="wallet-profile-btn sync-twitter-btn">Sync Twitter</button>
+          <button class="wallet-profile-btn unlink-twitter-btn">Unlink Twitter</button>
+        `;
+        
+        // Add event listeners for the new buttons
+        const syncBtn = twitterButtonsContainer.querySelector('.sync-twitter-btn');
+        const unlinkBtn = twitterButtonsContainer.querySelector('.unlink-twitter-btn');
+        
+        if (syncBtn) {
+          syncBtn.addEventListener('click', async function() {
+            try {
+              await user.reload();
+              const updatedUser = firebase.auth().currentUser;
+              const username = updatedUser.providerData[0]?.username || updatedUser.displayName;
+              
+              // Update profile avatar
+              const profileAvatar = document.querySelector('.wallet-profile-avatar');
+              if (profileAvatar && updatedUser.photoURL) {
+                profileAvatar.src = updatedUser.photoURL;
+              }
+              
+              // Update profile name and handle
+              const profileName = document.querySelector('.wallet-profile-name');
+              if (profileName) {
+                profileName.innerHTML = `${updatedUser.displayName}<span class="wallet-profile-handle">@${username}</span>`;
+              }
+              
+              // Update Twitter info
+              const twitterInfo = document.querySelector('.wallet-profile-twitter');
+              if (twitterInfo) {
+                twitterInfo.innerHTML = `<a href="https://twitter.com/${username}" style="color:#a020f0;">@${username}</a> <span style="color:#a020f0;">✔️</span>`;
+                twitterInfo.style.display = '';
+              }
+              
+              alert('Twitter profile synced successfully!');
+            } catch (error) {
+              console.error('Error syncing Twitter profile:', error);
+              alert('Error syncing Twitter profile: ' + error.message);
+            }
+          });
+        }
+        
+        if (unlinkBtn) {
+          unlinkBtn.addEventListener('click', async function() {
+            try {
+              await user.unlink('twitter.com');
+              alert('Twitter account unlinked!');
+              updateTwitterButtons(); // Refresh buttons
+              window.location.reload(); // Reload to update UI
+            } catch (error) {
+              alert('Error unlinking Twitter: ' + error.message);
+            }
+          });
+        }
+      } else {
+        // User registered with email
+        twitterButtonsContainer.innerHTML = `
+          <button class="wallet-profile-btn connect-twitter-btn">Connect Twitter</button>
+        `;
+        
+        const connectBtn = twitterButtonsContainer.querySelector('.connect-twitter-btn');
+        if (connectBtn) {
+          connectBtn.addEventListener('click', async function() {
+            const provider = new firebase.auth.TwitterAuthProvider();
+            try {
+              await user.linkWithPopup(provider);
+              alert('Twitter account connected!');
+              updateTwitterButtons(); // Refresh buttons
+              window.location.reload(); // Reload to update UI
+            } catch (error) {
+              alert('Error connecting Twitter: ' + error.message);
+            }
+          });
+        }
+      }
+    }
 
+    // Call updateTwitterButtons when auth state changes
+    firebase.auth().onAuthStateChanged(function(user) {
+      if (user) {
+        updateTwitterButtons();
+      }
+    });
+// ... existing code ...
+</script>
 
 </body>
 
