@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>POST</title>
+  <title>MESH</title>
   <link href="https://fonts.googleapis.com/css?family=Inter:400,500,700&display=swap" rel="stylesheet">
   <link rel="icon" type="image/png" href="images/logo2.png">
   <style>
@@ -2654,7 +2654,7 @@
 
       </div>
       <div class="wallet-item">
-        <img src="images/logo2.png" alt="POST" class="wallet-icon" style="width:64px;">
+        <img src="images/logo2.png" alt="MESH" class="wallet-icon" style="width:64px;">
         <div class="wallet-item-label">$MESH</div>
         <div class="wallet-item-value">0.0</div>
         <button class="wallet-btn">Buy/Sell</button>
@@ -2718,7 +2718,7 @@
             </div>
           </div>
           <div class="wallet-profile-fund-label">
-            Fund your POST from
+            Fund your MESH from
           </div>
           <div class="wallet-profile-fund-row">
             <button class="wallet-fund-btn wallet-fund-coinbase">
@@ -2743,7 +2743,7 @@
 
           </div>
           <div class="wallet-item">
-            <img src="images/logo2.png" alt="POST" class="wallet-icon" style="width:64px;">
+            <img src="images/logo2.png" alt="MESH" class="wallet-icon" style="width:64px;">
             <div class="wallet-item-label">$MESH</div>
             <div class="wallet-item-value">0.0</div>
             <button class="wallet-btn">Buy/Sell</button>
@@ -2776,7 +2776,7 @@
           <button class="chat-tab" id="newClubBtn">New club</button>
         </div>
         <div class="chat-notify">
-          <span>Stay up to date with POST by turning on notifications</span>
+          <span>Stay up to date with MESH by turning on notifications</span>
           <button class="chat-notify-btn" id="notificationToggleBtn">Turn on</button>
         </div>
         <div class="chat-list">
@@ -4483,7 +4483,7 @@
               localStorage.setItem('wallet_address', address);
               renderWalletAddress(); // Re-render to show connected state
               
-              // Fetch POST balance after connecting wallet
+              // Fetch MESH balance after connecting wallet
               if (typeof fetchPostBalance === 'function') {
                 fetchPostBalance();
               }
@@ -4517,7 +4517,7 @@
               // Re-render the wallet address section
               renderWalletAddress();
               
-              // Clear POST balance display
+              // Clear MESH balance display
               const balanceElements = document.querySelectorAll('.wallet-item-value');
               balanceElements.forEach(element => {
                 element.textContent = '0.0000';
@@ -4550,7 +4550,7 @@
     // Вызовем при загрузке страницы
     document.addEventListener('DOMContentLoaded', renderWalletAddress);
 
-    // Function to fetch POST token balance
+    // Function to fetch MESH token balance
     async function fetchPostBalance() {
       try {
         if (!window.solana || !window.solana.isPhantom) {
@@ -4567,7 +4567,7 @@
           return;
         }
 
-        // POST token mint address on Solana
+        // MESH token mint address on Solana
         const postMintAddress = new solanaWeb3.PublicKey('C9U2Ksk6KKWvLEeo5yUQ7Xu46X7NzeBJtd9PBfuXaUSM');
         
         try {
@@ -4617,10 +4617,10 @@
       }
     }
 
-    // Function to fetch POST price
+    // Function to fetch MESH price
     async function fetchPrice() {
       try {
-        // Replace with actual API call to get POST price
+        // Replace with actual API call to get MESH price
         const price = 0.04; // Example price
         const priceElements = document.querySelectorAll('.wallet-post-price');
         priceElements.forEach(element => {
@@ -4630,7 +4630,7 @@
         // Update wallet value after price update
         updateWalletValue();
       } catch (error) {
-        console.error('Error fetching POST price:', error);
+        console.error('Error fetching MESH price:', error);
       }
     }
 
@@ -4669,7 +4669,7 @@
           localStorage.setItem('wallet_address', address);
           renderWalletAddress();
           
-          // Fetch POST balance after connecting wallet
+          // Fetch MESH balance after connecting wallet
           await fetchPostBalance();
 
           // Set up periodic balance updates
@@ -4831,7 +4831,7 @@
           localStorage.setItem('wallet_address', address);
           updateClubWalletBalance();
           
-          // Fetch POST balance after connecting wallet
+          // Fetch MESH balance after connecting wallet
           if (typeof fetchPostBalance === 'function') {
             fetchPostBalance();
           }
@@ -5007,7 +5007,7 @@
       // Update price every 10 seconds
       setInterval(fetchPrice, 10000);
 
-      // Function to fetch POST token balance
+      // Function to fetch MESH token balance
       async function fetchPostBalance() {
         try {
           const address = localStorage.getItem('wallet_address');
@@ -5015,7 +5015,7 @@
 
           // Fetch token balance from Solana RPC
           const response = await fetch('https://api.mainnet-beta.solana.com', {
-            method: 'POST',
+            method: 'MESH',
             headers: {
               'Content-Type': 'application/json',
             },
@@ -5026,7 +5026,7 @@
               params: [
                 address,
                 {
-                  mint: 'POST' // Replace with actual POST token mint address
+                  mint: 'MESH' // Replace with actual MESH token mint address
                 },
                 {
                   encoding: 'jsonParsed'
@@ -5044,7 +5044,7 @@
             });
           }
         } catch (error) {
-          console.error('Error fetching POST balance:', error);
+          console.error('Error fetching MESH balance:', error);
         }
       }
 
@@ -5341,7 +5341,7 @@ if (discoverItem) {
         updateNotificationButtonState();
 
         new Notification('Notifications Enabled', {
-          body: 'You will now receive notifications from POST',
+          body: 'You will now receive notifications from MESH',
           icon: 'images/logo2.png'
         });
       } else {
