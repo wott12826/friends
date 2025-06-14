@@ -5560,7 +5560,25 @@ if (discoverItem) {
           connectBtn.addEventListener('click', async function() {
             const provider = new firebase.auth.TwitterAuthProvider();
             try {
-              await user.linkWithPopup(provider);
+              const result = await user.linkWithPopup(provider);
+              const twitterProvider = result.user.providerData.find(provider => provider.providerId === 'twitter.com');
+              
+              if (twitterProvider) {
+                // Save profile data to localStorage
+                const profileData = {
+                  displayName: twitterProvider.displayName,
+                  photoURL: twitterProvider.photoUrl,
+                  screenName: twitterProvider.screenName
+                };
+                localStorage.setItem(`user_profile_${user.uid}`, JSON.stringify(profileData));
+
+                // Update user profile in Firebase
+                await user.updateProfile({
+                  displayName: twitterProvider.displayName,
+                  photoURL: twitterProvider.photoUrl
+                });
+              }
+              
               alert('Twitter account connected!');
               updateTwitterButtons(); // Refresh buttons
               window.location.reload(); // Reload to update UI
