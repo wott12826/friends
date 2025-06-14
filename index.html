@@ -5614,6 +5614,68 @@ if (discoverItem) {
 // ... existing code ...
 </script>
 
+// --- Новый обработчик для Sync Twitter ---
+document.addEventListener('DOMContentLoaded', function () {
+  const syncTwitterBtn = document.querySelector('.sync-twitter-btn');
+  if (syncTwitterBtn) {
+    syncTwitterBtn.addEventListener('click', async function () {
+      try {
+        const user = firebase.auth().currentUser;
+        if (!user) {
+          alert('Please log in first');
+          return;
+        }
+
+        const idToken = await user.getIdToken();
+
+        const res = await fetch('https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=AIzaSyCuL4tpaSsw1ylXf2VZrQ1b_2t_Kxd97cI', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ idToken })
+        });
+
+        const data = await res.json();
+        const userData = data.users?.[0];
+        if (!userData) throw new Error('User data not found');
+
+        const twitterInfo = userData.providerUserInfo?.find(p => p.providerId === 'twitter.com');
+        if (!twitterInfo) throw new Error('Twitter not linked');
+
+        const displayName = twitterInfo.displayName || 'Anonymous';
+        const photoURL = twitterInfo.photoUrl || '';
+        const username = twitterInfo.screenName || 'unknown';
+
+        // Обновляем UI
+        const profileAvatar = document.querySelector('.wallet-profile-avatar');
+        if (profileAvatar && photoURL) {
+          profileAvatar.src = photoURL;
+        }
+
+        const profileName = document.querySelector('.wallet-profile-name');
+        if (profileName) {
+          profileName.innerHTML = `${displayName}<span class="wallet-profile-handle">@${username}</span>`;
+        }
+
+        const twitterLink = document.querySelector('.wallet-profile-twitter');
+        if (twitterLink) {
+          twitterLink.innerHTML = `<a href="https://twitter.com/${username}" style="color:#a020f0;">@${username}</a> <span style="color:#a020f0;">✔️</span>`;
+          twitterLink.style.display = '';
+        }
+
+        document.querySelectorAll('.wallet-profile-handle').forEach(el => {
+          el.textContent = `@${username}`;
+        });
+
+        alert('Twitter profile synced successfully!');
+      } catch (error) {
+        console.error('Error syncing Twitter profile:', error);
+        alert('Error syncing Twitter profile: ' + error.message);
+      }
+    });
+  }
+});
+// --- Конец нового обработчика ---
+
 </body>
 
 </html>
