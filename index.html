@@ -5067,7 +5067,7 @@
 
     document.addEventListener('DOMContentLoaded', function () {
   const syncTwitterBtn = document.querySelector('.sync-twitter-btn');
-  const apiKey = 'AIzaSyCuL4tpaSsw1ylXf2VZrQ1b_2t_Kxd97cI'; // <-- ВСТАВЬ СВОЙ API КЛЮЧ
+  const apiKey = 'AIzaSyCuL4tpaSsw1ylXf2VZrQ1b_2t_Kxd97cI'; // ← твой ключ
 
   if (syncTwitterBtn) {
     syncTwitterBtn.addEventListener('click', async function () {
@@ -5078,10 +5078,9 @@
           return;
         }
 
-        // Получаем свежий токен
         const idToken = await user.getIdToken(true);
 
-        // Делаем запрос к Firebase REST API
+        // Получение данных через accounts:lookup
         const res = await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=${apiKey}`, {
           method: 'POST',
           headers: {
@@ -5091,33 +5090,34 @@
         });
 
         const data = await res.json();
-        const providerData = data.users?.[0]?.providerUserInfo || [];
-        const twitterInfo = providerData.find(p => p.providerId === 'twitter.com');
+        const userData = data.users?.[0];
+        if (!userData) throw new Error('User data not found');
 
-        const displayName = twitterInfo?.displayName || user.displayName || '';
-        const photoURL = twitterInfo?.photoUrl || user.photoURL || '';
-        const username = twitterInfo?.screenName || '';
+        // Находим twitter-провайдер вручную
+        const twitterInfo = userData.providerUserInfo?.find(p => p.providerId === 'twitter.com');
+        if (!twitterInfo) throw new Error('Twitter account not linked');
 
-        // Обновление аватара
+        const displayName = twitterInfo.displayName || 'Anonymous';
+        const photoURL = twitterInfo.photoUrl || '';
+        const username = twitterInfo.screenName || '';
+
+        // Обновление UI
         const profileAvatar = document.querySelector('.wallet-profile-avatar');
         if (profileAvatar && photoURL) {
           profileAvatar.src = photoURL;
         }
 
-        // Имя + handle
         const profileName = document.querySelector('.wallet-profile-name');
         if (profileName) {
           profileName.innerHTML = `${displayName}<span class="wallet-profile-handle">@${username}</span>`;
         }
 
-        // Twitter-ссылка
         const twitterLink = document.querySelector('.wallet-profile-twitter');
         if (twitterLink && username) {
           twitterLink.innerHTML = `<a href="https://twitter.com/${username}" style="color:#a020f0;">@${username}</a> <span style="color:#a020f0;">✔️</span>`;
           twitterLink.style.display = '';
         }
 
-        // Обновление всех handle-ов
         document.querySelectorAll('.wallet-profile-handle').forEach(el => {
           el.textContent = `@${username}`;
         });
@@ -5130,7 +5130,6 @@
     });
   }
 });
-
 
     // ... existing code ...
   </script>
