@@ -5526,6 +5526,41 @@ if (discoverItem) {
 // ... existing code ...
 </script>
 
+// Add this code after the firebase.auth().onAuthStateChanged function
+firebase.auth().onAuthStateChanged(function(user) {
+  if (user) {
+    // Load saved profile data from localStorage
+    const savedProfile = localStorage.getItem(`user_profile_${user.uid}`);
+    if (savedProfile) {
+      const profileData = JSON.parse(savedProfile);
+      
+      // Update profile avatar
+      const profileAvatar = document.querySelector('.wallet-profile-avatar');
+      if (profileAvatar && profileData.photoURL) {
+        profileAvatar.src = profileData.photoURL;
+      }
+      
+      // Update profile name and handle
+      const profileName = document.querySelector('.wallet-profile-name');
+      if (profileName) {
+        profileName.innerHTML = `${profileData.displayName}<span class="wallet-profile-handle">@${profileData.screenName}</span>`;
+      }
+      
+      // Update Twitter info
+      const twitterInfo = document.querySelector('.wallet-profile-twitter');
+      if (twitterInfo) {
+        twitterInfo.innerHTML = `<a href="https://twitter.com/${profileData.screenName}" style="color:#a020f0;">@${profileData.screenName}</a> <span style="color:#a020f0;">✔️</span>`;
+        twitterInfo.style.display = '';
+      }
+      
+      // Update all wallet-profile-handle elements
+      document.querySelectorAll('.wallet-profile-handle').forEach(el => {
+        el.textContent = `@${profileData.screenName}`;
+      });
+    }
+  }
+});
+// ... existing code ...
 </body>
 
 </html>
