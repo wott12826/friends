@@ -3345,38 +3345,39 @@
         document.getElementById('main-app').style.display = 'flex';
         showTab('chat');
 
-        // Обновляем аватар пользователя
+        // Get Twitter provider data if available
+        const twitterProvider = user.providerData.find(provider => provider.providerId === 'twitter.com');
+
+        // Update avatar
         const profileAvatar = document.querySelector('.wallet-profile-avatar');
         if (profileAvatar) {
-          profileAvatar.src = user.photoURL || 'https://e7.pngegg.com/pngimages/178/595/png-clipart-user-profile-computer-icons-login-user-avatars-monochrome-black-thumbnail.png';
+          profileAvatar.src = twitterProvider?.photoUrl || user.photoURL || 'https://e7.pngegg.com/pngimages/178/595/png-clipart-user-profile-computer-icons-login-user-avatars-monochrome-black-thumbnail.png';
         }
 
-        // Обновляем имя пользователя
+        // Update name and handle
         const profileName = document.querySelector('.wallet-profile-name');
         if (profileName) {
-          // Генерируем случайное число для ID пользователя
-          const randomId = Math.floor(Math.random() * 10000);
-          if (user.providerData && user.providerData[0]?.providerId === 'twitter.com') {
-            // Если пользователь вошел через Twitter
-            profileName.innerHTML = `${user.displayName}<span class="wallet-profile-handle">@${user.providerData[0].username || user.displayName}</span>`;
+          if (twitterProvider) {
+            profileName.innerHTML = `${twitterProvider.displayName}<span class="wallet-profile-handle">@${twitterProvider.screenName}</span>`;
           } else {
-            // Если пользователь вошел через email/password
+            const randomId = Math.floor(Math.random() * 10000);
             profileName.innerHTML = `User<span class="wallet-profile-handle">@user_${randomId}</span>`;
           }
         }
 
-        // Обновляем информацию о Twitter
+        // Update Twitter info
         const twitterInfo = document.querySelector('.wallet-profile-twitter');
         if (twitterInfo) {
-          if (user.providerData && user.providerData[0]?.providerId === 'twitter.com') {
-            // Если пользователь вошел через Twitter, показываем ссылку
-            const username = user.providerData[0].username || user.displayName;
-            twitterInfo.innerHTML = `<a href="https://twitter.com/${username}" style="color:#a020f0;">@${username}</a> <span style="color:#a020f0;">✔️</span>`;
+          if (twitterProvider) {
+            twitterInfo.innerHTML = `<a href="https://twitter.com/${twitterProvider.screenName}" style="color:#a020f0;">@${twitterProvider.screenName}</a> <span style="color:#a020f0;">✔️</span>`;
+            twitterInfo.style.display = '';
           } else {
-            // Если не через Twitter - скрываем блок
             twitterInfo.style.display = 'none';
           }
         }
+
+        // Update wallet address
+        renderWalletAddress();
       } else {
         document.querySelector('.container').style.display = '';
         document.getElementById('wallet').style.display = 'none';
@@ -5449,57 +5450,44 @@ if (discoverItem) {
               await user.reload();
               const updatedUser = firebase.auth().currentUser;
               
-              // Get Twitter username from provider data
+              // Get Twitter info from providerUserInfo
               const twitterProvider = updatedUser.providerData.find(provider => provider.providerId === 'twitter.com');
-              const username = twitterProvider?.screenName || twitterProvider?.displayName || updatedUser.displayName;
-              
-              // Update profile avatar
-              const profileAvatar = document.querySelector('.wallet-profile-avatar');
-              if (profileAvatar && updatedUser.photoURL) {
-                profileAvatar.src = updatedUser.photoURL;
-              }
-              
-              // Update profile name and handle
-              const profileName = document.querySelector('.wallet-profile-name');
-              if (profileName) {
-                profileName.innerHTML = `${updatedUser.displayName}<span class="wallet-profile-handle">@${username}</span>`;
-              }
-              
-              // Update Twitter info
-              const twitterInfo = document.querySelector('.wallet-profile-twitter');
-              if (twitterInfo) {
-                twitterInfo.innerHTML = `<a href="https://twitter.com/${username}" style="color:#a020f0;">@${username}</a> <span style="color:#a020f0;">✔️</span>`;
-                twitterInfo.style.display = '';
-              }
-              
-              // Update all wallet-profile-handle elements
-              document.querySelectorAll('.wallet-profile-handle').forEach(el => {
-                el.textContent = `@${username}`;
-              });
+              if (twitterProvider) {
+                // Update profile avatar
+                const profileAvatar = document.querySelector('.wallet-profile-avatar');
+                if (profileAvatar && twitterProvider.photoUrl) {
+                  profileAvatar.src = twitterProvider.photoUrl;
+                }
+                
+                // Update profile name and handle
+                const profileName = document.querySelector('.wallet-profile-name');
+                if (profileName) {
+                  profileName.innerHTML = `${twitterProvider.displayName}<span class="wallet-profile-handle">@${twitterProvider.screenName}</span>`;
+                }
+                
+                // Update Twitter info
+                const twitterInfo = document.querySelector('.wallet-profile-twitter');
+                if (twitterInfo) {
+                  twitterInfo.innerHTML = `<a href="https://twitter.com/${twitterProvider.screenName}" style="color:#a020f0;">@${twitterProvider.screenName}</a> <span style="color:#a020f0;">✔️</span>`;
+                  twitterInfo.style.display = '';
+                }
+                
+                // Update all wallet-profile-handle elements
+                document.querySelectorAll('.wallet-profile-handle').forEach(el => {
+                  el.textContent = `@${twitterProvider.screenName}`;
+                });
 
-              // Update user profile in Firebase
-              await updatedUser.updateProfile({
-                displayName: updatedUser.displayName,
-                photoURL: updatedUser.photoURL
-              });
-              
-              alert('Twitter profile synced successfully!');
+                // Update user profile in Firebase
+                await updatedUser.updateProfile({
+                  displayName: twitterProvider.displayName,
+                  photoURL: twitterProvider.photoUrl
+                });
+                
+                alert('Twitter profile synced successfully!');
+              }
             } catch (error) {
               console.error('Error syncing Twitter profile:', error);
               alert('Error syncing Twitter profile: ' + error.message);
-            }
-          });
-        }
-        
-        if (unlinkBtn) {
-          unlinkBtn.addEventListener('click', async function() {
-            try {
-              await user.unlink('twitter.com');
-              alert('Twitter account unlinked!');
-              updateTwitterButtons(); // Refresh buttons
-              window.location.reload(); // Reload to update UI
-            } catch (error) {
-              alert('Error unlinking Twitter: ' + error.message);
             }
           });
         }
