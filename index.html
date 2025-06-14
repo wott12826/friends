@@ -5445,8 +5445,11 @@ if (discoverItem) {
         if (syncBtn) {
           syncBtn.addEventListener('click', async function() {
             try {
+              // Reload user data to get fresh Twitter info
               await user.reload();
               const updatedUser = firebase.auth().currentUser;
+              
+              // Get Twitter username
               const username = updatedUser.providerData[0]?.username || updatedUser.displayName;
               
               // Update profile avatar
@@ -5467,6 +5470,11 @@ if (discoverItem) {
                 twitterInfo.innerHTML = `<a href="https://twitter.com/${username}" style="color:#a020f0;">@${username}</a> <span style="color:#a020f0;">✔️</span>`;
                 twitterInfo.style.display = '';
               }
+              
+              // Update all wallet-profile-handle elements
+              document.querySelectorAll('.wallet-profile-handle').forEach(el => {
+                el.textContent = `@${username}`;
+              });
               
               alert('Twitter profile synced successfully!');
             } catch (error) {
