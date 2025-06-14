@@ -5449,8 +5449,9 @@ if (discoverItem) {
               await user.reload();
               const updatedUser = firebase.auth().currentUser;
               
-              // Get Twitter username
-              const username = updatedUser.providerData[0]?.username || updatedUser.displayName;
+              // Get Twitter username from provider data
+              const twitterProvider = updatedUser.providerData.find(provider => provider.providerId === 'twitter.com');
+              const username = twitterProvider?.screenName || twitterProvider?.displayName || updatedUser.displayName;
               
               // Update profile avatar
               const profileAvatar = document.querySelector('.wallet-profile-avatar');
