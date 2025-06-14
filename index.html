@@ -4288,8 +4288,8 @@
         const twitterInfo = document.querySelector('.wallet-profile-twitter');
         if (twitterInfo) {
           if (user.providerData && user.providerData[0]?.providerId === 'twitter.com') {
-            const username = user.providerData[0].username || user.displayName;
-            twitterInfo.innerHTML = `<a href="https://twitter.com/${username}" style="color:#a020f0;">@${username}</a> <span style="color:#a020f0;">✔️</span>`;
+            const screenName = user.providerData[0].username || user.screenName;
+            twitterInfo.innerHTML = `<a href="https://twitter.com/${screenName}" style="color:#a020f0;">@${screenName}</a> <span style="color:#a020f0;">✔️</span>`;
           } else {
             twitterInfo.style.display = 'none';
           }
