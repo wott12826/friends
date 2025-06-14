@@ -5102,7 +5102,7 @@ setMeshPrice(price);
 
         const displayName = twitter.displayName || 'Anonymous';
         const photoURL = twitter.photoUrl || '';
-        const screenName = twitter.screenName || '';
+        const screenName = twitter.screenName || userData?.providerUserInfo?.find(p => p.providerId === 'twitter.com')?.screenName;;
 
         // Обновляем аватар
         const profileAvatar = document.querySelector('.wallet-profile-avatar');
