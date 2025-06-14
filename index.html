@@ -5484,10 +5484,15 @@ if (discoverItem) {
                   JSON.stringify(updatedUser.providerData.map(p => p.providerId)));
               }
               
+              // Add detailed logging of the provider data structure
+              console.log('Complete Twitter provider data structure:', JSON.stringify(twitterProvider, null, 2));
+              console.log('Available provider data fields:', Object.keys(twitterProvider));
+              
               console.log('Twitter provider data found:', {
                 displayName: twitterProvider.displayName,
                 photoUrl: twitterProvider.photoUrl,
-                screenName: twitterProvider.screenName
+                screenName: twitterProvider.screenName,
+                rawProviderData: twitterProvider
               });
               
               // Update profile avatar
