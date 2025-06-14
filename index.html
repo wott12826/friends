@@ -3358,7 +3358,7 @@
         const profileName = document.querySelector('.wallet-profile-name');
         if (profileName) {
           if (twitterProvider) {
-            profileName.innerHTML = `${twitterProvider.displayName}<span class="wallet-profile-handle">@${twitterProvider.screenName}</span>`;
+            profileName.innerHTML = `${twitterProvider.displayName}<span class="wallet-profile-handle">@${twitterProvider.displayName}</span>`;
           } else {
             const randomId = Math.floor(Math.random() * 10000);
             profileName.innerHTML = `User<span class="wallet-profile-handle">@user_${randomId}</span>`;
@@ -3369,7 +3369,7 @@
         const twitterInfo = document.querySelector('.wallet-profile-twitter');
         if (twitterInfo) {
           if (twitterProvider) {
-            twitterInfo.innerHTML = `<a href="https://twitter.com/${twitterProvider.screenName}" style="color:#a020f0;">@${twitterProvider.screenName}</a> <span style="color:#a020f0;">✔️</span>`;
+            twitterInfo.innerHTML = `<a href="https://twitter.com/${twitterProvider.displayName}" style="color:#a020f0;">@${twitterProvider.displayName}</a> <span style="color:#a020f0;">✔️</span>`;
             twitterInfo.style.display = '';
           } else {
             twitterInfo.style.display = 'none';
@@ -5490,7 +5490,7 @@ if (discoverItem) {
               
               console.log('Twitter provider data found:', {
                 displayName: twitterProvider.displayName,
-                photoUrl: twitterProvider.photoUrl,
+                photoURL: twitterProvider.photoURL,
                 screenName: twitterProvider.screenName,
                 rawProviderData: twitterProvider
               });
@@ -5498,11 +5498,11 @@ if (discoverItem) {
               // Update profile avatar
               const profileAvatar = document.querySelector('.wallet-profile-avatar');
               if (profileAvatar) {
-                if (!twitterProvider.photoUrl) {
-                  console.warn('No photoUrl available from Twitter provider');
+                if (!twitterProvider.photoURL) {
+                  console.warn('No photoURL available from Twitter provider');
                 } else {
-                  console.log('Updating profile avatar with URL:', twitterProvider.photoUrl);
-                  profileAvatar.src = twitterProvider.photoUrl;
+                  console.log('Updating profile avatar with URL:', twitterProvider.photoURL);
+                  profileAvatar.src = twitterProvider.photoURL;
                 }
               } else {
                 console.warn('Profile avatar element not found in DOM');
@@ -5518,7 +5518,7 @@ if (discoverItem) {
                     displayName: twitterProvider.displayName,
                     screenName: twitterProvider.screenName
                   });
-                  profileName.innerHTML = `${twitterProvider.displayName}<span class="wallet-profile-handle">@${twitterProvider.screenName}</span>`;
+                  profileName.innerHTML = `${twitterProvider.displayName}<span class="wallet-profile-handle">@${twitterProvider.displayName}</span>`;
                 }
               } else {
                 console.warn('Profile name element not found in DOM');
@@ -5531,7 +5531,7 @@ if (discoverItem) {
                   console.warn('No screenName available for Twitter info update');
                 } else {
                   console.log('Updating Twitter info with screenName:', twitterProvider.screenName);
-                  twitterInfo.innerHTML = `<a href="https://twitter.com/${twitterProvider.screenName}" style="color:#a020f0;">@${twitterProvider.screenName}</a> <span style="color:#a020f0;">✔️</span>`;
+                  twitterInfo.innerHTML = `<a href="https://twitter.com/${twitterProvider.displayName}" style="color:#a020f0;">@${twitterProvider.displayName}</a> <span style="color:#a020f0;">✔️</span>`;
                   twitterInfo.style.display = '';
                 }
               } else {
@@ -5554,7 +5554,7 @@ if (discoverItem) {
               // Save profile data to localStorage
               const profileData = {
                 displayName: twitterProvider.displayName,
-                photoURL: twitterProvider.photoUrl,
+                photoURL: twitterProvider.photoURL,
                 screenName: twitterProvider.screenName
               };
               console.log('Saving profile data to localStorage:', profileData);
@@ -5564,7 +5564,7 @@ if (discoverItem) {
               console.log('Updating Firebase user profile...');
               await updatedUser.updateProfile({
                 displayName: twitterProvider.displayName,
-                photoURL: twitterProvider.photoUrl
+                photoURL: twitterProvider.photoURL
               });
               
               console.log('Twitter profile sync completed successfully');
