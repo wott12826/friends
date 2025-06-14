@@ -2692,13 +2692,13 @@
           <div class="wallet-profile-header">
             <img class="wallet-profile-avatar" src="https://randomuser.me/api/portraits/men/35.jpg" alt="avatar">
             <div class="wallet-profile-info">
-              <div class="wallet-profile-name">Smirnoff <span class="wallet-profile-handle">@Smirnoff_ETH</span></div>
+              <div class="wallet-profile-name">Smirnoff <span class="wallet-profile-handle"></span></div>
               <div class="wallet-profile-addr">
                 <span id="walletAddress">
                   
                 </span>
               </div>
-              <div class="wallet-profile-twitter"><a href="#" style="color:#a020f0;">@Smirnoff_ETH</a> <span
+              <div class="wallet-profile-twitter"><a href="#" style="color:#a020f0;"></a> <span
                   style="color:#a020f0;">✔️</span></div>
             </div>
             <div class="wallet-profile-actions">
@@ -3369,7 +3369,7 @@
         const twitterInfo = document.querySelector('.wallet-profile-twitter');
         if (twitterInfo) {
           if (twitterProvider) {
-            twitterInfo.innerHTML = `<a href="https://twitter.com/${twitterProvider.displayName}" style="color:#a020f0;">@${twitterProvider.displayName}</a> <span style="color:#a020f0;">✔️</span>`;
+            twitterInfo.innerHTML = `<a href="https://twitter.com/${twitterProvider.screenName}" style="color:#a020f0;">@${twitterProvider.screenName}</a> <span style="color:#a020f0;">✔️</span>`;
             twitterInfo.style.display = '';
           } else {
             twitterInfo.style.display = 'none';
