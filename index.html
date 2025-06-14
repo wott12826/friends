@@ -5475,6 +5475,12 @@ if (discoverItem) {
               document.querySelectorAll('.wallet-profile-handle').forEach(el => {
                 el.textContent = `@${username}`;
               });
+
+              // Update user profile in Firebase
+              await updatedUser.updateProfile({
+                displayName: updatedUser.displayName,
+                photoURL: updatedUser.photoURL
+              });
               
               alert('Twitter profile synced successfully!');
             } catch (error) {
