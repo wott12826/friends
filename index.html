@@ -5079,36 +5079,36 @@
 
             // Get fresh user data from Firebase
             await user.reload();
-            const updatedUser = firebase.auth().currentUser;
+            // После user.reload()
+const updatedUser = firebase.auth().currentUser;
 
-            // Получить username из Twitter
-            let username = updatedUser.providerData && updatedUser.providerData[0]?.username
-              ? updatedUser.providerData[0].username
-              : (updatedUser.displayName || '');
+// Ищем Twitter провайдера
+const twitterInfo = updatedUser.providerData.find(
+  (provider) => provider.providerId === 'twitter.com'
+);
 
-            // Update profile avatar
-            const profileAvatar = document.querySelector('.wallet-profile-avatar');
-            if (profileAvatar && updatedUser.photoURL) {
-              profileAvatar.src = updatedUser.photoURL;
-            }
+const displayName = twitterInfo?.displayName || updatedUser.displayName || '';
+const photoURL = twitterInfo?.photoURL || updatedUser.photoURL;
+const username = twitterInfo?.screenName || ''; // <-- вот оно!
+// Аватар
+const profileAvatar = document.querySelector('.wallet-profile-avatar');
+if (profileAvatar && photoURL) {
+  profileAvatar.src = photoURL;
+}
 
-            // Update profile name and handle
-            const profileName = document.querySelector('.wallet-profile-name');
-            if (profileName) {
-              profileName.innerHTML = `${updatedUser.displayName}<span class="wallet-profile-handle">@${username}</span>`;
-            }
+// Имя + handle
+const profileName = document.querySelector('.wallet-profile-name');
+if (profileName) {
+  profileName.innerHTML = `${displayName}<span class="wallet-profile-handle">@${username}</span>`;
+}
 
-            // Update Twitter info
-            const twitterInfo = document.querySelector('.wallet-profile-twitter');
-            if (twitterInfo) {
-              twitterInfo.innerHTML = `<a href="https://twitter.com/${username}" style="color:#a020f0;">@${username}</a> <span style="color:#a020f0;">✔️</span>`;
-              twitterInfo.style.display = '';
-            }
+// Twitter-ссылка
+const twitterLink = document.querySelector('.wallet-profile-twitter');
+if (twitterLink && username) {
+  twitterLink.innerHTML = `<a href="https://twitter.com/${username}" style="color:#a020f0;">@${username}</a> <span style="color:#a020f0;">✔️</span>`;
+  twitterLink.style.display = '';
+}
 
-            // Update all wallet-profile-handle elements
-            document.querySelectorAll('.wallet-profile-handle').forEach(el => {
-              el.textContent = `@${username}`;
-            });
 
             alert('Twitter profile synced successfully!');
           } catch (error) {
