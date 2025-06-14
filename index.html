@@ -4709,23 +4709,38 @@
 
     // Function to update wallet value
     function updateWalletValue() {
-      const priceElements = document.querySelectorAll('.wallet-post-price');
-      const balanceElements = document.querySelectorAll('.wallet-item-value');
-      
-      if (priceElements.length > 0 && balanceElements.length > 0) {
-        // Get price from wallet-post-price element (remove $ and convert to number)
-        const price = parseFloat(priceElements[0].textContent.replace('$', ''));
-        // Get balance from wallet-item-value element
-        const balance = parseFloat(balanceElements[0].textContent);
+      try {
+        const priceElements = document.querySelectorAll('.wallet-post-price');
+        const balanceElements = document.querySelectorAll('.wallet-item-value');
         
-        // Calculate total value as price * balance
-        const totalValue = price * balance;
-        
-        // Update all wallet-value elements with the calculated total
+        if (priceElements.length > 0 && balanceElements.length > 0) {
+          // Get price from wallet-post-price element (remove $ and convert to number)
+          const price = parseFloat(priceElements[0].textContent.replace('$', ''));
+          // Get balance from wallet-item-value element
+          const balance = parseFloat(balanceElements[0].textContent);
+          
+          // Calculate total value as price * balance
+          const totalValue = price * balance;
+          
+          // Update all wallet-value elements with the calculated total
+          const valueElements = document.querySelectorAll('.wallet-value');
+          valueElements.forEach(element => {
+            element.textContent = `$${totalValue.toFixed(2)}`;
+          });
+        } else {
+          // If elements are not found, set value to 0
+          const valueElements = document.querySelectorAll('.wallet-value');
+          valueElements.forEach(element => {
+            element.textContent = '$0.00';
+          });
+        }
+      } catch (error) {
+        // If any error occurs, set value to 0
         const valueElements = document.querySelectorAll('.wallet-value');
         valueElements.forEach(element => {
-          element.textContent = `$${totalValue.toFixed(2)}`;
+          element.textContent = '$0.00';
         });
+        console.error('Error updating wallet value:', error);
       }
     }
 
