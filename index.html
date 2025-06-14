@@ -5488,46 +5488,40 @@ if (discoverItem) {
               // Extract Twitter data with fallbacks
               const displayName = twitterProvider.displayName || 'Anonymous';
               const photoURL = twitterProvider.photoURL || '';
-              const screenName = twitterProvider.screenName || twitterProvider.displayName || 'anonymous';
-              
+              // Универсальный handle с fallback
+              const handle = twitterProvider.screenName || twitterProvider.username || twitterProvider.rawId || twitterProvider.displayName || 'unknown';
               // Update profile avatar
               const profileAvatar = document.querySelector('.wallet-profile-avatar');
               if (profileAvatar && photoURL) {
                 profileAvatar.src = photoURL;
               }
-              
               // Update profile name and handle
               const profileName = document.querySelector('.wallet-profile-name');
               if (profileName) {
-                profileName.innerHTML = `${displayName}<span class="wallet-profile-handle">@${screenName}</span>`;
+                profileName.innerHTML = `${displayName}<span class="wallet-profile-handle">@${handle}</span>`;
               }
-              
               // Update Twitter info
               const twitterInfo = document.querySelector('.wallet-profile-twitter');
               if (twitterInfo) {
-                twitterInfo.innerHTML = `<a href="https://twitter.com/${screenName}" style="color:#a020f0;">@${screenName}</a> <span style="color:#a020f0;">✔️</span>`;
+                twitterInfo.innerHTML = `<a href="https://twitter.com/${handle}" style="color:#a020f0;">@${handle}</a> <span style="color:#a020f0;">✔️</span>`;
                 twitterInfo.style.display = '';
               }
-              
               // Update all wallet-profile-handle elements
               document.querySelectorAll('.wallet-profile-handle').forEach(el => {
-                el.textContent = `@${screenName}`;
+                el.textContent = `@${handle}`;
               });
-              
               // Save profile data to localStorage
               const profileData = {
                 displayName,
                 photoURL,
-                screenName
+                handle
               };
               localStorage.setItem(`user_profile_${user.uid}`, JSON.stringify(profileData));
-              
               // Update user profile in Firebase
               await updatedUser.updateProfile({
                 displayName,
                 photoURL
               });
-              
               alert('Twitter profile synced successfully!');
             } catch (error) {
               console.error('Error syncing Twitter profile:', error);
