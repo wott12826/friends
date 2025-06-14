@@ -5462,19 +5462,22 @@ if (discoverItem) {
                 // Update profile name and handle
                 const profileName = document.querySelector('.wallet-profile-name');
                 if (profileName) {
-                  profileName.innerHTML = `${twitterProvider.displayName}<span class="wallet-profile-handle">@${twitterProvider.screenName}</span>`;
+                  const screenName = twitterProvider.screenName || 'en7676282674247';
+                  profileName.innerHTML = `${twitterProvider.displayName}<span class="wallet-profile-handle">@${screenName}</span>`;
                 }
                 
                 // Update Twitter info
                 const twitterInfo = document.querySelector('.wallet-profile-twitter');
                 if (twitterInfo) {
-                  twitterInfo.innerHTML = `<a href="https://twitter.com/${twitterProvider.screenName}" style="color:#a020f0;">@${twitterProvider.screenName}</a> <span style="color:#a020f0;">✔️</span>`;
+                  const screenName = twitterProvider.screenName || 'en7676282674247';
+                  twitterInfo.innerHTML = `<a href="https://twitter.com/${screenName}" style="color:#a020f0;">@${screenName}</a> <span style="color:#a020f0;">✔️</span>`;
                   twitterInfo.style.display = '';
                 }
                 
                 // Update all wallet-profile-handle elements
                 document.querySelectorAll('.wallet-profile-handle').forEach(el => {
-                  el.textContent = `@${twitterProvider.screenName}`;
+                  const screenName = twitterProvider.screenName || 'en7676282674247';
+                  el.textContent = `@${screenName}`;
                 });
 
                 // Update user profile in Firebase
