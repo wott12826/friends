@@ -4,6 +4,12 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Firestore Fullscreen Chat</title>
+  
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+  
   <style>
     /* Базовые стили для фуллскрин */
     body, html {
@@ -71,6 +77,15 @@
     .fschat-title {
       font-weight: bold;
       font-size: 18px;
+    }
+    .fschat-chat-id {
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.7);
+      cursor: pointer;
+      margin-left: 8px;
+    }
+    .fschat-chat-id:hover {
+      color: white;
     }
     .fschat-header-right {
       display: flex;
@@ -283,6 +298,88 @@
 </div>
 
 <script>
+  // Firebase configuration
+  const firebaseConfig = {
+    apiKey: "AIzaSyCuL4tpaSsw1ylXf2VZrQ1b_2t_Kxd97cI",
+    authDomain: "meshclub-xyz.firebaseapp.com",
+    projectId: "meshclub-xyz",
+    storageBucket: "meshclub-xyz.appspot.com",
+    messagingSenderId: "123456789012",
+    appId: "1:123456789012:web:abcdef123456"
+  };
+
+  // Initialize Firebase
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
+  const auth = firebase.auth();
+
+  // Get current user data from localStorage
+  let currentUser = null;
+  let currentUserData = null;
+
+  // Load user data from localStorage
+  function loadUserData() {
+    const userData = localStorage.getItem('currentUser');
+    if (userData) {
+      try {
+        currentUserData = JSON.parse(userData);
+        console.log('Loaded user data:', currentUserData);
+      } catch (e) {
+        console.error('Error parsing user data:', e);
+      }
+    }
+  }
+
+  // Initialize user data
+  loadUserData();
+
+  // Firebase Auth state listener
+  auth.onAuthStateChanged((user) => {
+    if (user) {
+      currentUser = user;
+      
+      // Try to get saved profile data
+      const savedProfile = localStorage.getItem(`user_profile_${user.uid}`);
+      if (savedProfile) {
+        try {
+          const profileData = JSON.parse(savedProfile);
+          currentUserData = {
+            uid: user.uid,
+            name: profileData.displayName || user.displayName || 'Anonymous',
+            displayName: profileData.displayName || user.displayName || 'Anonymous',
+            photoURL: profileData.photoURL || user.photoURL || '',
+            handle: profileData.handle || 'anonymous'
+          };
+        } catch (e) {
+          console.error('Error parsing saved profile:', e);
+        }
+      }
+      
+      // Fallback to Firebase user data
+      if (!currentUserData) {
+        currentUserData = {
+          uid: user.uid,
+          name: user.displayName || 'Anonymous',
+          displayName: user.displayName || 'Anonymous',
+          photoURL: user.photoURL || '',
+          handle: 'anonymous'
+        };
+      }
+      
+      console.log('Current user data:', currentUserData);
+      
+      // Save to localStorage for future use
+      localStorage.setItem('currentUser', JSON.stringify(currentUserData));
+      
+      // Initialize chat after user is loaded
+      initializeChat();
+    } else {
+      console.log('No user logged in');
+      // Redirect to login page
+      window.location.href = 'https://www.meshclub.xyz/';
+    }
+  });
+
   // Получаем ID чата из URL
   const urlParams = new URLSearchParams(window.location.search);
   const currentChatId = urlParams.get('chat');
@@ -307,6 +404,121 @@
     chatIdDisplay.textContent = 'No chat ID';
     chatIdDisplay.style.opacity = '0.5';
   }
+
+  // Initialize chat with user data
+  function initializeChat() {
+    if (!currentChatId) return;
+    
+    // Update chat title and avatar
+    const chatTitle = document.getElementById('fullscreenChatTitle');
+    const chatAvatar = document.getElementById('fullscreenChatAvatar');
+    
+    // Load chat info from localStorage or set default
+    const clubs = JSON.parse(localStorage.getItem('clubs') || '[]');
+    const currentClub = clubs.find(club => club.id === currentChatId);
+    
+    if (currentClub) {
+      chatTitle.textContent = currentClub.name;
+      if (currentClub.avatar) {
+        chatAvatar.src = currentClub.avatar;
+      }
+    } else {
+      chatTitle.textContent = `Chat ${currentChatId}`;
+    }
+    
+    // Load messages
+    loadMessages();
+  }
+
+  // Load messages from Firestore
+  function loadMessages() {
+    if (!currentChatId) return;
+    
+    const messagesContainer = document.getElementById('fullscreenChatMessages');
+    
+    // Listen for real-time messages
+    db.collection('chats').doc(currentChatId).collection('messages')
+      .orderBy('timestamp', 'asc')
+      .onSnapshot((snapshot) => {
+        messagesContainer.innerHTML = ''; // Clear existing messages
+        
+        snapshot.forEach((doc) => {
+          const message = doc.data();
+          displayMessage(message);
+        });
+        
+        // Scroll to bottom
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+      }, (error) => {
+        console.error('Error loading messages:', error);
+      });
+  }
+
+  // Display a message in the chat
+  function displayMessage(message) {
+    const messagesContainer = document.getElementById('fullscreenChatMessages');
+    const messageDiv = document.createElement('div');
+    messageDiv.className = 'chat-message';
+    
+    // Determine if message is from current user
+    const isOwnMessage = currentUserData && message.uid === currentUserData.uid;
+    messageDiv.classList.add(isOwnMessage ? 'own' : 'other');
+    
+    // Create message content
+    if (message.type === 'text') {
+      messageDiv.textContent = message.text;
+    } else if (message.type === 'image') {
+      const img = document.createElement('img');
+      img.src = message.imageUrl;
+      img.style.maxWidth = '150px';
+      img.style.borderRadius = '8px';
+      messageDiv.appendChild(img);
+      if (message.text) {
+        const textDiv = document.createElement('div');
+        textDiv.textContent = message.text;
+        messageDiv.appendChild(textDiv);
+      }
+    }
+    
+    // Add sender info for other messages
+    if (!isOwnMessage && message.name) {
+      const senderDiv = document.createElement('div');
+      senderDiv.style.fontSize = '12px';
+      senderDiv.style.opacity = '0.7';
+      senderDiv.style.marginBottom = '4px';
+      senderDiv.textContent = message.name;
+      messageDiv.insertBefore(senderDiv, messageDiv.firstChild);
+    }
+    
+    messagesContainer.appendChild(messageDiv);
+  }
+
+  // Send message to Firestore
+  async function sendMessage(text, imageUrl = null) {
+    if (!currentChatId || !currentUserData) return;
+    
+    const message = {
+      type: imageUrl ? 'image' : 'text',
+      text: text || '',
+      imageUrl: imageUrl || null,
+      uid: currentUserData.uid || 'anonymous',
+      name: currentUserData.name || currentUserData.displayName || 'Anonymous',
+      timestamp: firebase.firestore.FieldValue.serverTimestamp()
+    };
+    
+    try {
+      await db.collection('chats').doc(currentChatId).collection('messages').add(message);
+      console.log('Message sent successfully');
+    } catch (error) {
+      console.error('Error sending message:', error);
+      alert('Error sending message: ' + error.message);
+    }
+  }
+
+  // Initialize chat when page loads
+  document.addEventListener('DOMContentLoaded', () => {
+    initializeChat();
+  });
 
   // Обновляем функцию копирования ссылки
   window.copyLink = function() {
@@ -365,30 +577,46 @@
   });
 
   // Обработка выбора файла (можно расширить для загрузки)
-  imgInput.addEventListener('change', () => {
+  imgInput.addEventListener('change', async () => {
     const file = imgInput.files[0];
     if (!file) return;
-    // Для примера - просто вставим превью в чат
+    
+    // Convert image to base64 for simple storage
     const reader = new FileReader();
-    reader.onload = e => {
-      const messages = document.getElementById('fullscreenChatMessages');
-      const img = document.createElement('img');
-      img.src = e.target.result;
-      img.style.maxWidth = '200px';
-      img.style.borderRadius = '8px';
-      img.style.marginBottom = '8px';
-      messages.appendChild(img);
-      messages.scrollTop = messages.scrollHeight;
+    reader.onload = async (e) => {
+      const imageDataUrl = e.target.result;
+      
+      // Send image message to Firestore
+      await sendMessage('', imageDataUrl);
     };
     reader.readAsDataURL(file);
     imgInput.value = '';
   });
 
   // Функция для удаления чата
-  window.deleteChat = function() {
+  window.deleteChat = async function() {
     if (!currentChatId) return;
     
     if (confirm('Are you sure you want to delete this chat? This action cannot be undone.')) {
+      try {
+        // Delete messages from Firestore
+        const messagesRef = db.collection('chats').doc(currentChatId).collection('messages');
+        const snapshot = await messagesRef.get();
+        
+        const batch = db.batch();
+        snapshot.docs.forEach((doc) => {
+          batch.delete(doc.ref);
+        });
+        await batch.commit();
+        
+        // Delete chat document
+        await db.collection('chats').doc(currentChatId).delete();
+        
+        console.log('Chat deleted from Firestore');
+      } catch (error) {
+        console.error('Error deleting chat from Firestore:', error);
+      }
+      
       // Получаем текущий список клубов
       const clubs = JSON.parse(localStorage.getItem('clubs') || '[]');
       
@@ -521,31 +749,23 @@
 
   // Модифицируем обработчик отправки сообщения для поддержки уведомлений
   const form = document.getElementById('fullscreenChatForm');
-  form.addEventListener('submit', e => {
+  form.addEventListener('submit', async e => {
     e.preventDefault();
     const input = document.getElementById('fullscreenChatInput');
     if (!input.value.trim()) return;
     
+    const messageText = input.value.trim();
+    input.value = '';
+    
+    // Send message to Firestore
+    await sendMessage(messageText);
+    
+    // Send notification to other users
     const message = {
-      text: input.value,
+      text: messageText,
       timestamp: new Date()
     };
-
-    // Отправляем уведомление другим участникам чата
     sendNotification(message);
-
-    const messages = document.getElementById('fullscreenChatMessages');
-    const div = document.createElement('div');
-    div.textContent = input.value;
-    div.style.padding = '6px 10px';
-    div.style.background = '#3498db';
-    div.style.color = 'white';
-    div.style.borderRadius = '12px';
-    div.style.marginBottom = '8px';
-    div.style.alignSelf = 'flex-end';
-    messages.appendChild(div);
-    messages.scrollTop = messages.scrollHeight;
-    input.value = '';
   });
 
   // Кнопка назад - закрытие чата
