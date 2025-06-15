@@ -3,7 +3,7 @@
     "firebase": "^11.8.1"
   },
   "scripts": {
-    "build": "tailwindcss -i ./src/input.css -o ./dist/output.css --watch"
+    "build": "tailwindcss -i ./src/input.css -o ./dist/output.css"
   },
   "devDependencies": {
     "tailwindcss": "^3.4.1",
