@@ -4376,11 +4376,47 @@
         // Обновляем имя пользователя
         const profileName = document.querySelector('.wallet-profile-name');
         if (profileName) {
-          const randomId = Math.floor(Math.random() * 10000);
-          if (user.providerData && user.providerData[0]?.providerId === 'twitter.com') {
-            profileName.innerHTML = `${user.displayName}<span class="wallet-profile-handle">@${user.providerData[0].username || user.displayName}</span>`;
+          // Try to get saved profile data first
+          const savedProfile = localStorage.getItem(`user_profile_${user.uid}`);
+          if (savedProfile) {
+            try {
+              const profileData = JSON.parse(savedProfile);
+              const displayName = profileData.displayName || user.displayName || 'Anonymous';
+              const handle = profileData.handle || 'anonymous';
+              if (handle !== 'undefined') {
+                profileName.innerHTML = `${displayName}<span class="wallet-profile-handle">@${handle}</span>`;
+              } else {
+                const randomId = Math.floor(Math.random() * 10000);
+                profileName.innerHTML = `${displayName}<span class="wallet-profile-handle">@user_${randomId}</span>`;
+              }
+            } catch (e) {
+              console.error('Error parsing saved profile data:', e);
+              // Fallback to default logic
+              const randomId = Math.floor(Math.random() * 10000);
+              if (user.providerData && user.providerData[0]?.providerId === 'twitter.com') {
+                const username = user.providerData[0].username || user.providerData[0].screenName;
+                if (username && username !== 'undefined') {
+                  profileName.innerHTML = `${user.displayName}<span class="wallet-profile-handle">@${username}</span>`;
+                } else {
+                  profileName.innerHTML = `${user.displayName}<span class="wallet-profile-handle">@user_${randomId}</span>`;
+                }
+              } else {
+                profileName.innerHTML = `User<span class="wallet-profile-handle">@user_${randomId}</span>`;
+              }
+            }
           } else {
-            profileName.innerHTML = `User<span class="wallet-profile-handle">@user_${randomId}</span>`;
+            // No saved profile, use default logic
+            const randomId = Math.floor(Math.random() * 10000);
+            if (user.providerData && user.providerData[0]?.providerId === 'twitter.com') {
+              const username = user.providerData[0].username || user.providerData[0].screenName;
+              if (username && username !== 'undefined') {
+                profileName.innerHTML = `${user.displayName}<span class="wallet-profile-handle">@${username}</span>`;
+              } else {
+                profileName.innerHTML = `${user.displayName}<span class="wallet-profile-handle">@user_${randomId}</span>`;
+              }
+            } else {
+              profileName.innerHTML = `User<span class="wallet-profile-handle">@user_${randomId}</span>`;
+            }
           }
         }
 
@@ -4391,8 +4427,30 @@
         const twitterInfo = document.querySelector('.wallet-profile-twitter');
         if (twitterInfo) {
           if (user.providerData && user.providerData[0]?.providerId === 'twitter.com') {
-            const screenName = user.providerData[0].username || user.screenName;
-            twitterInfo.innerHTML = `<a href="https://twitter.com/${screenName}" style="color:#a020f0;">@${screenName}</a> <span style="color:#a020f0;">✔️</span>`;
+            const screenName = user.providerData[0].username || user.providerData[0].screenName;
+            if (screenName && screenName !== 'undefined') {
+              twitterInfo.innerHTML = `<a href="https://twitter.com/${screenName}" style="color:#a020f0;">@${screenName}</a> <span style="color:#a020f0;">✔️</span>`;
+              twitterInfo.style.display = '';
+            } else {
+              // Try to get saved profile data
+              const savedProfile = localStorage.getItem(`user_profile_${user.uid}`);
+              if (savedProfile) {
+                try {
+                  const profileData = JSON.parse(savedProfile);
+                  if (profileData.handle && profileData.handle !== 'anonymous' && profileData.handle !== 'undefined' && !profileData.handle.startsWith('user_')) {
+                    twitterInfo.innerHTML = `<a href="https://twitter.com/${profileData.handle}" style="color:#a020f0;">@${profileData.handle}</a> <span style="color:#a020f0;">✔️</span>`;
+                    twitterInfo.style.display = '';
+                  } else {
+                    twitterInfo.style.display = 'none';
+                  }
+                } catch (e) {
+                  console.error('Error parsing saved profile data:', e);
+                  twitterInfo.style.display = 'none';
+                }
+              } else {
+                twitterInfo.style.display = 'none';
+              }
+            }
           } else {
             twitterInfo.style.display = 'none';
           }
@@ -5847,16 +5905,26 @@ if (discoverItem) {
         profileName.innerHTML = `${displayName}<span class="wallet-profile-handle">@${handle}</span>`;
       }
       
-      // Update Twitter info
+      // Update Twitter info - fix undefined issue
       const twitterInfo = document.querySelector('.wallet-profile-twitter');
-      if (twitterInfo && profileData.handle && profileData.handle !== 'anonymous') {
-        twitterInfo.innerHTML = `<a href="https://twitter.com/${profileData.handle}" style="color:#a020f0;">@${profileData.handle}</a> <span style="color:#a020f0;">✔️</span>`;
-        twitterInfo.style.display = '';
+      if (twitterInfo) {
+        const handle = profileData.handle;
+        if (handle && handle !== 'anonymous' && handle !== 'undefined' && !handle.startsWith('user_')) {
+          // Show Twitter link only for real Twitter handles
+          twitterInfo.innerHTML = `<a href="https://twitter.com/${handle}" style="color:#a020f0;">@${handle}</a> <span style="color:#a020f0;">✔️</span>`;
+          twitterInfo.style.display = '';
+        } else {
+          // Hide Twitter info for non-Twitter handles
+          twitterInfo.style.display = 'none';
+        }
       }
       
       // Update all wallet-profile-handle elements
       document.querySelectorAll('.wallet-profile-handle').forEach(el => {
-        el.textContent = `@${profileData.handle || 'anonymous'}`;
+        const handle = profileData.handle || 'anonymous';
+        if (handle !== 'undefined') {
+          el.textContent = `@${handle}`;
+        }
       });
       
       console.log('Profile UI updated successfully');
