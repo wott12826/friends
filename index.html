@@ -2622,6 +2622,7 @@
         flex-direction: column;
         align-items: center;
         padding-top: 32px;
+        transition: transform 0.3s ease;
       }
 
       .sidebar.mobile-open {
@@ -3313,17 +3314,20 @@
       document.querySelectorAll('.sidebar-item').forEach(el => el.classList.remove('active'));
       document.querySelector('.sidebar-item[data-tab="' + tab + '"]').classList.add('active');
       
-      // Ensure sidebar is visible when switching tabs
-      const sidebar = document.querySelector('.sidebar');
-      if (sidebar) {
-        sidebar.style.display = '';
-      }
-      
-      // Only handle mobile menu state on mobile screens
-      if (window.innerWidth < 768) {
+      // Close sidebar on mobile when switching tabs
+      if (window.innerWidth <= 768) {
+        const sidebar = document.querySelector('.sidebar');
+        const sidebarDim = document.getElementById('sidebarDim');
         const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
+        
+        if (sidebar) {
+          sidebar.classList.remove('mobile-open');
+        }
+        if (sidebarDim) {
+          sidebarDim.classList.remove('active');
+        }
         if (mobileMenuBtn) {
-          mobileMenuBtn.classList.remove('active');
+          mobileMenuBtn.classList.remove('open');
         }
       }
     }
