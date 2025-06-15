@@ -5503,6 +5503,10 @@ if (discoverItem) {
       const tabId = this.getAttribute('data-tab');
       document.querySelectorAll('.tab-content').forEach(tab => tab.style.display = 'none');
       document.getElementById('tab-' + tabId).style.display = 'block';
+
+      // Close sidebar when any tab becomes active
+      sidebar.classList.remove('active');
+      mobileMenuBtn.classList.remove('active');
     });
   });
 // ... existing code ...
