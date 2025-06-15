@@ -2939,7 +2939,18 @@ document.addEventListener('DOMContentLoaded', function () {
       if (e.key === 'Enter') {
         const val = chatSearch.value.trim();
         if (val.includes('|') || val.includes('%7C')) {
-          window.location.href = '/chat.html?chat=' + encodeURIComponent(val);
+          // Проверка существования чата
+          let chatKey = val.replace('%7C', '|');
+          let exists = false;
+          try {
+            const clubs = JSON.parse(localStorage.getItem('clubs') || '[]');
+            exists = clubs.some(club => (club.name + '|' + club.ticker) === chatKey);
+          } catch {}
+          if (exists) {
+            window.location.href = '/chat.html?chat=' + encodeURIComponent(val);
+          } else {
+            alert('Чат с таким кодом не найден!');
+          }
         }
       }
     });
