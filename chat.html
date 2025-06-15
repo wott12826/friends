@@ -301,11 +301,12 @@
   // Firebase configuration
   const firebaseConfig = {
     apiKey: "AIzaSyCuL4tpaSsw1ylXf2VZrQ1b_2t_Kxd97cI",
-    authDomain: "meshclub-xyz.firebaseapp.com",
-    projectId: "meshclub-xyz",
-    storageBucket: "meshclub-xyz.appspot.com",
-    messagingSenderId: "123456789012",
-    appId: "1:123456789012:web:abcdef123456"
+    authDomain: "post-ad037.firebaseapp.com",
+    projectId: "post-ad037",
+    storageBucket: "post-ad037.firebasestorage.app",
+    messagingSenderId: "377312187432",
+    appId: "1:377312187432:web:565f47c145e0e73ac0911d",
+    measurementId: "G-T48NR3B9VW"
   };
 
   // Initialize Firebase
@@ -483,12 +484,15 @@
     };
   }
 
-  // Получаем ID чата из URL
-  const urlParams = new URLSearchParams(window.location.search);
-  const currentChatId = urlParams.get('chat');
+  // Get chat ID from URL
+  function getChatIdFromUrl() {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get('chat');
+  }
 
   // Отображаем ID чата
   const chatIdDisplay = document.getElementById('chatIdDisplay');
+  const currentChatId = getChatIdFromUrl();
   if (currentChatId) {
     chatIdDisplay.textContent = `ID: ${currentChatId}`;
     chatIdDisplay.title = 'Click to copy chat ID';
@@ -526,27 +530,34 @@
     listenForMessages(chatId);
   }
 
-  // Load messages from Firestore
-  function loadMessages() {
-    if (!currentChatId) return;
+  // Listen for messages from Firestore
+  function listenForMessages(chatId) {
+    if (!chatId) {
+      console.error('No chat ID provided to listenForMessages');
+      return;
+    }
+    
+    console.log('Setting up message listener for chat:', chatId);
     
     const messagesContainer = document.getElementById('fullscreenChatMessages');
     
     // Listen for real-time messages
-    db.collection('chats').doc(currentChatId).collection('messages')
+    db.collection('chats').doc(chatId).collection('messages')
       .orderBy('timestamp', 'asc')
       .onSnapshot((snapshot) => {
+        console.log('Received message snapshot, count:', snapshot.size);
         messagesContainer.innerHTML = ''; // Clear existing messages
         
         snapshot.forEach((doc) => {
           const message = doc.data();
+          console.log('Displaying message:', message);
           displayMessage(message);
         });
         
         // Scroll to bottom
         messagesContainer.scrollTop = messagesContainer.scrollHeight;
       }, (error) => {
-        console.error('Error loading messages:', error);
+        console.error('Error listening for messages:', error);
       });
   }
 
@@ -605,8 +616,11 @@
 
   // Send message to Firestore
   async function sendMessage(text, imageUrl = null) {
-    if (!currentChatId || !currentUserData) {
+    const chatId = getChatIdFromUrl();
+    if (!chatId || !currentUserData) {
       console.error('Cannot send message: missing chat ID or user data');
+      console.error('Chat ID:', chatId);
+      console.error('User data:', currentUserData);
       return;
     }
     
@@ -623,7 +637,7 @@
     console.log('Sending message:', message);
     
     try {
-      await db.collection('chats').doc(currentChatId).collection('messages').add(message);
+      await db.collection('chats').doc(chatId).collection('messages').add(message);
       console.log('Message sent successfully');
     } catch (error) {
       console.error('Error sending message:', error);
@@ -638,8 +652,9 @@
 
   // Обновляем функцию копирования ссылки
   window.copyLink = function() {
-    if (!currentChatId) return;
-    const link = window.location.origin + window.location.pathname + '?chat=' + encodeURIComponent(currentChatId);
+    const chatId = getChatIdFromUrl();
+    if (!chatId) return;
+    const link = window.location.origin + window.location.pathname + '?chat=' + encodeURIComponent(chatId);
     navigator.clipboard.writeText(link).then(() => {
       alert('Chat link copied to clipboard!');
       document.querySelector('.fschat-menu').style.display = 'none';
@@ -711,12 +726,13 @@
 
   // Функция для удаления чата
   window.deleteChat = async function() {
-    if (!currentChatId) return;
+    const chatId = getChatIdFromUrl();
+    if (!chatId) return;
     
     if (confirm('Are you sure you want to delete this chat? This action cannot be undone.')) {
       try {
         // Delete messages from Firestore
-        const messagesRef = db.collection('chats').doc(currentChatId).collection('messages');
+        const messagesRef = db.collection('chats').doc(chatId).collection('messages');
         const snapshot = await messagesRef.get();
         
         const batch = db.batch();
@@ -726,7 +742,7 @@
         await batch.commit();
         
         // Delete chat document
-        await db.collection('chats').doc(currentChatId).delete();
+        await db.collection('chats').doc(chatId).delete();
         
         console.log('Chat deleted from Firestore');
       } catch (error) {
@@ -744,7 +760,7 @@
       localStorage.setItem('clubs', JSON.stringify(updatedClubs));
       
       // Удаляем сообщения чата
-      localStorage.removeItem('clubmsg_' + currentChatId);
+      localStorage.removeItem('clubmsg_' + chatId);
       
       // Перенаправляем на главную страницу
       window.location.href = 'https://www.meshclub.xyz/';
@@ -753,6 +769,9 @@
 
   // Функция для включения/выключения уведомлений
   window.toggleNotifications = function() {
+    const chatId = getChatIdFromUrl();
+    if (!chatId) return;
+    
     const notificationsText = document.getElementById('notificationsText');
     const isEnabled = notificationsText.textContent.includes('Turn off');
     
@@ -761,21 +780,21 @@
       if (Notification.permission !== 'granted') {
         Notification.requestPermission().then(permission => {
           if (permission === 'granted') {
-            enableNotifications();
+            enableNotifications(chatId);
           }
         });
       } else {
-        enableNotifications();
+        enableNotifications(chatId);
       }
     } else {
-      disableNotifications();
+      disableNotifications(chatId);
     }
   };
 
-  function enableNotifications() {
+  function enableNotifications(chatId) {
     const notificationsText = document.getElementById('notificationsText');
     notificationsText.textContent = 'Turn off notifications';
-    localStorage.setItem(`notifications_${currentChatId}`, 'enabled');
+    localStorage.setItem(`notifications_${chatId}`, 'enabled');
     
     // Подписываемся на новые сообщения
     if ('serviceWorker' in navigator) {
@@ -788,10 +807,10 @@
     }
   }
 
-  function disableNotifications() {
+  function disableNotifications(chatId) {
     const notificationsText = document.getElementById('notificationsText');
     notificationsText.textContent = 'Turn on notifications';
-    localStorage.removeItem(`notifications_${currentChatId}`);
+    localStorage.removeItem(`notifications_${chatId}`);
   }
 
   // Функция для закрепления чата
@@ -836,8 +855,11 @@
 
   // Проверяем состояние уведомлений и закрепления при загрузке
   window.addEventListener('load', () => {
+    const chatId = getChatIdFromUrl();
+    if (!chatId) return;
+    
     // Проверяем состояние уведомлений
-    const notificationsEnabled = localStorage.getItem(`notifications_${currentChatId}`);
+    const notificationsEnabled = localStorage.getItem(`notifications_${chatId}`);
     if (notificationsEnabled) {
       const notificationsText = document.getElementById('notificationsText');
       notificationsText.textContent = 'Turn off notifications';
@@ -855,7 +877,8 @@
 
   // Функция для отправки уведомлений
   function sendNotification(message) {
-    if (Notification.permission === 'granted' && localStorage.getItem(`notifications_${currentChatId}`)) {
+    const chatId = getChatIdFromUrl();
+    if (Notification.permission === 'granted' && localStorage.getItem(`notifications_${chatId}`)) {
       const notification = new Notification('New message', {
         body: message.text,
         icon: '/images/logo2.png'
