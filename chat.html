@@ -319,69 +319,66 @@
 
   // Load user data from localStorage
   function loadUserData() {
-    // First try to get current user data
-    const userData = localStorage.getItem('currentUser');
-    if (userData) {
-      try {
+    try {
+      const userData = localStorage.getItem('currentUser');
+      if (userData) {
         currentUserData = JSON.parse(userData);
-        console.log('Loaded current user data from localStorage:', currentUserData);
-        return;
-      } catch (e) {
-        console.error('Error parsing current user data:', e);
+        console.log('Loaded user data:', currentUserData);
+        return true;
       }
-    }
-    
-    // If no current user data, try to get it from Firebase Auth
-    const user = auth.currentUser;
-    if (user) {
-      const savedProfile = localStorage.getItem(`user_profile_${user.uid}`);
-      if (savedProfile) {
-        try {
-          const profileData = JSON.parse(savedProfile);
-          currentUserData = {
-            uid: user.uid,
-            name: profileData.displayName || user.displayName || 'Anonymous',
-            displayName: profileData.displayName || user.displayName || 'Anonymous',
-            photoURL: profileData.photoURL || user.photoURL || '',
-            handle: profileData.handle || 'anonymous'
-          };
-          console.log('Loaded profile data from localStorage:', currentUserData);
-        } catch (e) {
-          console.error('Error parsing saved profile data:', e);
-        }
+      
+      // Try to get from profile data if currentUser not found
+      const keys = Object.keys(localStorage);
+      const profileKey = keys.find(key => key.startsWith('user_profile_'));
+      if (profileKey) {
+        const profileData = JSON.parse(localStorage.getItem(profileKey));
+        currentUserData = {
+          uid: profileKey.replace('user_profile_', ''),
+          name: profileData.displayName || 'Anonymous',
+          handle: profileData.handle || 'anonymous',
+          photoURL: profileData.photoURL || 'https://e7.pngegg.com/pngimages/178/595/png-clipart-user-profile-computer-icons-login-user-avatars-monochrome-black-thumbnail.png'
+        };
+        console.log('Loaded user data from profile:', currentUserData);
+        return true;
       }
+      
+      console.log('No user data found in localStorage');
+      return false;
+    } catch (error) {
+      console.error('Error loading user data:', error);
+      return false;
     }
   }
 
   // Initialize user data
-  loadUserData();
+  if (!loadUserData()) {
+    // Create anonymous user if no data found
+    currentUserData = {
+      uid: 'anonymous_' + Date.now(),
+      name: 'Anonymous',
+      handle: 'anonymous',
+      photoURL: 'https://e7.pngegg.com/pngimages/178/595/png-clipart-user-profile-computer-icons-login-user-avatars-monochrome-black-thumbnail.png'
+    };
+    console.log('Created anonymous user:', currentUserData);
+  }
 
   // Listen for storage changes (when user updates profile in main app)
-  window.addEventListener('storage', (e) => {
-    if (e.key && e.key.startsWith('user_profile_')) {
-      console.log('Profile data updated in another tab, refreshing...');
-      loadUserData();
-      
-      // Re-initialize chat with new data
-      if (currentUser) {
-        const savedProfile = localStorage.getItem(`user_profile_${currentUser.uid}`);
-        if (savedProfile) {
-          try {
-            const profileData = JSON.parse(savedProfile);
-            currentUserData = {
-              uid: currentUser.uid,
-              name: profileData.displayName || currentUser.displayName || 'Anonymous',
-              displayName: profileData.displayName || currentUser.displayName || 'Anonymous',
-              photoURL: profileData.photoURL || currentUser.photoURL || '',
-              handle: profileData.handle || 'anonymous'
-            };
-            localStorage.setItem('currentUser', JSON.stringify(currentUserData));
-            console.log('Updated user data from storage change:', currentUserData);
-          } catch (e) {
-            console.error('Error parsing updated profile data:', e);
-          }
-        }
+  window.addEventListener('storage', function(e) {
+    if (e.key && (e.key === 'currentUser' || e.key.startsWith('user_profile_'))) {
+      console.log('User data updated in localStorage, reloading...');
+      if (loadUserData()) {
+        updateChatHeader();
+        console.log('User data reloaded:', currentUserData);
       }
+    }
+  });
+
+  // Also listen for same-tab updates
+  window.addEventListener('userDataUpdated', function() {
+    console.log('User data updated event received');
+    if (loadUserData()) {
+      updateChatHeader();
+      console.log('User data reloaded:', currentUserData);
     }
   });
 
@@ -511,29 +508,22 @@
     chatIdDisplay.style.opacity = '0.5';
   }
 
-  // Initialize chat with user data
+  // Initialize chat
   function initializeChat() {
-    if (!currentChatId) return;
-    
-    // Update chat title and avatar
-    const chatTitle = document.getElementById('fullscreenChatTitle');
-    const chatAvatar = document.getElementById('fullscreenChatAvatar');
-    
-    // Load chat info from localStorage or set default
-    const clubs = JSON.parse(localStorage.getItem('clubs') || '[]');
-    const currentClub = clubs.find(club => club.id === currentChatId);
-    
-    if (currentClub) {
-      chatTitle.textContent = currentClub.name;
-      if (currentClub.avatar) {
-        chatAvatar.src = currentClub.avatar;
-      }
-    } else {
-      chatTitle.textContent = `Chat ${currentChatId}`;
+    const chatId = getChatIdFromUrl();
+    if (!chatId) {
+      console.error('No chat ID found in URL');
+      return;
     }
     
-    // Load messages
-    loadMessages();
+    console.log('Initializing chat with ID:', chatId);
+    console.log('Current user data:', currentUserData);
+    
+    // Update chat header
+    updateChatHeader();
+    
+    // Listen for new messages
+    listenForMessages(chatId);
   }
 
   // Load messages from Firestore
@@ -578,6 +568,9 @@
       img.src = message.imageUrl;
       img.style.maxWidth = '150px';
       img.style.borderRadius = '8px';
+      img.onerror = function() {
+        this.style.display = 'none';
+      };
       messageDiv.appendChild(img);
       if (message.text) {
         const textDiv = document.createElement('div');
@@ -592,6 +585,7 @@
       senderDiv.style.fontSize = '12px';
       senderDiv.style.opacity = '0.7';
       senderDiv.style.marginBottom = '4px';
+      senderDiv.style.fontWeight = '600';
       
       // Show name and handle if available
       let senderText = message.name;
@@ -604,6 +598,9 @@
     }
     
     messagesContainer.appendChild(messageDiv);
+    
+    // Auto-scroll to bottom
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
   }
 
   // Send message to Firestore
@@ -903,6 +900,44 @@
     chat.classList.add('active');
     backdrop.classList.add('active');
   };
+
+  // Update chat header with user info
+  function updateChatHeader() {
+    const chatId = getChatIdFromUrl();
+    const avatarEl = document.getElementById('fullscreenChatAvatar');
+    const titleEl = document.getElementById('fullscreenChatTitle');
+    const chatIdEl = document.querySelector('.fschat-chat-id');
+    
+    if (currentUserData) {
+      // Set user avatar with fallback
+      if (avatarEl) {
+        avatarEl.src = currentUserData.photoURL || 'https://e7.pngegg.com/pngimages/178/595/png-clipart-user-profile-computer-icons-login-user-avatars-monochrome-black-thumbnail.png';
+        avatarEl.onerror = function() {
+          this.src = 'https://e7.pngegg.com/pngimages/178/595/png-clipart-user-profile-computer-icons-login-user-avatars-monochrome-black-thumbnail.png';
+        };
+      }
+      
+      // Set chat title
+      if (titleEl) {
+        let displayName = currentUserData.name || 'Anonymous';
+        if (currentUserData.handle && currentUserData.handle !== 'anonymous') {
+          displayName += ` (@${currentUserData.handle})`;
+        }
+        titleEl.textContent = displayName;
+      }
+    }
+    
+    // Set chat ID
+    if (chatIdEl && chatId) {
+      chatIdEl.textContent = `Chat: ${chatId}`;
+    }
+  }
+
+  // Initialize chat
+  updateChatHeader();
+  
+  // Start the chat
+  initializeChat();
 </script>
 
 </body>

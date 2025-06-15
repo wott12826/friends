@@ -1409,6 +1409,117 @@
       height: 100vh;
         border-radius: 0;
       }
+      
+      .fschat-header {
+        padding: 0 12px;
+        height: 56px;
+      }
+
+      .fschat-form {
+        padding: 8px 12px;
+        gap: 4px;
+      }
+
+      #fullscreenChatInput {
+        padding: 8px 12px;
+        font-size: 1rem;
+      }
+
+      .fschat-balance {
+        padding: 6px 10px;
+        font-size: 0.9rem;
+        max-width: 100px;
+      }
+
+      .fschat-menu {
+        min-width: 140px;
+      }
+
+      .fschat-menu-item {
+        padding: 10px 14px;
+        font-size: 0.95rem;
+      }
+      
+      .fschat-messages {
+        padding: 12px 8px;
+      }
+      
+      .fschat-message {
+        padding: 6px 12px;
+        margin-bottom: 6px;
+      }
+      
+      .fschat-message-content {
+        max-width: 85%;
+        padding: 6px 10px;
+      }
+      
+      .fschat-header-left {
+        gap: 8px;
+      }
+      
+      #fullscreenChatTitle {
+        font-size: 1rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .fschat-header {
+        padding: 0 8px;
+        height: 52px;
+      }
+
+      .fschat-form {
+        padding: 6px 8px;
+        gap: 2px;
+      }
+
+      #fullscreenChatInput {
+        padding: 6px 10px;
+        font-size: 0.95rem;
+      }
+
+      .fschat-balance {
+        padding: 4px 8px;
+        font-size: 0.85rem;
+        max-width: 80px;
+      }
+
+      #fullscreenChatAvatar {
+        width: 32px;
+        height: 32px;
+      }
+
+      #closeFullscreenChat {
+        width: 28px;
+        height: 28px;
+        font-size: 1.3rem;
+      }
+      
+      .fschat-messages {
+        padding: 8px 4px;
+      }
+      
+      .fschat-message {
+        padding: 4px 8px;
+        margin-bottom: 4px;
+      }
+      
+      .fschat-message-content {
+        max-width: 90%;
+        padding: 4px 8px;
+        font-size: 0.9rem;
+      }
+      
+      #fullscreenChatTitle {
+        font-size: 0.9rem;
+      }
+      
+      .fschat-send {
+        padding: 4px 8px;
+        font-size: 1rem;
+        min-width: 32px;
+      }
     }
 
     .fschat-header {
@@ -1937,11 +2048,16 @@
     }
 
     .wallet-copy-btn {
-      padding: 1px 4px;
+      padding: 8px 8px !important;
+      font-size: 0.85em;
       background: rgba(0, 0, 0, 0.1);
-      border-radius: 4px;
+      color: #000;
       border: none;
+      border-radius: 4px;
       cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
     }
 
     .wallet-disconnect-btn {
@@ -1953,17 +2069,6 @@
       border: none;
       border-radius: 4px;
       cursor: pointer;
-    }
-
-    .wallet-copy-btn {
-      padding: 1px 6px !important;
-      background: rgba(0, 0, 0, 0.1);
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
     }
 
     .wallet-profile-twitter {
@@ -5516,9 +5621,11 @@ if (discoverItem) {
                   handle = userHandle;
                   console.log('Using verified user-provided handle:', handle);
                 } else {
-                  // Use displayName as fallback if user cancels or verification fails
-                  handle = twitterProvider.displayName.toLowerCase().replace(/\s+/g, '_');
-                  console.log('Using displayName as fallback handle:', handle);
+                  // Only use fallback if user explicitly cancelled (returned null)
+                  // Don't use fallback if verification failed but user wants to keep trying
+                  console.log('User cancelled handle input, using fallback');
+                  handle = `user_${twitterProvider.uid.slice(-6)}`;
+                  console.log('Using UID-based fallback handle:', handle);
                 }
               } else if (twitterProvider.rawId) {
                 handle = twitterProvider.rawId;
@@ -5567,6 +5674,16 @@ if (discoverItem) {
               localStorage.setItem(`user_profile_${user.uid}`, JSON.stringify(profileData));
               console.log('Profile data saved to localStorage:', profileData);
               
+              // Also save as currentUser for chat compatibility
+              const currentUserData = {
+                uid: user.uid,
+                name: displayName,
+                handle: handle,
+                photoURL: photoURL
+              };
+              localStorage.setItem('currentUser', JSON.stringify(currentUserData));
+              console.log('Current user data saved for chat:', currentUserData);
+              
               // Verify the data was saved correctly
               const verifyData = localStorage.getItem(`user_profile_${user.uid}`);
               console.log('Verification - data in localStorage:', verifyData);
@@ -5587,6 +5704,9 @@ if (discoverItem) {
               
               // Immediately update the UI with new data
               updateProfileUI(profileData);
+              
+              // Dispatch event for chat windows to update user data
+              window.dispatchEvent(new CustomEvent('userDataUpdated', { detail: profileData }));
               
               alert('Twitter profile synced successfully!');
             } catch (error) {
