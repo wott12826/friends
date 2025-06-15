@@ -6153,6 +6153,32 @@ if (discoverItem) {
   });
 </script>
 
+<script>
+// ... existing code ...
+
+// Получение цены через Dexscreener API
+async function fetchDexscreenerPrice() {
+  try {
+    const res = await fetch('https://api.dexscreener.com/latest/dex/tokens/Q3GoXRETCNMgj874FAuFkomvx18GmNGL7Ct2gWZpump');
+    const data = await res.json();
+    const price = data.pairs?.[0]?.priceUsd;
+    if (price) {
+      document.querySelectorAll('.wallet-post-price').forEach(el => {
+        el.textContent = `$` + Number(price).toFixed(4);
+      });
+    }
+  } catch (e) {
+    console.error('Dexscreener price fetch error:', e);
+  }
+}
+
+// Запускать обновление цены раз в 10 секунд
+fetchDexscreenerPrice();
+setInterval(fetchDexscreenerPrice, 10000);
+
+// ... существующий код ...
+</script>
+
 </body>
 
 </html>
