@@ -5483,16 +5483,25 @@ if (discoverItem) {
   sidebar.querySelectorAll('.sidebar-item').forEach(item => {
     item.addEventListener('click', function (e) {
       if (this.tagName === 'A') return;
+      
+      // Close mobile menu when switching sections
       if (window.innerWidth <= 768) {
         sidebar.classList.remove('mobile-open');
         sidebarDim.classList.remove('active');
         mobileMenuBtn.classList.remove('open');
       }
+      
+      // Update active state
+      sidebar.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
+      this.classList.add('active');
+      
+      // Show corresponding tab content
+      const tabId = this.getAttribute('data-tab');
+      document.querySelectorAll('.tab-content').forEach(tab => tab.style.display = 'none');
+      document.getElementById('tab-' + tabId).style.display = 'block';
     });
   });
-
-  window.addEventListener('resize', updateSidebarVisibility);
-  document.addEventListener('DOMContentLoaded', updateSidebarVisibility);
+// ... existing code ...
 </script>
 
 <!-- ✅ Chat Notification Toggle -->
