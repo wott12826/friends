@@ -5527,6 +5527,14 @@ if (discoverItem) {
               
               console.log('Twitter provider data:', twitterProvider);
               
+              // Log all available properties to debug
+              console.log('Available Twitter provider properties:', Object.keys(twitterProvider));
+              console.log('screenName:', twitterProvider.screenName);
+              console.log('username:', twitterProvider.username);
+              console.log('rawId:', twitterProvider.rawId);
+              console.log('uid:', twitterProvider.uid);
+              console.log('displayName:', twitterProvider.displayName);
+              
               // Extract Twitter data with fallbacks
               const displayName = twitterProvider.displayName || 'Anonymous';
               const photoURL = twitterProvider.photoURL || '';
@@ -5535,14 +5543,22 @@ if (discoverItem) {
               let handle = '';
               if (twitterProvider.screenName) {
                 handle = twitterProvider.screenName;
+                console.log('Using screenName for handle:', handle);
               } else if (twitterProvider.username) {
                 handle = twitterProvider.username;
+                console.log('Using username for handle:', handle);
+              } else if (twitterProvider.uid && twitterProvider.uid !== twitterProvider.displayName) {
+                handle = twitterProvider.uid;
+                console.log('Using uid for handle:', handle);
               } else if (twitterProvider.rawId) {
                 handle = twitterProvider.rawId;
+                console.log('Using rawId for handle:', handle);
               } else if (twitterProvider.displayName) {
                 handle = twitterProvider.displayName.toLowerCase().replace(/\s+/g, '_');
+                console.log('Using displayName for handle (fallback):', handle);
               } else {
-                handle = 'unknown';
+                handle = 'anonymous';
+                console.log('Using anonymous for handle (last fallback)');
               }
               
               console.log('Extracted data:', { displayName, photoURL, handle });
