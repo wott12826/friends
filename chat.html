@@ -3,1133 +3,1349 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Firestore Fullscreen Chat</title>
+  <title>MESH Chat</title>
   
   <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
   
-  <style>
-    /* Базовые стили для фуллскрин */
-    body, html {
-      margin: 0; padding: 0; height: 100%;
-      font-family: Arial, sans-serif;
-      background: #f0f0f0;
-    }
-    #chatBackdrop {
-      position: fixed;
-      top:0; left:0; right:0; bottom:0;
-      background: rgba(0,0,0,0.5);
-      display: none;
-      z-index: 998;
-    }
-    .fullscreen-chat {
-      position: fixed;
-      top: 0; right: 0; bottom: 0; left: 0;
-      background: white;
-      display: none;
-      flex-direction: column;
-      z-index: 999;
-      max-width: 600px;
-      margin: auto;
-      box-shadow: 0 0 20px rgba(0,0,0,0.3);
-      height: 90vh;
-      border-radius: 8px;
-      overflow: hidden;
-    }
-    .fullscreen-chat.active,
-    #chatBackdrop.active {
-      display: flex;
-    }
-    .fschat-header {
-      background: #a020f0;
-      color: black;
-      padding: 10px 16px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      user-select: none;
-    }
-    .fschat-header-left {
-      display: flex;
-      align-items: center;
-    }
-    .fschat-back {
-      font-size: 24px;
-      background: none;
-      border: none;
-      color: white;
-      cursor: pointer;
-      margin-right: 10px;
-      padding: 0;
-      line-height: 1;
-      user-select: none;
-    }
-    .fschat-avatar {
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      object-fit: cover;
-      margin-right: 10px;
-      background: #888;
-    }
-    .fschat-title {
-      font-weight: bold;
-      font-size: 18px;
-    }
-    .fschat-chat-id {
-      font-size: 12px;
-      color: rgba(255, 255, 255, 0.7);
-      cursor: pointer;
-      margin-left: 8px;
-    }
-    .fschat-chat-id:hover {
-      color: white;
-    }
-    .fschat-header-right {
-      display: flex;
-      align-items: center;
-    }
-    .fschat-balance {
-      background: #34495e;
-      border: none;
-      color: white;
-      font-size: 14px;
-      padding: 5px 10px;
-      margin-right: 10px;
-      border-radius: 4px;
-      cursor: default;
-      display: flex;
-      align-items: center;
-      user-select: none;
-    }
-    .fschat-balance img {
-      margin-right: 5px;
-      height: 18px;
-    }
-    .fschat-menu-wrap {
-      position: relative;
-    }
-    .fschat-menu-btn {
-      font-size: 24px;
-      background: none;
-      border: none;
-      color: white;
-      cursor: pointer;
-      user-select: none;
-      padding: 0;
-      line-height: 1;
-    }
-    .fschat-menu {
-      position: absolute;
-      right: 0;
-      top: 30px;
-      background: white;
-      border: 1px solid #ccc;
-      min-width: 180px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-      display: none;
-      flex-direction: column;
-      z-index: 1000;
-      border-radius: 4px;
-    }
-    .fschat-menu-item {
-      padding: 8px 12px;
-      cursor: pointer;
-      font-size: 14px;
-      user-select: none;
-    }
-    .fschat-menu-item:hover {
-      background: #eee;
-    }
-    .fschat-messages {
-      flex: 1;
-      overflow-y: auto;
-      padding: 10px 16px;
-      background: #fafafa;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-    .chat-message {
-      max-width: 80%;
-      padding: 8px 12px;
-      border-radius: 12px;
-      word-break: break-word;
-    }
-    .chat-message.own {
-      background: #3498db;
-      color: white;
-      align-self: flex-end;
-      border-bottom-right-radius: 2px;
-    }
-    .chat-message.other {
-      background: #e1e1e1;
-      color: #333;
-      align-self: flex-start;
-      border-bottom-left-radius: 2px;
-    }
-    .chat-message img {
-      max-width: 150px;
-      margin-top: 6px;
-      border-radius: 8px;
-      display: block;
-    }
-    .fschat-tip {
-      font-size: 12px;
-      color: #888;
-      padding: 5px 16px;
-      background: #eee;
-      text-align: center;
-      user-select: none;
-    }
-    .fschat-form {
-      display: flex;
-      align-items: center;
-      padding: 10px 16px;
-      background: #fff;
-      border-top: 1px solid #ddd;
-    }
-    .fschat-emoji, .fschat-img-btn, .fschat-send {
-      cursor: pointer;
-      margin-right: 8px;
-      background: none;
-      border: none;
-      padding: 0;
-      user-select: none;
-    }
-    .fschat-emoji img, .fschat-img-btn img, .fschat-send img {
-      width: 24px;
-      height: 24px;
-      opacity: 0.7;
-      display: block;
-    }
-    #fullscreenChatInput {
-      flex: 1;
-      padding: 8px 12px;
-      font-size: 16px;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-    }
-    .emoji-panel {
-      position: absolute;
-      bottom: 60px;
-      left: 16px;
-      background: white;
-      border: 1px solid #ccc;
-      padding: 5px;
-      display: none;
-      flex-wrap: wrap;
-      width: 220px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-      z-index: 10000;
-      border-radius: 6px;
-    }
-    .emoji-btn {
-      background: none;
-      border: none;
-      cursor: pointer;
-      margin: 2px;
-      padding: 0;
-    }
-    .emoji-btn img {
-      width: 24px;
-      height: 24px;
-      display: block;
-    }
+  <!-- Tailwind CSS -->
+  <link href="./dist/output.css" rel="stylesheet">
+  
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  
+  <!-- Emoji Picker -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/emoji-mart@latest/css/emoji-mart.css">
+  <script src="https://cdn.jsdelivr.net/npm/emoji-mart@latest/dist/emoji-mart.js"></script>
 
-    /* Mobile responsive styles */
-    @media (max-width: 768px) {
-      .fullscreen-chat {
-        left: 0;
-        top: 0;
-        width: 100vw;
-        height: 100vh;
-        border-radius: 0;
-        max-width: none;
-        margin: 0;
-      }
-      
-      .fschat-header {
-        padding: 0 12px;
-        height: 56px;
-      }
-
-      .fschat-form {
-        padding: 8px 12px;
-        gap: 4px;
-      }
-
-      #fullscreenChatInput {
-        padding: 8px 12px;
-        font-size: 1rem;
-      }
-
-      .fschat-balance {
-        padding: 6px 10px;
-        font-size: 0.9rem;
-        max-width: 100px;
-      }
-
-      .fschat-menu {
-        min-width: 140px;
-      }
-
-      .fschat-menu-item {
-        padding: 10px 14px;
-        font-size: 0.95rem;
-      }
-      
-      .fschat-messages {
-        padding: 12px 8px;
-      }
-      
-      .fschat-message {
-        padding: 6px 12px;
-        max-width: 85%;
-      }
-      
-      .fschat-title {
-        font-size: 16px;
-      }
-      
-      .fschat-chat-id {
-        font-size: 11px;
-      }
-      
-      .emoji-panel {
-        width: 200px;
-        left: 8px;
-        bottom: 55px;
-      }
-      
-      .fschat-back {
-        font-size: 20px;
-        margin-right: 8px;
-      }
-      
-      .fschat-avatar {
-        width: 28px;
-        height: 28px;
-        margin-right: 8px;
-      }
-    }
-
-    @media (max-width: 480px) {
-      .fschat-header {
-        padding: 0 8px;
-      }
-      
-      .fschat-form {
-        padding: 6px 8px;
-      }
-      
-      .fschat-messages {
-        padding: 8px 6px;
-      }
-      
-      .fschat-balance {
-        display: none; /* Hide balance on very small screens */
-      }
-      
-      .fschat-title {
-        font-size: 14px;
-      }
-      
-      .fschat-chat-id {
-        font-size: 10px;
-      }
-      
-      .chat-message {
-        max-width: 90%;
-        padding: 6px 10px;
-        font-size: 14px;
-      }
-      
-      .emoji-panel {
-        width: 180px;
-      }
-    }
-  </style>
+  <!-- RecordRTC for voice messages -->
+  <script src="https://www.webrtc-experiment.com/RecordRTC.js"></script>
 </head>
-<body>
+<body class="bg-gray-100 font-sans">
+  <!-- Chat Backdrop -->
+  <div id="chatBackdrop" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50"></div>
 
-<!-- HTML из твоего примера -->
-<div id="chatBackdrop" class="chat-backdrop"></div>
-<div id="fullscreenChat" class="fullscreen-chat" role="dialog" aria-modal="true" aria-labelledby="fullscreenChatTitle">
-  <div class="fschat-header">
-    <div class="fschat-header-left">
-      <button id="closeFullscreenChat" class="fschat-back" href="https://www.meshclub.xyz/" aria-label="Close chat">&#8592;</button>
-      <img id="fullscreenChatAvatar" class="fschat-avatar" src="https://via.placeholder.com/32" alt="avatar">
-      <div class="fschat-title-wrap">
-        <span id="fullscreenChatTitle" class="fschat-title">Chat Title</span>
-        <span id="chatIdDisplay" class="fschat-chat-id"></span>
+  <!-- Fullscreen Chat -->
+  <div id="fullscreenChat" class="fixed inset-0 bg-white hidden flex-col z-50 max-w-2xl mx-auto h-[90vh] rounded-lg shadow-xl overflow-hidden md:mt-4">
+    <!-- Chat Header -->
+    <div class="bg-purple-600 text-white px-4 py-3 flex justify-between items-center">
+      <div class="flex items-center">
+        <button class="text-white text-2xl mr-3 hover:text-purple-200 transition-colors" onclick="closeFullscreenChat()">
+          <i class="fas fa-arrow-left"></i>
+        </button>
+        <img src="" alt="Avatar" class="w-8 h-8 rounded-full bg-gray-300 mr-3 object-cover" id="chatAvatar">
+        <div>
+          <div class="font-semibold text-lg" id="chatTitle">Chat Title</div>
+          <div class="text-sm text-purple-200 cursor-pointer hover:text-white transition-colors" id="chatId">Chat ID</div>
+        </div>
+      </div>
+      <div class="flex items-center space-x-3">
+        <!-- Search Button -->
+        <button class="text-white hover:text-purple-200 transition-colors" onclick="toggleSearch()">
+          <i class="fas fa-search text-xl"></i>
+        </button>
+        
+        <!-- Group Info Button (for group chats) -->
+        <button id="groupInfoBtn" class="text-white hover:text-purple-200 transition-colors hidden" onclick="showGroupInfo()">
+          <i class="fas fa-users text-xl"></i>
+        </button>
+
+        <div class="bg-gray-700 text-white text-sm px-3 py-1.5 rounded flex items-center">
+          <img src="images/logo2.png" alt="MESH" class="h-4 mr-2">
+          <span id="userBalance">0 MESH</span>
+        </div>
+        
+        <div class="relative">
+          <button class="text-white text-2xl hover:text-purple-200 transition-colors" onclick="toggleChatMenu()">
+            <i class="fas fa-ellipsis-v"></i>
+          </button>
+          <div id="chatMenu" class="absolute right-0 top-10 bg-white rounded-lg shadow-lg border border-gray-200 hidden w-48">
+            <button class="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-50 transition-colors" onclick="clearChat()">
+              <i class="fas fa-trash-alt mr-2"></i>Clear Chat
+            </button>
+            <button class="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-50 transition-colors" onclick="exportChat()">
+              <i class="fas fa-download mr-2"></i>Export Chat
+            </button>
+            <button class="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-50 transition-colors" onclick="toggleNotifications()">
+              <i class="fas fa-bell mr-2"></i><span id="notificationsText">Turn on notifications</span>
+            </button>
+            <button class="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-50 transition-colors" onclick="pinChat()">
+              <i class="fas fa-thumbtack mr-2"></i><span id="pinChatText">Pin to top</span>
+            </button>
+          </div>
+        </div>
       </div>
     </div>
-    <div class="fschat-header-right">
-      <button class="fschat-balance" title="Balance">
-        <img src="images/logo2.png" alt="logo" style="width:18px;vertical-align:middle;margin-right:4px;">0.0
+
+    <!-- Search Bar -->
+    <div id="searchBar" class="hidden px-4 py-2 bg-white border-b border-gray-200">
+      <div class="relative">
+        <input type="text" 
+               class="w-full px-4 py-2 pl-10 border border-gray-300 rounded-lg focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500"
+               placeholder="Search messages..."
+               onkeyup="searchMessages(this.value)">
+        <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+        <button class="absolute right-3 top-2 text-gray-400 hover:text-gray-600" onclick="toggleSearch()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Messages Container -->
+    <div id="chatMessages" class="flex-1 overflow-y-auto p-4 bg-gray-50 space-y-3">
+      <!-- Messages will be inserted here -->
+    </div>
+
+    <!-- Quoted Message Preview -->
+    <div id="quotedMessage" class="hidden px-4 py-2 bg-gray-100 border-t border-gray-200">
+      <div class="flex items-center justify-between">
+        <div class="flex-1">
+          <div class="text-sm text-gray-500">Quoting message</div>
+          <div class="text-sm text-gray-700" id="quotedMessageText"></div>
+        </div>
+        <button class="text-gray-500 hover:text-gray-700" onclick="cancelQuote()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Typing Indicator -->
+    <div id="typingIndicator" class="hidden px-4 py-2 bg-gray-100 text-gray-500 text-sm">
+      <div class="flex items-center space-x-2">
+        <div class="typing-dot"></div>
+        <div class="typing-dot"></div>
+        <div class="typing-dot"></div>
+        <span id="typingText">Someone is typing...</span>
+      </div>
+    </div>
+
+    <!-- Chat Tip -->
+    <div class="bg-gray-100 text-gray-500 text-xs py-2 px-4 text-center">
+      Messages are end-to-end encrypted
+    </div>
+
+    <!-- Chat Input Form -->
+    <div class="bg-white border-t border-gray-200 p-3 flex items-center">
+      <button class="text-gray-500 hover:text-purple-600 transition-colors mr-2" onclick="toggleEmojiPicker()">
+        <i class="far fa-smile text-xl"></i>
       </button>
-      <div class="fschat-menu-wrap">
-        <button class="fschat-menu-btn" title="Menu" aria-haspopup="true" aria-expanded="false">⋮</button>
-        <div class="fschat-menu" role="menu">
-          <div class="fschat-menu-item" role="menuitem" onclick="window.copyLink()">Copy chat link</div>
-          <div class="fschat-menu-item" role="menuitem" onclick="window.deleteChat()">Delete chat</div>
-          <div class="fschat-menu-item" role="menuitem" onclick="window.toggleNotifications()" id="notificationsToggle">
-            <span id="notificationsText">Turn on notifications</span>
-          </div>
-          <div class="fschat-menu-item" role="menuitem" onclick="window.pinChat()" id="pinChatToggle">
-            <span id="pinChatText">Pin to top of chat list</span>
+      <button class="text-gray-500 hover:text-purple-600 transition-colors mr-2" onclick="triggerImageUpload()">
+        <i class="far fa-image text-xl"></i>
+      </button>
+      <button class="text-gray-500 hover:text-purple-600 transition-colors mr-2" onclick="startVoiceRecording()">
+        <i class="fas fa-microphone text-xl"></i>
+      </button>
+      <input type="text" id="fullscreenChatInput" 
+             class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500"
+             placeholder="Type a message..."
+             onkeyup="handleTyping()">
+      <button class="text-purple-600 hover:text-purple-700 transition-colors ml-2" onclick="sendMessage()">
+        <i class="fas fa-paper-plane text-xl"></i>
+      </button>
+    </div>
+
+    <!-- Emoji Picker -->
+    <div id="emojiPicker" class="absolute bottom-20 left-4 hidden"></div>
+
+    <!-- Image Upload Input -->
+    <input type="file" id="imageUpload" accept="image/*" class="hidden">
+
+    <!-- Group Info Modal -->
+    <div id="groupInfoModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center">
+      <div class="bg-white rounded-lg shadow-xl w-full max-w-md mx-4">
+        <div class="p-4 border-b border-gray-200 flex justify-between items-center">
+          <h3 class="text-lg font-semibold">Group Info</h3>
+          <button onclick="closeGroupInfo()" class="text-gray-500 hover:text-gray-700">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        <div class="p-4">
+          <div class="space-y-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700">Group Name</label>
+              <input type="text" id="groupName" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500">
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700">Members</label>
+              <div id="groupMembers" class="mt-2 space-y-2">
+                <!-- Members will be listed here -->
+              </div>
+            </div>
+            <div>
+              <button class="w-full bg-purple-600 text-white py-2 px-4 rounded-lg hover:bg-purple-700 transition-colors" onclick="addGroupMember()">
+                Add Member
+              </button>
+            </div>
           </div>
         </div>
       </div>
     </div>
   </div>
-  <div id="fullscreenChatMessages" class="fschat-messages"></div>
-  <div class="fschat-tip">Tip: Chat with your key holders here. They can see your messages and only you can see their messages.</div>
-  <form id="fullscreenChatForm" class="fschat-form" style="position:relative;">
-    <button type="button" class="fschat-emoji" aria-label="Emoji picker" title="Emoji picker" style="background: none; border: none; padding: 0; cursor: pointer;">
-      <img src="https://toppng.com/uploads/preview/font-emoji-svg-png-icon-free-download-389350-onlinewebfonts-play-button-image-11563230644rbzu7hlann.png" alt="emoji" style="width: 24px; height: 24px; opacity: 0.7;">
-    </button>
-    <div class="emoji-panel" role="list">
-      <!-- emoji buttons -->
-      <button type="button" class="emoji-btn" data-emoji="👍" title="👍"><img src="https://em-content.zobj.net/thumbs/120/apple/325/thumbs-up_1f44d.png" alt="👍"></button>
-      <button type="button" class="emoji-btn" data-emoji="❤️" title="❤️"><img src="https://em-content.zobj.net/thumbs/120/apple/325/red-heart_2764-fe0f.png" alt="❤️"></button>
-      <button type="button" class="emoji-btn" data-emoji="😊" title="😊"><img src="https://em-content.zobj.net/thumbs/120/apple/325/smiling-face-with-smiling-eyes_1f60a.png" alt="😊"></button>
-      <!-- ... добавь остальные -->
-    </div>
-    <button type="button" class="fschat-img-btn" id="fschatImgBtn" aria-label="Add image" style="background: none; border: none; padding: 0; cursor: pointer;">
-      <img src="https://static.thenounproject.com/png/1034957-200.png" alt="add image" style="width: 24px; height: 24px; opacity: 0.7;">
-    </button>
-    <input type="file" id="fschatImgInput" accept="image/*" style="display:none;">
-    <input id="fullscreenChatInput" type="text" placeholder="Write something..." autocomplete="off" style="margin-left:8px;" aria-label="Message input">
-    <button type="submit" class="fschat-send" aria-label="Send message" style="background: none; border: none; padding: 0; cursor: pointer;">
-      <img src="https://static-00.iconduck.com/assets.00/send-icon-2048x2048-h9h456ci.png" alt="send" style="width: 24px; height: 24px; opacity: 0.7;">
-    </button>
-  </form>
-</div>
 
-<script>
-  // Firebase configuration
-  const firebaseConfig = {
-    apiKey: "AIzaSyCuL4tpaSsw1ylXf2VZrQ1b_2t_Kxd97cI",
-    authDomain: "post-ad037.firebaseapp.com",
-    projectId: "post-ad037",
-    storageBucket: "post-ad037.firebasestorage.app",
-    messagingSenderId: "377312187432",
-    appId: "1:377312187432:web:565f47c145e0e73ac0911d",
-    measurementId: "G-T48NR3B9VW"
-  };
-
-  // Initialize Firebase
-  firebase.initializeApp(firebaseConfig);
-  const db = firebase.firestore();
-  const auth = firebase.auth();
-
-  // Get current user data from localStorage
-  let currentUser = null;
-  let currentUserData = null;
-
-  // Load user data from localStorage
-  function loadUserData() {
-    try {
-      const userData = localStorage.getItem('currentUser');
-      if (userData) {
-        currentUserData = JSON.parse(userData);
-        console.log('Loaded user data:', currentUserData);
-        return true;
-      }
-      
-      // Try to get from profile data if currentUser not found
-      const keys = Object.keys(localStorage);
-      const profileKey = keys.find(key => key.startsWith('user_profile_'));
-      if (profileKey) {
-        const profileData = JSON.parse(localStorage.getItem(profileKey));
-        currentUserData = {
-          uid: profileKey.replace('user_profile_', ''),
-          name: profileData.displayName || 'Anonymous',
-          handle: profileData.handle || 'anonymous',
-          photoURL: profileData.photoURL || 'https://e7.pngegg.com/pngimages/178/595/png-clipart-user-profile-computer-icons-login-user-avatars-monochrome-black-thumbnail.png'
-        };
-        console.log('Loaded user data from profile:', currentUserData);
-        return true;
-      }
-      
-      console.log('No user data found in localStorage');
-      return false;
-    } catch (error) {
-      console.error('Error loading user data:', error);
-      return false;
+  <style>
+    /* Typing animation */
+    .typing-dot {
+      width: 8px;
+      height: 8px;
+      background: #a020f0;
+      border-radius: 50%;
+      animation: typing 1.4s infinite ease-in-out;
     }
-  }
+    
+    .typing-dot:nth-child(1) { animation-delay: 0s; }
+    .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+    .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+    
+    @keyframes typing {
+      0%, 60%, 100% { transform: translateY(0); }
+      30% { transform: translateY(-4px); }
+    }
 
-  // Initialize user data
-  if (!loadUserData()) {
-    // Create anonymous user if no data found
-    currentUserData = {
-      uid: 'anonymous_' + Date.now(),
-      name: 'Anonymous',
-      handle: 'anonymous',
-      photoURL: 'https://e7.pngegg.com/pngimages/178/595/png-clipart-user-profile-computer-icons-login-user-avatars-monochrome-black-thumbnail.png'
+    /* Message animation */
+    .message-enter {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    
+    .message-enter-active {
+      opacity: 1;
+      transform: translateY(0);
+      transition: opacity 300ms, transform 300ms;
+    }
+
+    /* Read receipt animation */
+    .read-receipt {
+      opacity: 0;
+      transform: scale(0.8);
+      transition: opacity 0.3s, transform 0.3s;
+    }
+    
+    .read-receipt.active {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    /* Voice message recording animation */
+    .recording {
+      animation: pulse 1.5s infinite;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+      100% { transform: scale(1); }
+    }
+
+    /* Reaction picker */
+    .reaction-picker {
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      padding: 8px;
+      display: flex;
+      gap: 4px;
+      z-index: 1000;
+    }
+
+    /* Message reactions */
+    .message-reactions {
+      display: flex;
+      gap: 4px;
+      margin-top: 4px;
+    }
+
+    .reaction {
+      background: rgba(160, 32, 240, 0.1);
+      border-radius: 12px;
+      padding: 2px 6px;
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      gap: 2px;
+    }
+
+    /* Quoted message */
+    .quoted-message {
+      border-left: 3px solid #a020f0;
+      padding-left: 8px;
+      margin-bottom: 4px;
+      font-size: 12px;
+      color: #666;
+    }
+  </style>
+
+  <script>
+    // Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyCuL4tpaSsw1ylXf2VZrQ1b_2t_Kxd97cI",
+      authDomain: "post-ad037.firebaseapp.com",
+      projectId: "post-ad037",
+      storageBucket: "post-ad037.firebasestorage.app",
+      messagingSenderId: "377312187432",
+      appId: "1:377312187432:web:565f47c145e0e73ac0911d",
+      measurementId: "G-T48NR3B9VW"
     };
-    console.log('Created anonymous user:', currentUserData);
-  }
 
-  // Listen for storage changes (when user updates profile in main app)
-  window.addEventListener('storage', function(e) {
-    if (e.key && (e.key === 'currentUser' || e.key.startsWith('user_profile_'))) {
-      console.log('User data updated in localStorage, reloading...');
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    const auth = firebase.auth();
+
+    // Get current user data from localStorage
+    let currentUser = null;
+    let currentUserData = null;
+
+    // Load user data from localStorage
+    function loadUserData() {
+      try {
+        const userData = localStorage.getItem('currentUser');
+        if (userData) {
+          currentUserData = JSON.parse(userData);
+          console.log('Loaded user data:', currentUserData);
+          return true;
+        }
+        
+        // Try to get from profile data if currentUser not found
+        const keys = Object.keys(localStorage);
+        const profileKey = keys.find(key => key.startsWith('user_profile_'));
+        if (profileKey) {
+          const profileData = JSON.parse(localStorage.getItem(profileKey));
+          currentUserData = {
+            uid: profileKey.replace('user_profile_', ''),
+            name: profileData.displayName || 'Anonymous',
+            handle: profileData.handle || 'anonymous',
+            photoURL: profileData.photoURL || 'https://e7.pngegg.com/pngimages/178/595/png-clipart-user-profile-computer-icons-login-user-avatars-monochrome-black-thumbnail.png'
+          };
+          console.log('Loaded user data from profile:', currentUserData);
+          return true;
+        }
+        
+        console.log('No user data found in localStorage');
+        return false;
+      } catch (error) {
+        console.error('Error loading user data:', error);
+        return false;
+      }
+    }
+
+    // Initialize user data
+    if (!loadUserData()) {
+      // Create anonymous user if no data found
+      currentUserData = {
+        uid: 'anonymous_' + Date.now(),
+        name: 'Anonymous',
+        handle: 'anonymous',
+        photoURL: 'https://e7.pngegg.com/pngimages/178/595/png-clipart-user-profile-computer-icons-login-user-avatars-monochrome-black-thumbnail.png'
+      };
+      console.log('Created anonymous user:', currentUserData);
+    }
+
+    // Listen for storage changes (when user updates profile in main app)
+    window.addEventListener('storage', function(e) {
+      if (e.key && (e.key === 'currentUser' || e.key.startsWith('user_profile_'))) {
+        console.log('User data updated in localStorage, reloading...');
+        if (loadUserData()) {
+          updateChatHeader();
+          console.log('User data reloaded:', currentUserData);
+        }
+      }
+    });
+
+    // Also listen for same-tab updates
+    window.addEventListener('userDataUpdated', function() {
+      console.log('User data updated event received');
       if (loadUserData()) {
         updateChatHeader();
         console.log('User data reloaded:', currentUserData);
       }
-    }
-  });
+    });
 
-  // Also listen for same-tab updates
-  window.addEventListener('userDataUpdated', function() {
-    console.log('User data updated event received');
-    if (loadUserData()) {
-      updateChatHeader();
-      console.log('User data reloaded:', currentUserData);
-    }
-  });
-
-  // Function to manually refresh user data
-  window.refreshUserData = function() {
-    if (currentUser) {
-      const savedProfile = localStorage.getItem(`user_profile_${currentUser.uid}`);
-      if (savedProfile) {
-        try {
-          const profileData = JSON.parse(savedProfile);
-          currentUserData = {
-            uid: currentUser.uid,
-            name: profileData.displayName || currentUser.displayName || 'Anonymous',
-            displayName: profileData.displayName || currentUser.displayName || 'Anonymous',
-            photoURL: profileData.photoURL || currentUser.photoURL || '',
-            handle: profileData.handle || 'anonymous'
-          };
-          localStorage.setItem('currentUser', JSON.stringify(currentUserData));
-          console.log('Manually refreshed user data:', currentUserData);
-          return true;
-        } catch (e) {
-          console.error('Error parsing profile data during refresh:', e);
-          return false;
+    // Function to manually refresh user data
+    window.refreshUserData = function() {
+      if (currentUser) {
+        const savedProfile = localStorage.getItem(`user_profile_${currentUser.uid}`);
+        if (savedProfile) {
+          try {
+            const profileData = JSON.parse(savedProfile);
+            currentUserData = {
+              uid: currentUser.uid,
+              name: profileData.displayName || currentUser.displayName || 'Anonymous',
+              displayName: profileData.displayName || currentUser.displayName || 'Anonymous',
+              photoURL: profileData.photoURL || currentUser.photoURL || '',
+              handle: profileData.handle || 'anonymous'
+            };
+            localStorage.setItem('currentUser', JSON.stringify(currentUserData));
+            console.log('Manually refreshed user data:', currentUserData);
+            return true;
+          } catch (e) {
+            console.error('Error parsing profile data during refresh:', e);
+            return false;
+          }
         }
       }
-    }
-    return false;
-  };
+      return false;
+    };
 
-  // Firebase Auth state listener
-  auth.onAuthStateChanged((user) => {
-    if (user) {
-      currentUser = user;
-      
-      // Try to get saved profile data first
-      const savedProfile = localStorage.getItem(`user_profile_${user.uid}`);
-      if (savedProfile) {
-        try {
-          const profileData = JSON.parse(savedProfile);
-          currentUserData = {
-            uid: user.uid,
-            name: profileData.displayName || user.displayName || 'Anonymous',
-            displayName: profileData.displayName || user.displayName || 'Anonymous',
-            photoURL: profileData.photoURL || user.photoURL || '',
-            handle: profileData.handle || 'anonymous'
-          };
-          console.log('Using saved profile data:', currentUserData);
-        } catch (e) {
-          console.error('Error parsing saved profile:', e);
-          // Fallback to Firebase user data
+    // Firebase Auth state listener
+    auth.onAuthStateChanged((user) => {
+      if (user) {
+        currentUser = user;
+        
+        // Try to get saved profile data first
+        const savedProfile = localStorage.getItem(`user_profile_${user.uid}`);
+        if (savedProfile) {
+          try {
+            const profileData = JSON.parse(savedProfile);
+            currentUserData = {
+              uid: user.uid,
+              name: profileData.displayName || user.displayName || 'Anonymous',
+              displayName: profileData.displayName || user.displayName || 'Anonymous',
+              photoURL: profileData.photoURL || user.photoURL || '',
+              handle: profileData.handle || 'anonymous'
+            };
+            console.log('Using saved profile data:', currentUserData);
+          } catch (e) {
+            console.error('Error parsing saved profile:', e);
+            // Fallback to Firebase user data
+            currentUserData = createFallbackUserData(user);
+          }
+        } else {
+          // No saved profile, use Firebase user data
           currentUserData = createFallbackUserData(user);
+          console.log('No saved profile found, using Firebase data:', currentUserData);
+        }
+        
+        console.log('Final current user data:', currentUserData);
+        
+        // Save to localStorage for future use
+        localStorage.setItem('currentUser', JSON.stringify(currentUserData));
+        
+        // Initialize chat after user is loaded
+        initializeChat();
+      } else {
+        console.log('No user logged in');
+        // Redirect to login page
+        window.location.href = 'https://www.meshclub.xyz/';
+      }
+    });
+
+    // Helper function to create fallback user data
+    function createFallbackUserData(user) {
+      // Try to get Twitter provider data
+      const twitterProvider = user.providerData?.find(provider => provider.providerId === 'twitter.com');
+      
+      let handle = 'anonymous';
+      let displayName = user.displayName || 'Anonymous';
+      
+      if (twitterProvider) {
+        // Try to extract handle from Twitter provider
+        if (twitterProvider.screenName) {
+          handle = twitterProvider.screenName;
+        } else if (twitterProvider.username) {
+          handle = twitterProvider.username;
+        } else if (twitterProvider.uid && twitterProvider.uid !== twitterProvider.displayName) {
+          handle = twitterProvider.uid;
+        } else if (twitterProvider.displayName) {
+          handle = twitterProvider.displayName.toLowerCase().replace(/\s+/g, '_');
+        }
+        
+        displayName = twitterProvider.displayName || displayName;
+      }
+      
+      return {
+        uid: user.uid,
+        name: displayName,
+        displayName: displayName,
+        photoURL: user.photoURL || '',
+        handle: handle
+      };
+    }
+
+    // Get chat ID from URL
+    function getChatIdFromUrl() {
+      const urlParams = new URLSearchParams(window.location.search);
+      return urlParams.get('chat');
+    }
+
+    // Отображаем ID чата
+    const chatIdDisplay = document.getElementById('chatId');
+    const currentChatId = getChatIdFromUrl();
+    if (currentChatId) {
+      chatIdDisplay.textContent = `ID: ${currentChatId}`;
+      chatIdDisplay.title = 'Click to copy chat ID';
+      
+      // Добавляем обработчик клика для копирования ID
+      chatIdDisplay.addEventListener('click', () => {
+        navigator.clipboard.writeText(currentChatId).then(() => {
+          const originalText = chatIdDisplay.textContent;
+          chatIdDisplay.textContent = 'Copied!';
+          setTimeout(() => {
+            chatIdDisplay.textContent = originalText;
+          }, 2000);
+        });
+      });
+    } else {
+      chatIdDisplay.textContent = 'No chat ID';
+      chatIdDisplay.style.opacity = '0.5';
+    }
+
+    // Typing indicator
+    let typingTimeout;
+    const typingIndicator = document.getElementById('typingIndicator');
+    const typingText = document.getElementById('typingText');
+
+    function handleTyping() {
+      const chatId = getChatIdFromUrl();
+      if (!chatId) return;
+
+      // Update typing status in Firestore
+      db.collection('chats').doc(chatId).collection('typing').doc(currentUserData.uid).set({
+        isTyping: true,
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+      });
+
+      // Clear previous timeout
+      clearTimeout(typingTimeout);
+
+      // Set new timeout
+      typingTimeout = setTimeout(() => {
+        db.collection('chats').doc(chatId).collection('typing').doc(currentUserData.uid).delete();
+      }, 3000);
+    }
+
+    // Listen for typing status
+    function listenForTyping(chatId) {
+      db.collection('chats').doc(chatId).collection('typing')
+        .where('isTyping', '==', true)
+        .onSnapshot((snapshot) => {
+          const typingUsers = snapshot.docs
+            .filter(doc => doc.id !== currentUserData.uid)
+            .map(doc => doc.data().name);
+
+          if (typingUsers.length > 0) {
+            typingText.textContent = `${typingUsers.join(', ')} ${typingUsers.length === 1 ? 'is' : 'are'} typing...`;
+            typingIndicator.classList.remove('hidden');
+          } else {
+            typingIndicator.classList.add('hidden');
+          }
+        });
+    }
+
+    // Enhanced message display with animations
+    function displayMessage(message) {
+      const messagesContainer = document.getElementById('chatMessages');
+      const messageDiv = document.createElement('div');
+      
+      // Determine if message is from current user
+      const isOwnMessage = currentUserData && message.uid === currentUserData.uid;
+      
+      // Base message classes
+      const baseClasses = 'max-w-[80%] p-3 rounded-lg break-words message-enter';
+      const ownClasses = 'bg-purple-600 text-white ml-auto rounded-br-none';
+      const otherClasses = 'bg-gray-200 text-gray-800 rounded-bl-none';
+      
+      messageDiv.className = `${baseClasses} ${isOwnMessage ? ownClasses : otherClasses}`;
+      
+      // Create message content
+      if (message.type === 'text') {
+        messageDiv.textContent = message.text;
+      } else if (message.type === 'image') {
+        const img = document.createElement('img');
+        img.src = message.imageUrl;
+        img.className = 'max-w-[150px] mt-2 rounded-lg';
+        img.onerror = function() {
+          this.style.display = 'none';
+        };
+        messageDiv.appendChild(img);
+        if (message.text) {
+          const textDiv = document.createElement('div');
+          textDiv.className = 'mt-2';
+          textDiv.textContent = message.text;
+          messageDiv.appendChild(textDiv);
+        }
+      }
+      
+      // Add sender info for other messages
+      if (!isOwnMessage && message.name) {
+        const senderDiv = document.createElement('div');
+        senderDiv.className = 'text-xs text-gray-500 mb-1 font-medium';
+        
+        let senderText = message.name;
+        if (message.handle && message.handle !== 'anonymous' && message.handle !== 'undefined') {
+          senderText += ` @${message.handle}`;
+        }
+        
+        senderDiv.textContent = senderText;
+        messageDiv.insertBefore(senderDiv, messageDiv.firstChild);
+      }
+
+      // Add read receipt for own messages
+      if (isOwnMessage) {
+        const readReceipt = document.createElement('div');
+        readReceipt.className = 'read-receipt text-xs text-purple-200 mt-1 flex items-center';
+        readReceipt.innerHTML = '<i class="fas fa-check-double mr-1"></i>';
+        messageDiv.appendChild(readReceipt);
+
+        // Update read status
+        if (message.read) {
+          readReceipt.classList.add('active');
+        }
+      }
+      
+      messagesContainer.appendChild(messageDiv);
+      
+      // Trigger animation
+      requestAnimationFrame(() => {
+        messageDiv.classList.add('message-enter-active');
+      });
+      
+      // Auto-scroll with smooth animation
+      messagesContainer.scrollTo({
+        top: messagesContainer.scrollHeight,
+        behavior: 'smooth'
+      });
+    }
+
+    // Send message to Firestore
+    async function sendMessage(text, imageUrl = null) {
+      const chatId = getChatIdFromUrl();
+      if (!chatId || !currentUserData) {
+        console.error('Cannot send message: missing chat ID or user data');
+        console.error('Chat ID:', chatId);
+        console.error('User data:', currentUserData);
+        return;
+      }
+      
+      const message = {
+        type: imageUrl ? 'image' : 'text',
+        text: text || '',
+        imageUrl: imageUrl || null,
+        uid: currentUserData.uid || 'anonymous',
+        name: currentUserData.name || currentUserData.displayName || 'Anonymous',
+        handle: currentUserData.handle || 'anonymous',
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+      };
+      
+      console.log('Sending message:', message);
+      
+      try {
+        await db.collection('chats').doc(chatId).collection('messages').add(message);
+        console.log('Message sent successfully');
+      } catch (error) {
+        console.error('Error sending message:', error);
+        alert('Error sending message: ' + error.message);
+      }
+    }
+
+    // Initialize chat when page loads
+    document.addEventListener('DOMContentLoaded', () => {
+      initializeChat();
+    });
+
+    // Обновляем функцию копирования ссылки
+    window.copyLink = function() {
+      const chatId = getChatIdFromUrl();
+      if (!chatId) return;
+      const link = window.location.origin + window.location.pathname + '?chat=' + encodeURIComponent(chatId);
+      navigator.clipboard.writeText(link).then(() => {
+        alert('Chat link copied to clipboard!');
+        document.querySelector('.fschat-menu').style.display = 'none';
+      });
+    };
+
+    // Открытие / закрытие меню
+    const menuBtn = document.querySelector('.fschat-menu-btn');
+    const menu = document.querySelector('.fschat-menu');
+    menuBtn.addEventListener('click', () => {
+      if (menu.style.display === 'flex' || menu.style.display === 'block') {
+        menu.style.display = 'none';
+        menuBtn.setAttribute('aria-expanded', 'false');
+      } else {
+        menu.style.display = 'flex';
+        menuBtn.setAttribute('aria-expanded', 'true');
+      }
+    });
+
+    // Закрытие меню при клике вне
+    document.addEventListener('click', e => {
+      if (!menu.contains(e.target) && !menuBtn.contains(e.target)) {
+        menu.style.display = 'none';
+        menuBtn.setAttribute('aria-expanded', 'false');
+      }
+    });
+
+    // Показ/скрытие панели эмодзи
+    const emojiBtn = document.querySelector('.fschat-emoji');
+    const emojiPanel = document.querySelector('.emoji-panel');
+    emojiBtn.addEventListener('click', () => {
+      emojiPanel.style.display = emojiPanel.style.display === 'flex' ? 'none' : 'flex';
+    });
+
+    // Вставка эмодзи в инпут
+    emojiPanel.querySelectorAll('.emoji-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const emoji = btn.getAttribute('data-emoji');
+        const input = document.getElementById('fullscreenChatInput');
+        input.value += emoji;
+        input.focus();
+        emojiPanel.style.display = 'none';
+      });
+    });
+
+    // Кнопка добавления изображения - открытие выбора файла
+    const imgBtn = document.getElementById('fschatImgBtn');
+    const imgInput = document.getElementById('fschatImgInput');
+    imgBtn.addEventListener('click', () => {
+      imgInput.click();
+    });
+
+    // Обработка выбора файла (можно расширить для загрузки)
+    imgInput.addEventListener('change', async () => {
+      const file = imgInput.files[0];
+      if (!file) return;
+      
+      // Convert image to base64 for simple storage
+      const reader = new FileReader();
+      reader.onload = async (e) => {
+        const imageDataUrl = e.target.result;
+        
+        // Send image message to Firestore
+        await sendMessage('', imageDataUrl);
+      };
+      reader.readAsDataURL(file);
+      imgInput.value = '';
+    });
+
+    // Функция для удаления чата
+    window.deleteChat = async function() {
+      const chatId = getChatIdFromUrl();
+      if (!chatId) return;
+      
+      if (confirm('Are you sure you want to delete this chat? This action cannot be undone.')) {
+        try {
+          // Delete messages from Firestore
+          const messagesRef = db.collection('chats').doc(chatId).collection('messages');
+          const snapshot = await messagesRef.get();
+          
+          const batch = db.batch();
+          snapshot.docs.forEach((doc) => {
+            batch.delete(doc.ref);
+          });
+          await batch.commit();
+          
+          // Delete chat document
+          await db.collection('chats').doc(chatId).delete();
+          
+          console.log('Chat deleted from Firestore');
+        } catch (error) {
+          console.error('Error deleting chat from Firestore:', error);
+        }
+        
+        // Получаем текущий список клубов
+        const clubs = JSON.parse(localStorage.getItem('clubs') || '[]');
+        
+        // Удаляем чат из списка
+        const clubName = document.getElementById('chatTitle').textContent.split('(')[0].trim();
+        const updatedClubs = clubs.filter(club => club.name !== clubName);
+        
+        // Сохраняем обновленный список
+        localStorage.setItem('clubs', JSON.stringify(updatedClubs));
+        
+        // Удаляем сообщения чата
+        localStorage.removeItem('clubmsg_' + chatId);
+        
+        // Перенаправляем на главную страницу
+        window.location.href = 'https://www.meshclub.xyz/';
+      }
+    };
+
+    // Функция для включения/выключения уведомлений
+    window.toggleNotifications = function() {
+      const chatId = getChatIdFromUrl();
+      if (!chatId) return;
+      
+      const notificationsText = document.getElementById('notificationsText');
+      const isEnabled = notificationsText.textContent.includes('Turn off');
+      
+      if (!isEnabled) {
+        // Запрашиваем разрешение на уведомления
+        if (Notification.permission !== 'granted') {
+          Notification.requestPermission().then(permission => {
+            if (permission === 'granted') {
+              enableNotifications(chatId);
+            }
+          });
+        } else {
+          enableNotifications(chatId);
         }
       } else {
-        // No saved profile, use Firebase user data
-        currentUserData = createFallbackUserData(user);
-        console.log('No saved profile found, using Firebase data:', currentUserData);
+        disableNotifications(chatId);
       }
-      
-      console.log('Final current user data:', currentUserData);
-      
-      // Save to localStorage for future use
-      localStorage.setItem('currentUser', JSON.stringify(currentUserData));
-      
-      // Initialize chat after user is loaded
-      initializeChat();
-    } else {
-      console.log('No user logged in');
-      // Redirect to login page
-      window.location.href = 'https://www.meshclub.xyz/';
-    }
-  });
-
-  // Helper function to create fallback user data
-  function createFallbackUserData(user) {
-    // Try to get Twitter provider data
-    const twitterProvider = user.providerData?.find(provider => provider.providerId === 'twitter.com');
-    
-    let handle = 'anonymous';
-    let displayName = user.displayName || 'Anonymous';
-    
-    if (twitterProvider) {
-      // Try to extract handle from Twitter provider
-      if (twitterProvider.screenName) {
-        handle = twitterProvider.screenName;
-      } else if (twitterProvider.username) {
-        handle = twitterProvider.username;
-      } else if (twitterProvider.uid && twitterProvider.uid !== twitterProvider.displayName) {
-        handle = twitterProvider.uid;
-      } else if (twitterProvider.displayName) {
-        handle = twitterProvider.displayName.toLowerCase().replace(/\s+/g, '_');
-      }
-      
-      displayName = twitterProvider.displayName || displayName;
-    }
-    
-    return {
-      uid: user.uid,
-      name: displayName,
-      displayName: displayName,
-      photoURL: user.photoURL || '',
-      handle: handle
     };
-  }
 
-  // Get chat ID from URL
-  function getChatIdFromUrl() {
-    const urlParams = new URLSearchParams(window.location.search);
-    return urlParams.get('chat');
-  }
-
-  // Отображаем ID чата
-  const chatIdDisplay = document.getElementById('chatIdDisplay');
-  const currentChatId = getChatIdFromUrl();
-  if (currentChatId) {
-    chatIdDisplay.textContent = `ID: ${currentChatId}`;
-    chatIdDisplay.title = 'Click to copy chat ID';
-    
-    // Добавляем обработчик клика для копирования ID
-    chatIdDisplay.addEventListener('click', () => {
-      navigator.clipboard.writeText(currentChatId).then(() => {
-        const originalText = chatIdDisplay.textContent;
-        chatIdDisplay.textContent = 'Copied!';
-        setTimeout(() => {
-          chatIdDisplay.textContent = originalText;
-        }, 2000);
-      });
-    });
-  } else {
-    chatIdDisplay.textContent = 'No chat ID';
-    chatIdDisplay.style.opacity = '0.5';
-  }
-
-  // Initialize chat
-  function initializeChat() {
-    const chatId = getChatIdFromUrl();
-    if (!chatId) {
-      console.error('No chat ID found in URL');
-      return;
-    }
-    
-    console.log('Initializing chat with ID:', chatId);
-    console.log('Current user data:', currentUserData);
-    
-    // Update chat header
-    updateChatHeader();
-    
-    // Listen for new messages
-    listenForMessages(chatId);
-  }
-
-  // Listen for messages from Firestore
-  function listenForMessages(chatId) {
-    if (!chatId) {
-      console.error('No chat ID provided to listenForMessages');
-      return;
-    }
-    
-    console.log('Setting up message listener for chat:', chatId);
-    
-    const messagesContainer = document.getElementById('fullscreenChatMessages');
-    
-    // Listen for real-time messages
-    db.collection('chats').doc(chatId).collection('messages')
-      .orderBy('timestamp', 'asc')
-      .onSnapshot((snapshot) => {
-        console.log('Received message snapshot, count:', snapshot.size);
-        messagesContainer.innerHTML = ''; // Clear existing messages
-        
-        snapshot.forEach((doc) => {
-          const message = doc.data();
-          console.log('Displaying message:', message);
-          displayMessage(message);
+    function enableNotifications(chatId) {
+      const notificationsText = document.getElementById('notificationsText');
+      notificationsText.textContent = 'Turn off notifications';
+      localStorage.setItem(`notifications_${chatId}`, 'enabled');
+      
+      // Подписываемся на новые сообщения
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.ready.then(registration => {
+          registration.showNotification('Notifications enabled', {
+            body: 'You will now receive notifications for new messages',
+            icon: '/images/logo2.png'
+          });
         });
-        
-        // Scroll to bottom
-        messagesContainer.scrollTop = messagesContainer.scrollHeight;
-      }, (error) => {
-        console.error('Error listening for messages:', error);
-      });
-  }
-
-  // Display a message in the chat
-  function displayMessage(message) {
-    const messagesContainer = document.getElementById('fullscreenChatMessages');
-    const messageDiv = document.createElement('div');
-    messageDiv.className = 'chat-message';
-    
-    // Determine if message is from current user
-    const isOwnMessage = currentUserData && message.uid === currentUserData.uid;
-    messageDiv.classList.add(isOwnMessage ? 'own' : 'other');
-    
-    // Create message content
-    if (message.type === 'text') {
-      messageDiv.textContent = message.text;
-    } else if (message.type === 'image') {
-      const img = document.createElement('img');
-      img.src = message.imageUrl;
-      img.style.maxWidth = '150px';
-      img.style.borderRadius = '8px';
-      img.onerror = function() {
-        this.style.display = 'none';
-      };
-      messageDiv.appendChild(img);
-      if (message.text) {
-        const textDiv = document.createElement('div');
-        textDiv.textContent = message.text;
-        messageDiv.appendChild(textDiv);
       }
     }
-    
-    // Add sender info for other messages
-    if (!isOwnMessage && message.name) {
-      const senderDiv = document.createElement('div');
-      senderDiv.style.fontSize = '12px';
-      senderDiv.style.opacity = '0.7';
-      senderDiv.style.marginBottom = '4px';
-      senderDiv.style.fontWeight = '600';
-      
-      // Show name and handle if available
-      let senderText = message.name;
-      if (message.handle && message.handle !== 'anonymous' && message.handle !== 'undefined') {
-        senderText += ` @${message.handle}`;
-      }
-      
-      senderDiv.textContent = senderText;
-      messageDiv.insertBefore(senderDiv, messageDiv.firstChild);
+
+    function disableNotifications(chatId) {
+      const notificationsText = document.getElementById('notificationsText');
+      notificationsText.textContent = 'Turn on notifications';
+      localStorage.removeItem(`notifications_${chatId}`);
     }
-    
-    messagesContainer.appendChild(messageDiv);
-    
-    // Auto-scroll to bottom
-    messagesContainer.scrollTop = messagesContainer.scrollHeight;
-  }
 
-  // Send message to Firestore
-  async function sendMessage(text, imageUrl = null) {
-    const chatId = getChatIdFromUrl();
-    if (!chatId || !currentUserData) {
-      console.error('Cannot send message: missing chat ID or user data');
-      console.error('Chat ID:', chatId);
-      console.error('User data:', currentUserData);
-      return;
-    }
-    
-    const message = {
-      type: imageUrl ? 'image' : 'text',
-      text: text || '',
-      imageUrl: imageUrl || null,
-      uid: currentUserData.uid || 'anonymous',
-      name: currentUserData.name || currentUserData.displayName || 'Anonymous',
-      handle: currentUserData.handle || 'anonymous',
-      timestamp: firebase.firestore.FieldValue.serverTimestamp()
-    };
-    
-    console.log('Sending message:', message);
-    
-    try {
-      await db.collection('chats').doc(chatId).collection('messages').add(message);
-      console.log('Message sent successfully');
-    } catch (error) {
-      console.error('Error sending message:', error);
-      alert('Error sending message: ' + error.message);
-    }
-  }
-
-  // Initialize chat when page loads
-  document.addEventListener('DOMContentLoaded', () => {
-    initializeChat();
-  });
-
-  // Обновляем функцию копирования ссылки
-  window.copyLink = function() {
-    const chatId = getChatIdFromUrl();
-    if (!chatId) return;
-    const link = window.location.origin + window.location.pathname + '?chat=' + encodeURIComponent(chatId);
-    navigator.clipboard.writeText(link).then(() => {
-      alert('Chat link copied to clipboard!');
-      document.querySelector('.fschat-menu').style.display = 'none';
-    });
-  };
-
-  // Открытие / закрытие меню
-  const menuBtn = document.querySelector('.fschat-menu-btn');
-  const menu = document.querySelector('.fschat-menu');
-  menuBtn.addEventListener('click', () => {
-    if (menu.style.display === 'flex' || menu.style.display === 'block') {
-      menu.style.display = 'none';
-      menuBtn.setAttribute('aria-expanded', 'false');
-    } else {
-      menu.style.display = 'flex';
-      menuBtn.setAttribute('aria-expanded', 'true');
-    }
-  });
-
-  // Закрытие меню при клике вне
-  document.addEventListener('click', e => {
-    if (!menu.contains(e.target) && !menuBtn.contains(e.target)) {
-      menu.style.display = 'none';
-      menuBtn.setAttribute('aria-expanded', 'false');
-    }
-  });
-
-  // Показ/скрытие панели эмодзи
-  const emojiBtn = document.querySelector('.fschat-emoji');
-  const emojiPanel = document.querySelector('.emoji-panel');
-  emojiBtn.addEventListener('click', () => {
-    emojiPanel.style.display = emojiPanel.style.display === 'flex' ? 'none' : 'flex';
-  });
-
-  // Вставка эмодзи в инпут
-  emojiPanel.querySelectorAll('.emoji-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const emoji = btn.getAttribute('data-emoji');
-      const input = document.getElementById('fullscreenChatInput');
-      input.value += emoji;
-      input.focus();
-      emojiPanel.style.display = 'none';
-    });
-  });
-
-  // Кнопка добавления изображения - открытие выбора файла
-  const imgBtn = document.getElementById('fschatImgBtn');
-  const imgInput = document.getElementById('fschatImgInput');
-  imgBtn.addEventListener('click', () => {
-    imgInput.click();
-  });
-
-  // Обработка выбора файла (можно расширить для загрузки)
-  imgInput.addEventListener('change', async () => {
-    const file = imgInput.files[0];
-    if (!file) return;
-    
-    // Convert image to base64 for simple storage
-    const reader = new FileReader();
-    reader.onload = async (e) => {
-      const imageDataUrl = e.target.result;
-      
-      // Send image message to Firestore
-      await sendMessage('', imageDataUrl);
-    };
-    reader.readAsDataURL(file);
-    imgInput.value = '';
-  });
-
-  // Функция для удаления чата
-  window.deleteChat = async function() {
-    const chatId = getChatIdFromUrl();
-    if (!chatId) return;
-    
-    if (confirm('Are you sure you want to delete this chat? This action cannot be undone.')) {
-      try {
-        // Delete messages from Firestore
-        const messagesRef = db.collection('chats').doc(chatId).collection('messages');
-        const snapshot = await messagesRef.get();
-        
-        const batch = db.batch();
-        snapshot.docs.forEach((doc) => {
-          batch.delete(doc.ref);
-        });
-        await batch.commit();
-        
-        // Delete chat document
-        await db.collection('chats').doc(chatId).delete();
-        
-        console.log('Chat deleted from Firestore');
-      } catch (error) {
-        console.error('Error deleting chat from Firestore:', error);
-      }
+    // Функция для закрепления чата
+    window.pinChat = function() {
+      const pinChatText = document.getElementById('pinChatText');
+      const isPinned = pinChatText.textContent.includes('Unpin');
       
       // Получаем текущий список клубов
       const clubs = JSON.parse(localStorage.getItem('clubs') || '[]');
       
-      // Удаляем чат из списка
-      const clubName = document.getElementById('fullscreenChatTitle').textContent.split('(')[0].trim();
-      const updatedClubs = clubs.filter(club => club.name !== clubName);
+      // Находим текущий чат
+      const clubName = document.getElementById('chatTitle').textContent.split('(')[0].trim();
+      const currentClub = clubs.find(club => club.name === clubName);
+      if (!currentClub) return;
       
-      // Сохраняем обновленный список
-      localStorage.setItem('clubs', JSON.stringify(updatedClubs));
-      
-      // Удаляем сообщения чата
-      localStorage.removeItem('clubmsg_' + chatId);
-      
-      // Перенаправляем на главную страницу
-      window.location.href = 'https://www.meshclub.xyz/';
-    }
-  };
-
-  // Функция для включения/выключения уведомлений
-  window.toggleNotifications = function() {
-    const chatId = getChatIdFromUrl();
-    if (!chatId) return;
-    
-    const notificationsText = document.getElementById('notificationsText');
-    const isEnabled = notificationsText.textContent.includes('Turn off');
-    
-    if (!isEnabled) {
-      // Запрашиваем разрешение на уведомления
-      if (Notification.permission !== 'granted') {
-        Notification.requestPermission().then(permission => {
-          if (permission === 'granted') {
-            enableNotifications(chatId);
-          }
-        });
+      if (!isPinned) {
+        // Закрепляем чат
+        currentClub.pinned = true;
+        pinChatText.textContent = 'Unpin from top';
+        
+        // Перемещаем чат в начало списка
+        const updatedClubs = [
+          currentClub,
+          ...clubs.filter(club => club.name !== clubName)
+        ];
+        
+        localStorage.setItem('clubs', JSON.stringify(updatedClubs));
       } else {
-        enableNotifications(chatId);
+        // Открепляем чат
+        currentClub.pinned = false;
+        pinChatText.textContent = 'Pin to top of chat list';
+        
+        // Перемещаем чат в конец списка
+        const updatedClubs = [
+          ...clubs.filter(club => club.name !== clubName),
+          currentClub
+        ];
+        
+        localStorage.setItem('clubs', JSON.stringify(updatedClubs));
       }
-    } else {
-      disableNotifications(chatId);
-    }
-  };
+    };
 
-  function enableNotifications(chatId) {
-    const notificationsText = document.getElementById('notificationsText');
-    notificationsText.textContent = 'Turn off notifications';
-    localStorage.setItem(`notifications_${chatId}`, 'enabled');
-    
-    // Подписываемся на новые сообщения
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.ready.then(registration => {
-        registration.showNotification('Notifications enabled', {
-          body: 'You will now receive notifications for new messages',
+    // Проверяем состояние уведомлений и закрепления при загрузке
+    window.addEventListener('load', () => {
+      const chatId = getChatIdFromUrl();
+      if (!chatId) return;
+      
+      // Проверяем состояние уведомлений
+      const notificationsEnabled = localStorage.getItem(`notifications_${chatId}`);
+      if (notificationsEnabled) {
+        const notificationsText = document.getElementById('notificationsText');
+        notificationsText.textContent = 'Turn off notifications';
+      }
+
+      // Проверяем состояние закрепления из списка клубов
+      const clubs = JSON.parse(localStorage.getItem('clubs') || '[]');
+      const clubName = document.getElementById('chatTitle').textContent.split('(')[0].trim();
+      const currentClub = clubs.find(club => club.name === clubName);
+      if (currentClub && currentClub.pinned) {
+        const pinChatText = document.getElementById('pinChatText');
+        pinChatText.textContent = 'Unpin from top';
+      }
+    });
+
+    // Функция для отправки уведомлений
+    function sendNotification(message) {
+      const chatId = getChatIdFromUrl();
+      if (Notification.permission === 'granted' && localStorage.getItem(`notifications_${chatId}`)) {
+        const notification = new Notification('New message', {
+          body: message.text,
           icon: '/images/logo2.png'
         });
-      });
+      }
     }
-  }
 
-  function disableNotifications(chatId) {
-    const notificationsText = document.getElementById('notificationsText');
-    notificationsText.textContent = 'Turn on notifications';
-    localStorage.removeItem(`notifications_${chatId}`);
-  }
-
-  // Функция для закрепления чата
-  window.pinChat = function() {
-    const pinChatText = document.getElementById('pinChatText');
-    const isPinned = pinChatText.textContent.includes('Unpin');
-    
-    // Получаем текущий список клубов
-    const clubs = JSON.parse(localStorage.getItem('clubs') || '[]');
-    
-    // Находим текущий чат
-    const clubName = document.getElementById('fullscreenChatTitle').textContent.split('(')[0].trim();
-    const currentClub = clubs.find(club => club.name === clubName);
-    if (!currentClub) return;
-    
-    if (!isPinned) {
-      // Закрепляем чат
-      currentClub.pinned = true;
-      pinChatText.textContent = 'Unpin from top';
+    // Модифицируем обработчик отправки сообщения для поддержки уведомлений
+    const form = document.getElementById('fullscreenChatForm');
+    form.addEventListener('submit', async e => {
+      e.preventDefault();
+      const input = document.getElementById('fullscreenChatInput');
+      if (!input.value.trim()) return;
       
-      // Перемещаем чат в начало списка
-      const updatedClubs = [
-        currentClub,
-        ...clubs.filter(club => club.name !== clubName)
-      ];
+      const messageText = input.value.trim();
+      input.value = '';
       
-      localStorage.setItem('clubs', JSON.stringify(updatedClubs));
-    } else {
-      // Открепляем чат
-      currentClub.pinned = false;
-      pinChatText.textContent = 'Pin to top of chat list';
+      // Send message to Firestore
+      await sendMessage(messageText);
       
-      // Перемещаем чат в конец списка
-      const updatedClubs = [
-        ...clubs.filter(club => club.name !== clubName),
-        currentClub
-      ];
-      
-      localStorage.setItem('clubs', JSON.stringify(updatedClubs));
-    }
-  };
+      // Send notification to other users
+      const message = {
+        text: messageText,
+        timestamp: new Date()
+      };
+      sendNotification(message);
+    });
 
-  // Проверяем состояние уведомлений и закрепления при загрузке
-  window.addEventListener('load', () => {
-    const chatId = getChatIdFromUrl();
-    if (!chatId) return;
-    
-    // Проверяем состояние уведомлений
-    const notificationsEnabled = localStorage.getItem(`notifications_${chatId}`);
-    if (notificationsEnabled) {
-      const notificationsText = document.getElementById('notificationsText');
-      notificationsText.textContent = 'Turn off notifications';
-    }
+    // Кнопка назад - закрытие чата
+    const closeBtn = document.getElementById('closeFullscreenChat');
+    const chat = document.getElementById('fullscreenChat');
+    const backdrop = document.getElementById('chatBackdrop');
+    closeBtn.addEventListener('click', () => {
+      chat.classList.remove('active');
+      backdrop.classList.remove('active');
+      // Navigate to chat tab
+      window.location.href = 'https://www.meshclub.xyz/';
+    });
 
-    // Проверяем состояние закрепления из списка клубов
-    const clubs = JSON.parse(localStorage.getItem('clubs') || '[]');
-    const clubName = document.getElementById('fullscreenChatTitle').textContent.split('(')[0].trim();
-    const currentClub = clubs.find(club => club.name === clubName);
-    if (currentClub && currentClub.pinned) {
-      const pinChatText = document.getElementById('pinChatText');
-      pinChatText.textContent = 'Unpin from top';
-    }
-  });
-
-  // Функция для отправки уведомлений
-  function sendNotification(message) {
-    const chatId = getChatIdFromUrl();
-    if (Notification.permission === 'granted' && localStorage.getItem(`notifications_${chatId}`)) {
-      const notification = new Notification('New message', {
-        body: message.text,
-        icon: '/images/logo2.png'
-      });
-    }
-  }
-
-  // Модифицируем обработчик отправки сообщения для поддержки уведомлений
-  const form = document.getElementById('fullscreenChatForm');
-  form.addEventListener('submit', async e => {
-    e.preventDefault();
-    const input = document.getElementById('fullscreenChatInput');
-    if (!input.value.trim()) return;
-    
-    const messageText = input.value.trim();
-    input.value = '';
-    
-    // Send message to Firestore
-    await sendMessage(messageText);
-    
-    // Send notification to other users
-    const message = {
-      text: messageText,
-      timestamp: new Date()
+    // Для примера открываем чат сразу
+    window.onload = () => {
+      chat.classList.add('active');
+      backdrop.classList.add('active');
     };
-    sendNotification(message);
-  });
 
-  // Кнопка назад - закрытие чата
-  const closeBtn = document.getElementById('closeFullscreenChat');
-  const chat = document.getElementById('fullscreenChat');
-  const backdrop = document.getElementById('chatBackdrop');
-  closeBtn.addEventListener('click', () => {
-    chat.classList.remove('active');
-    backdrop.classList.remove('active');
-    // Navigate to chat tab
-    window.location.href = 'https://www.meshclub.xyz/';
-  });
-
-  // Для примера открываем чат сразу
-  window.onload = () => {
-    chat.classList.add('active');
-    backdrop.classList.add('active');
-  };
-
-  // Update chat header with chat info (not user info)
-  function updateChatHeader() {
-    const chatId = getChatIdFromUrl();
-    const avatarEl = document.getElementById('fullscreenChatAvatar');
-    const titleEl = document.getElementById('fullscreenChatTitle');
-    const chatIdEl = document.querySelector('.fschat-chat-id');
-    
-    if (chatId) {
-      // Parse chat ID to extract chat info
-      // Format: "clubName|ticker" or "discover|clubName|ticker" or "user_username"
-      let chatName = 'Chat';
-      let chatAvatar = 'https://via.placeholder.com/32x32?text=💬';
+    // Update chat header with chat info (not user info)
+    function updateChatHeader() {
+      const chatId = getChatIdFromUrl();
+      const avatarEl = document.getElementById('chatAvatar');
+      const titleEl = document.getElementById('chatTitle');
+      const chatIdEl = document.querySelector('.fschat-chat-id');
       
-      if (chatId.includes('|')) {
-        const parts = chatId.split('|');
-        if (parts[0] === 'discover') {
-          // Discover chat format: "discover|clubName|ticker"
-          chatName = parts[1];
-          if (parts[2]) {
-            chatName += ` ($${parts[2]})`;
+      if (chatId) {
+        // Parse chat ID to extract chat info
+        // Format: "clubName|ticker" or "discover|clubName|ticker" or "user_username"
+        let chatName = 'Chat';
+        let chatAvatar = 'https://via.placeholder.com/32x32?text=💬';
+        
+        if (chatId.includes('|')) {
+          const parts = chatId.split('|');
+          if (parts[0] === 'discover') {
+            // Discover chat format: "discover|clubName|ticker"
+            chatName = parts[1];
+            if (parts[2]) {
+              chatName += ` ($${parts[2]})`;
+            }
+            // Try to get avatar from discover clubs
+            const discoverClubs = {
+              'ZENAI': 'images/ZENAI.png',
+              'KITTY': 'images/KITTY.png',
+              'MADHOUSE': 'images/MADHOUSE.png',
+              'VLOGS': 'images/VLOGS.png',
+              'GANTU': 'images/GANTU.png',
+              'MASK': 'images/MASK.png',
+              'XAI41P': 'images/XAI41P.png',
+              'AuraFarm': 'images/AuraFarm.png',
+              'DUPE': 'images/DUPE.png',
+              'KOKOK': 'images/KOKOK.png'
+            };
+            chatAvatar = discoverClubs[parts[1]] || chatAvatar;
+          } else {
+            // Regular club format: "clubName|ticker"
+            chatName = parts[0];
+            if (parts[1]) {
+              chatName += ` ($${parts[1]})`;
+            }
+            
+            // Try to get avatar from localStorage clubs
+            const clubs = JSON.parse(localStorage.getItem('clubs') || '[]');
+            const club = clubs.find(c => c.name === parts[0]);
+            if (club && club.avatar) {
+              chatAvatar = club.avatar;
+            }
           }
-          // Try to get avatar from discover clubs
-          const discoverClubs = {
-            'ZENAI': 'images/ZENAI.png',
-            'KITTY': 'images/KITTY.png',
-            'MADHOUSE': 'images/MADHOUSE.png',
-            'VLOGS': 'images/VLOGS.png',
-            'GANTU': 'images/GANTU.png',
-            'MASK': 'images/MASK.png',
-            'XAI41P': 'images/XAI41P.png',
-            'AuraFarm': 'images/AuraFarm.png',
-            'DUPE': 'images/DUPE.png',
-            'KOKOK': 'images/KOKOK.png'
-          };
-          chatAvatar = discoverClubs[parts[1]] || chatAvatar;
+        } else if (chatId.startsWith('user_')) {
+          // User chat format: "user_username"
+          const username = chatId.replace('user_', '');
+          chatName = `@${username}`;
+          chatAvatar = 'https://e7.pngegg.com/pngimages/178/595/png-clipart-user-profile-computer-icons-login-user-avatars-monochrome-black-thumbnail.png';
         } else {
-          // Regular club format: "clubName|ticker"
-          chatName = parts[0];
-          if (parts[1]) {
-            chatName += ` ($${parts[1]})`;
+          // Generic chat
+          chatName = chatId;
+        }
+        
+        // Set chat avatar with fallback
+        if (avatarEl) {
+          avatarEl.src = chatAvatar;
+          avatarEl.onerror = function() {
+            this.src = 'https://via.placeholder.com/32x32?text=💬';
+          };
+        }
+        
+        // Set chat title
+        if (titleEl) {
+          titleEl.textContent = chatName;
+        }
+        
+        // Set chat ID
+        if (chatIdEl) {
+          chatIdEl.textContent = `ID: ${chatId}`;
+        }
+      } else {
+        // No chat ID
+        if (titleEl) {
+          titleEl.textContent = 'No Chat';
+        }
+        if (chatIdEl) {
+          chatIdEl.textContent = 'No ID';
+        }
+      }
+    }
+
+    // Initialize chat
+    updateChatHeader();
+    
+    // Start the chat
+    initializeChat();
+
+    // Initialize emoji picker
+    function initializeEmojiPicker() {
+      const picker = new EmojiMart.Picker({
+        onSelect: (emoji) => {
+          const input = document.getElementById('fullscreenChatInput');
+          input.value += emoji.native;
+          input.focus();
+          document.getElementById('emojiPicker').classList.add('hidden');
+        },
+        theme: 'light',
+        showPreview: false,
+        showSkinTones: false,
+        style: {
+          width: '100%',
+          height: '300px'
+        }
+      });
+
+      document.getElementById('emojiPicker').appendChild(picker);
+    }
+
+    // Toggle emoji picker
+    function toggleEmojiPicker() {
+      const picker = document.getElementById('emojiPicker');
+      picker.classList.toggle('hidden');
+    }
+
+    // Voice recording
+    let recorder = null;
+    let isRecording = false;
+
+    async function startVoiceRecording() {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        recorder = new RecordRTC(stream, {
+          type: 'audio',
+          mimeType: 'audio/webm',
+          recorderType: RecordRTC.StereoAudioRecorder,
+          numberOfAudioChannels: 1,
+          desiredSampRate: 16000,
+        });
+
+        recorder.startRecording();
+        isRecording = true;
+        
+        // Update UI
+        const micButton = document.querySelector('.fa-microphone');
+        micButton.classList.add('recording', 'text-red-500');
+        
+        // Stop recording after 60 seconds
+        setTimeout(() => {
+          if (isRecording) {
+            stopVoiceRecording();
           }
+        }, 60000);
+      } catch (error) {
+        console.error('Error starting voice recording:', error);
+        alert('Could not access microphone');
+      }
+    }
+
+    function stopVoiceRecording() {
+      if (!recorder || !isRecording) return;
+
+      recorder.stopRecording(() => {
+        const blob = recorder.getBlob();
+        const audioUrl = URL.createObjectURL(blob);
+        
+        // Upload to Firebase Storage and send message
+        uploadVoiceMessage(blob);
+        
+        // Reset UI
+        const micButton = document.querySelector('.fa-microphone');
+        micButton.classList.remove('recording', 'text-red-500');
+        
+        isRecording = false;
+        recorder = null;
+      });
+    }
+
+    // Message reactions
+    function showReactionPicker(messageId, event) {
+      const picker = document.createElement('div');
+      picker.className = 'reaction-picker';
+      picker.innerHTML = `
+        <button onclick="addReaction('${messageId}', '👍')">👍</button>
+        <button onclick="addReaction('${messageId}', '❤️')">❤️</button>
+        <button onclick="addReaction('${messageId}', '😂')">😂</button>
+        <button onclick="addReaction('${messageId}', '😮')">😮</button>
+        <button onclick="addReaction('${messageId}', '😢')">😢</button>
+        <button onclick="addReaction('${messageId}', '🙏')">🙏</button>
+      `;
+      
+      const message = event.target.closest('.message');
+      message.appendChild(picker);
+      
+      // Close picker when clicking outside
+      document.addEventListener('click', function closePicker(e) {
+        if (!picker.contains(e.target)) {
+          picker.remove();
+          document.removeEventListener('click', closePicker);
+        }
+      });
+    }
+
+    async function addReaction(messageId, reaction) {
+      const chatId = getChatIdFromUrl();
+      if (!chatId) return;
+
+      try {
+        const messageRef = db.collection('chats').doc(chatId).collection('messages').doc(messageId);
+        const message = await messageRef.get();
+        const reactions = message.data().reactions || {};
+        
+        // Toggle reaction
+        if (reactions[reaction]?.includes(currentUserData.uid)) {
+          reactions[reaction] = reactions[reaction].filter(id => id !== currentUserData.uid);
+          if (reactions[reaction].length === 0) {
+            delete reactions[reaction];
+          }
+        } else {
+          reactions[reaction] = [...(reactions[reaction] || []), currentUserData.uid];
+        }
+        
+        await messageRef.update({ reactions });
+      } catch (error) {
+        console.error('Error adding reaction:', error);
+      }
+    }
+
+    // Message quoting
+    function quoteMessage(message) {
+      const quotedMessage = document.getElementById('quotedMessage');
+      const quotedMessageText = document.getElementById('quotedMessageText');
+      
+      quotedMessageText.textContent = message.text;
+      quotedMessage.classList.remove('hidden');
+      
+      // Store quoted message for sending
+      window.quotedMessage = message;
+    }
+
+    function cancelQuote() {
+      const quotedMessage = document.getElementById('quotedMessage');
+      quotedMessage.classList.add('hidden');
+      window.quotedMessage = null;
+    }
+
+    // Message search
+    function toggleSearch() {
+      const searchBar = document.getElementById('searchBar');
+      searchBar.classList.toggle('hidden');
+      
+      if (!searchBar.classList.contains('hidden')) {
+        searchBar.querySelector('input').focus();
+      }
+    }
+
+    async function searchMessages(query) {
+      if (!query) {
+        // Reset messages display
+        listenForMessages(getChatIdFromUrl());
+        return;
+      }
+
+      const chatId = getChatIdFromUrl();
+      if (!chatId) return;
+
+      try {
+        const messagesRef = db.collection('chats').doc(chatId).collection('messages');
+        const snapshot = await messagesRef
+          .orderBy('timestamp', 'desc')
+          .get();
+
+        const messages = [];
+        snapshot.forEach(doc => {
+          const message = doc.data();
+          if (message.text?.toLowerCase().includes(query.toLowerCase())) {
+            messages.push({ id: doc.id, ...message });
+          }
+        });
+
+        displaySearchResults(messages);
+      } catch (error) {
+        console.error('Error searching messages:', error);
+      }
+    }
+
+    function displaySearchResults(messages) {
+      const container = document.getElementById('chatMessages');
+      container.innerHTML = '';
+
+      messages.forEach(message => {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = 'message bg-white p-3 rounded-lg shadow-sm mb-2';
+        messageDiv.innerHTML = `
+          <div class="text-sm text-gray-500 mb-1">${message.name}</div>
+          <div class="text-gray-800">${message.text}</div>
+          <div class="text-xs text-gray-400 mt-1">
+            ${new Date(message.timestamp?.toDate()).toLocaleString()}
+          </div>
+        `;
+        container.appendChild(messageDiv);
+      });
+    }
+
+    // Group chat functionality
+    function showGroupInfo() {
+      const modal = document.getElementById('groupInfoModal');
+      modal.classList.remove('hidden');
+      loadGroupInfo();
+    }
+
+    function closeGroupInfo() {
+      const modal = document.getElementById('groupInfoModal');
+      modal.classList.add('hidden');
+    }
+
+    async function loadGroupInfo() {
+      const chatId = getChatIdFromUrl();
+      if (!chatId) return;
+
+      try {
+        const chatDoc = await db.collection('chats').doc(chatId).get();
+        const chatData = chatDoc.data();
+
+        if (chatData.type === 'group') {
+          document.getElementById('groupName').value = chatData.name;
           
-          // Try to get avatar from localStorage clubs
-          const clubs = JSON.parse(localStorage.getItem('clubs') || '[]');
-          const club = clubs.find(c => c.name === parts[0]);
-          if (club && club.avatar) {
-            chatAvatar = club.avatar;
+          const membersContainer = document.getElementById('groupMembers');
+          membersContainer.innerHTML = '';
+          
+          for (const memberId of chatData.members) {
+            const memberDoc = await db.collection('users').doc(memberId).get();
+            const memberData = memberDoc.data();
+            
+            const memberDiv = document.createElement('div');
+            memberDiv.className = 'flex items-center justify-between p-2 bg-gray-50 rounded';
+            memberDiv.innerHTML = `
+              <div class="flex items-center">
+                <img src="${memberData.photoURL}" class="w-8 h-8 rounded-full mr-2">
+                <div>
+                  <div class="font-medium">${memberData.name}</div>
+                  <div class="text-sm text-gray-500">@${memberData.handle}</div>
+                </div>
+              </div>
+              ${memberId === currentUserData.uid ? '' : `
+                <button onclick="removeMember('${memberId}')" class="text-red-500 hover:text-red-700">
+                  <i class="fas fa-times"></i>
+                </button>
+              `}
+            `;
+            membersContainer.appendChild(memberDiv);
           }
         }
-      } else if (chatId.startsWith('user_')) {
-        // User chat format: "user_username"
-        const username = chatId.replace('user_', '');
-        chatName = `@${username}`;
-        chatAvatar = 'https://e7.pngegg.com/pngimages/178/595/png-clipart-user-profile-computer-icons-login-user-avatars-monochrome-black-thumbnail.png';
-      } else {
-        // Generic chat
-        chatName = chatId;
-      }
-      
-      // Set chat avatar with fallback
-      if (avatarEl) {
-        avatarEl.src = chatAvatar;
-        avatarEl.onerror = function() {
-          this.src = 'https://via.placeholder.com/32x32?text=💬';
-        };
-      }
-      
-      // Set chat title
-      if (titleEl) {
-        titleEl.textContent = chatName;
-      }
-      
-      // Set chat ID
-      if (chatIdEl) {
-        chatIdEl.textContent = `ID: ${chatId}`;
-      }
-    } else {
-      // No chat ID
-      if (titleEl) {
-        titleEl.textContent = 'No Chat';
-      }
-      if (chatIdEl) {
-        chatIdEl.textContent = 'No ID';
+      } catch (error) {
+        console.error('Error loading group info:', error);
       }
     }
-  }
 
-  // Initialize chat
-  updateChatHeader();
-  
-  // Start the chat
-  initializeChat();
-</script>
+    async function addGroupMember() {
+      const username = prompt('Enter username to add:');
+      if (!username) return;
 
+      const chatId = getChatIdFromUrl();
+      if (!chatId) return;
+
+      try {
+        // Find user by username
+        const usersRef = db.collection('users');
+        const snapshot = await usersRef.where('handle', '==', username).get();
+        
+        if (snapshot.empty) {
+          alert('User not found');
+          return;
+        }
+
+        const userDoc = snapshot.docs[0];
+        const chatRef = db.collection('chats').doc(chatId);
+        
+        await chatRef.update({
+          members: firebase.firestore.FieldValue.arrayUnion(userDoc.id)
+        });
+
+        loadGroupInfo();
+      } catch (error) {
+        console.error('Error adding member:', error);
+        alert('Could not add member');
+      }
+    }
+
+    async function removeMember(memberId) {
+      if (!confirm('Are you sure you want to remove this member?')) return;
+
+      const chatId = getChatIdFromUrl();
+      if (!chatId) return;
+
+      try {
+        const chatRef = db.collection('chats').doc(chatId);
+        await chatRef.update({
+          members: firebase.firestore.FieldValue.arrayRemove(memberId)
+        });
+
+        loadGroupInfo();
+      } catch (error) {
+        console.error('Error removing member:', error);
+        alert('Could not remove member');
+      }
+    }
+
+    // Initialize chat with new features
+    function initializeChat() {
+      const chatId = getChatIdFromUrl();
+      if (!chatId) {
+        console.error('No chat ID found in URL');
+        return;
+      }
+      
+      // Initialize features
+      initializeEmojiPicker();
+      listenForTyping(chatId);
+      updateChatHeader();
+      listenForMessages(chatId);
+      
+      // Check if it's a group chat
+      db.collection('chats').doc(chatId).get().then(doc => {
+        if (doc.data()?.type === 'group') {
+          document.getElementById('groupInfoBtn').classList.remove('hidden');
+        }
+      });
+    }
+  </script>
 </body>
 </html>
