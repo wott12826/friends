@@ -16,21 +16,97 @@
 
 <body class="bg-gray-50 font-sans text-gray-800">
   <!-- Mobile Menu Button -->
-  <button class="fixed top-0 left-0 z-50 flex items-center justify-center w-10 h-10 p-2 bg-white rounded-full shadow-md cursor-pointer md:hidden">
+  <button id="mobileMenuBtn" class="fixed top-4 left-4 z-50 flex items-center justify-center w-10 h-10 p-2 bg-white rounded-full shadow-md cursor-pointer md:hidden hover:bg-gray-50 transition-colors">
     <img src="images/logo2.png" alt="Menu" class="w-full h-full object-contain">
   </button>
 
   <!-- Sidebar -->
-  <aside class="fixed top-0 left-0 z-40 w-85vw max-w-[300px] h-screen bg-white border-r border-gray-200 shadow-sm transition-transform duration-300 ease-in-out overflow-y-auto md:translate-x-0 -translate-x-full">
-    <!-- Sidebar content will go here -->
+  <aside id="sidebar" class="fixed top-0 left-0 z-40 w-[85vw] max-w-[300px] h-screen bg-white border-r border-gray-200 shadow-sm transition-transform duration-300 ease-in-out overflow-y-auto md:translate-x-0 -translate-x-full">
+    <div class="p-6">
+      <div class="flex items-center justify-between mb-8">
+        <img src="images/logo2.png" alt="MESH Logo" class="h-8">
+        <button class="md:hidden text-gray-500 hover:text-gray-700">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      
+      <!-- Navigation -->
+      <nav class="space-y-2">
+        <a href="#" class="flex items-center px-4 py-3 text-gray-700 rounded-lg hover:bg-purple-50 hover:text-purple-600 transition-colors">
+          <i class="fas fa-home w-6"></i>
+          <span>Home</span>
+        </a>
+        <a href="#" class="flex items-center px-4 py-3 text-gray-700 rounded-lg hover:bg-purple-50 hover:text-purple-600 transition-colors">
+          <i class="fas fa-wallet w-6"></i>
+          <span>Wallet</span>
+        </a>
+        <a href="#" class="flex items-center px-4 py-3 text-gray-700 rounded-lg hover:bg-purple-50 hover:text-purple-600 transition-colors">
+          <i class="fas fa-comments w-6"></i>
+          <span>Chat</span>
+        </a>
+      </nav>
+    </div>
   </aside>
 
   <!-- Main Content -->
   <main class="min-h-screen transition-all duration-300 ease-in-out md:ml-[300px]">
-    <!-- Main content will go here -->
+    <div class="container mx-auto px-4 py-8">
+      <!-- Header Section -->
+      <header class="mb-8">
+        <h1 class="text-3xl font-bold text-gray-900 mb-2">Welcome to MESH</h1>
+        <p class="text-gray-600">Your decentralized social platform</p>
+      </header>
+
+      <!-- Main Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Wallet Card -->
+        <div class="bg-white rounded-xl shadow-sm p-6 hover:shadow-md transition-shadow">
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-xl font-semibold text-gray-900">Wallet</h2>
+            <i class="fas fa-wallet text-purple-600"></i>
+          </div>
+          <p class="text-gray-600 mb-4">Manage your MESH tokens and transactions</p>
+          <button class="w-full bg-purple-600 text-white py-3 px-4 rounded-lg hover:bg-purple-700 transition-colors">
+            Connect Wallet
+          </button>
+        </div>
+
+        <!-- Chat Card -->
+        <div class="bg-white rounded-xl shadow-sm p-6 hover:shadow-md transition-shadow">
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-xl font-semibold text-gray-900">Chat</h2>
+            <i class="fas fa-comments text-purple-600"></i>
+          </div>
+          <p class="text-gray-600 mb-4">Join the conversation with other members</p>
+          <button class="w-full bg-purple-600 text-white py-3 px-4 rounded-lg hover:bg-purple-700 transition-colors">
+            Open Chat
+          </button>
+        </div>
+
+        <!-- Profile Card -->
+        <div class="bg-white rounded-xl shadow-sm p-6 hover:shadow-md transition-shadow">
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-xl font-semibold text-gray-900">Profile</h2>
+            <i class="fas fa-user text-purple-600"></i>
+          </div>
+          <p class="text-gray-600 mb-4">View and edit your profile settings</p>
+          <button class="w-full bg-purple-600 text-white py-3 px-4 rounded-lg hover:bg-purple-700 transition-colors">
+            View Profile
+          </button>
+        </div>
+      </div>
+    </div>
   </main>
 
-  <!-- ... existing code ... -->
+  <script>
+    // Mobile menu toggle
+    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+    const sidebar = document.getElementById('sidebar');
+    
+    mobileMenuBtn.addEventListener('click', () => {
+      sidebar.classList.toggle('-translate-x-full');
+    });
+  </script>
 </body>
 
 </html>
