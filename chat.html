@@ -319,26 +319,21 @@
 
   // Load user data from localStorage
   function loadUserData() {
+    // First try to get current user data
     const userData = localStorage.getItem('currentUser');
     if (userData) {
       try {
         currentUserData = JSON.parse(userData);
-        console.log('Loaded user data:', currentUserData);
+        console.log('Loaded current user data from localStorage:', currentUserData);
+        return;
       } catch (e) {
-        console.error('Error parsing user data:', e);
+        console.error('Error parsing current user data:', e);
       }
     }
-  }
-
-  // Initialize user data
-  loadUserData();
-
-  // Firebase Auth state listener
-  auth.onAuthStateChanged((user) => {
+    
+    // If no current user data, try to get it from Firebase Auth
+    const user = auth.currentUser;
     if (user) {
-      currentUser = user;
-      
-      // Try to get saved profile data
       const savedProfile = localStorage.getItem(`user_profile_${user.uid}`);
       if (savedProfile) {
         try {
@@ -350,23 +345,102 @@
             photoURL: profileData.photoURL || user.photoURL || '',
             handle: profileData.handle || 'anonymous'
           };
+          console.log('Loaded profile data from localStorage:', currentUserData);
         } catch (e) {
-          console.error('Error parsing saved profile:', e);
+          console.error('Error parsing saved profile data:', e);
         }
       }
+    }
+  }
+
+  // Initialize user data
+  loadUserData();
+
+  // Listen for storage changes (when user updates profile in main app)
+  window.addEventListener('storage', (e) => {
+    if (e.key && e.key.startsWith('user_profile_')) {
+      console.log('Profile data updated in another tab, refreshing...');
+      loadUserData();
       
-      // Fallback to Firebase user data
-      if (!currentUserData) {
-        currentUserData = {
-          uid: user.uid,
-          name: user.displayName || 'Anonymous',
-          displayName: user.displayName || 'Anonymous',
-          photoURL: user.photoURL || '',
-          handle: 'anonymous'
-        };
+      // Re-initialize chat with new data
+      if (currentUser) {
+        const savedProfile = localStorage.getItem(`user_profile_${currentUser.uid}`);
+        if (savedProfile) {
+          try {
+            const profileData = JSON.parse(savedProfile);
+            currentUserData = {
+              uid: currentUser.uid,
+              name: profileData.displayName || currentUser.displayName || 'Anonymous',
+              displayName: profileData.displayName || currentUser.displayName || 'Anonymous',
+              photoURL: profileData.photoURL || currentUser.photoURL || '',
+              handle: profileData.handle || 'anonymous'
+            };
+            localStorage.setItem('currentUser', JSON.stringify(currentUserData));
+            console.log('Updated user data from storage change:', currentUserData);
+          } catch (e) {
+            console.error('Error parsing updated profile data:', e);
+          }
+        }
+      }
+    }
+  });
+
+  // Function to manually refresh user data
+  window.refreshUserData = function() {
+    if (currentUser) {
+      const savedProfile = localStorage.getItem(`user_profile_${currentUser.uid}`);
+      if (savedProfile) {
+        try {
+          const profileData = JSON.parse(savedProfile);
+          currentUserData = {
+            uid: currentUser.uid,
+            name: profileData.displayName || currentUser.displayName || 'Anonymous',
+            displayName: profileData.displayName || currentUser.displayName || 'Anonymous',
+            photoURL: profileData.photoURL || currentUser.photoURL || '',
+            handle: profileData.handle || 'anonymous'
+          };
+          localStorage.setItem('currentUser', JSON.stringify(currentUserData));
+          console.log('Manually refreshed user data:', currentUserData);
+          return true;
+        } catch (e) {
+          console.error('Error parsing profile data during refresh:', e);
+          return false;
+        }
+      }
+    }
+    return false;
+  };
+
+  // Firebase Auth state listener
+  auth.onAuthStateChanged((user) => {
+    if (user) {
+      currentUser = user;
+      
+      // Try to get saved profile data first
+      const savedProfile = localStorage.getItem(`user_profile_${user.uid}`);
+      if (savedProfile) {
+        try {
+          const profileData = JSON.parse(savedProfile);
+          currentUserData = {
+            uid: user.uid,
+            name: profileData.displayName || user.displayName || 'Anonymous',
+            displayName: profileData.displayName || user.displayName || 'Anonymous',
+            photoURL: profileData.photoURL || user.photoURL || '',
+            handle: profileData.handle || 'anonymous'
+          };
+          console.log('Using saved profile data:', currentUserData);
+        } catch (e) {
+          console.error('Error parsing saved profile:', e);
+          // Fallback to Firebase user data
+          currentUserData = createFallbackUserData(user);
+        }
+      } else {
+        // No saved profile, use Firebase user data
+        currentUserData = createFallbackUserData(user);
+        console.log('No saved profile found, using Firebase data:', currentUserData);
       }
       
-      console.log('Current user data:', currentUserData);
+      console.log('Final current user data:', currentUserData);
       
       // Save to localStorage for future use
       localStorage.setItem('currentUser', JSON.stringify(currentUserData));
@@ -379,6 +453,38 @@
       window.location.href = 'https://www.meshclub.xyz/';
     }
   });
+
+  // Helper function to create fallback user data
+  function createFallbackUserData(user) {
+    // Try to get Twitter provider data
+    const twitterProvider = user.providerData?.find(provider => provider.providerId === 'twitter.com');
+    
+    let handle = 'anonymous';
+    let displayName = user.displayName || 'Anonymous';
+    
+    if (twitterProvider) {
+      // Try to extract handle from Twitter provider
+      if (twitterProvider.screenName) {
+        handle = twitterProvider.screenName;
+      } else if (twitterProvider.username) {
+        handle = twitterProvider.username;
+      } else if (twitterProvider.uid && twitterProvider.uid !== twitterProvider.displayName) {
+        handle = twitterProvider.uid;
+      } else if (twitterProvider.displayName) {
+        handle = twitterProvider.displayName.toLowerCase().replace(/\s+/g, '_');
+      }
+      
+      displayName = twitterProvider.displayName || displayName;
+    }
+    
+    return {
+      uid: user.uid,
+      name: displayName,
+      displayName: displayName,
+      photoURL: user.photoURL || '',
+      handle: handle
+    };
+  }
 
   // Получаем ID чата из URL
   const urlParams = new URLSearchParams(window.location.search);
@@ -486,7 +592,14 @@
       senderDiv.style.fontSize = '12px';
       senderDiv.style.opacity = '0.7';
       senderDiv.style.marginBottom = '4px';
-      senderDiv.textContent = message.name;
+      
+      // Show name and handle if available
+      let senderText = message.name;
+      if (message.handle && message.handle !== 'anonymous' && message.handle !== 'undefined') {
+        senderText += ` @${message.handle}`;
+      }
+      
+      senderDiv.textContent = senderText;
       messageDiv.insertBefore(senderDiv, messageDiv.firstChild);
     }
     
@@ -495,7 +608,10 @@
 
   // Send message to Firestore
   async function sendMessage(text, imageUrl = null) {
-    if (!currentChatId || !currentUserData) return;
+    if (!currentChatId || !currentUserData) {
+      console.error('Cannot send message: missing chat ID or user data');
+      return;
+    }
     
     const message = {
       type: imageUrl ? 'image' : 'text',
@@ -503,8 +619,11 @@
       imageUrl: imageUrl || null,
       uid: currentUserData.uid || 'anonymous',
       name: currentUserData.name || currentUserData.displayName || 'Anonymous',
+      handle: currentUserData.handle || 'anonymous',
       timestamp: firebase.firestore.FieldValue.serverTimestamp()
     };
+    
+    console.log('Sending message:', message);
     
     try {
       await db.collection('chats').doc(currentChatId).collection('messages').add(message);

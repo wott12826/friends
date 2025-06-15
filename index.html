@@ -3349,15 +3349,32 @@
         const savedProfile = localStorage.getItem(`user_profile_${user.uid}`);
         let profileData = null;
         
+        console.log('=== Profile Loading Debug ===');
+        console.log('User UID:', user.uid);
+        console.log('Looking for key:', `user_profile_${user.uid}`);
+        console.log('Raw saved profile:', savedProfile);
+        
         if (savedProfile) {
           try {
             profileData = JSON.parse(savedProfile);
-            console.log('Loaded saved profile data:', profileData);
+            console.log('Parsed profile data:', profileData);
+            console.log('Profile displayName:', profileData.displayName);
+            console.log('Profile handle:', profileData.handle);
+            console.log('Profile photoURL:', profileData.photoURL);
           } catch (e) {
             console.error('Error parsing saved profile data:', e);
           }
         } else {
           console.log('No saved profile data found for user:', user.uid);
+          
+          // Let's also check what keys exist in localStorage
+          console.log('All localStorage keys:');
+          for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+            if (key.startsWith('user_profile_')) {
+              console.log(`  ${key}: ${localStorage.getItem(key)}`);
+            }
+          }
         }
 
         // Get Twitter provider data if available
@@ -3384,9 +3401,11 @@
         // Update name and handle - use saved data first, then Twitter data, then default
         const profileName = document.querySelector('.wallet-profile-name');
         if (profileName) {
-          if (profileData && profileData.displayName && profileData.handle) {
-            profileName.innerHTML = `${profileData.displayName}<span class="wallet-profile-handle">@${profileData.handle}</span>`;
-            console.log('Using saved profile name and handle:', profileData.displayName, profileData.handle);
+          if (profileData && (profileData.displayName || profileData.handle)) {
+            const displayName = profileData.displayName || 'Anonymous';
+            const handle = profileData.handle || 'anonymous';
+            profileName.innerHTML = `${displayName}<span class="wallet-profile-handle">@${handle}</span>`;
+            console.log('Using saved profile name and handle:', displayName, handle);
           } else if (twitterProvider) {
             const handle = twitterProvider.screenName || twitterProvider.username || twitterProvider.displayName || 'anonymous';
             profileName.innerHTML = `${twitterProvider.displayName}<span class="wallet-profile-handle">@${handle}</span>`;
@@ -3401,15 +3420,18 @@
         // Update Twitter info - use saved data first, then Twitter data
         const twitterInfo = document.querySelector('.wallet-profile-twitter');
         if (twitterInfo) {
-          if (profileData && profileData.handle) {
+          if (profileData && profileData.handle && profileData.handle !== 'anonymous') {
             twitterInfo.innerHTML = `<a href="https://twitter.com/${profileData.handle}" style="color:#a020f0;">@${profileData.handle}</a> <span style="color:#a020f0;">✔️</span>`;
             twitterInfo.style.display = '';
+            console.log('Using saved Twitter handle:', profileData.handle);
           } else if (twitterProvider) {
             const handle = twitterProvider.screenName || twitterProvider.username || twitterProvider.displayName || 'anonymous';
             twitterInfo.innerHTML = `<a href="https://twitter.com/${handle}" style="color:#a020f0;">@${handle}</a> <span style="color:#a020f0;">✔️</span>`;
             twitterInfo.style.display = '';
+            console.log('Using Twitter provider handle:', handle);
           } else {
             twitterInfo.style.display = 'none';
+            console.log('No Twitter info to display');
           }
         }
 
@@ -5610,11 +5632,26 @@ if (discoverItem) {
               localStorage.setItem(`user_profile_${user.uid}`, JSON.stringify(profileData));
               console.log('Profile data saved to localStorage:', profileData);
               
+              // Verify the data was saved correctly
+              const verifyData = localStorage.getItem(`user_profile_${user.uid}`);
+              console.log('Verification - data in localStorage:', verifyData);
+              if (verifyData) {
+                try {
+                  const parsedVerify = JSON.parse(verifyData);
+                  console.log('Verification - parsed data:', parsedVerify);
+                } catch (e) {
+                  console.error('Verification failed - could not parse saved data:', e);
+                }
+              }
+              
               // Update user profile in Firebase
               await updatedUser.updateProfile({
                 displayName,
                 photoURL
               });
+              
+              // Immediately update the UI with new data
+              updateProfileUI(profileData);
               
               alert('Twitter profile synced successfully!');
             } catch (error) {
@@ -5736,6 +5773,41 @@ if (discoverItem) {
       }
     });
 // ... existing code ...
+
+    // Function to update profile UI immediately
+    function updateProfileUI(profileData) {
+      console.log('Updating profile UI with data:', profileData);
+      
+      // Update avatar
+      const profileAvatar = document.querySelector('.wallet-profile-avatar');
+      if (profileAvatar && profileData.photoURL) {
+        profileAvatar.src = profileData.photoURL;
+      }
+      
+      // Update name and handle
+      const profileName = document.querySelector('.wallet-profile-name');
+      if (profileName) {
+        const displayName = profileData.displayName || 'Anonymous';
+        const handle = profileData.handle || 'anonymous';
+        profileName.innerHTML = `${displayName}<span class="wallet-profile-handle">@${handle}</span>`;
+      }
+      
+      // Update Twitter info
+      const twitterInfo = document.querySelector('.wallet-profile-twitter');
+      if (twitterInfo && profileData.handle && profileData.handle !== 'anonymous') {
+        twitterInfo.innerHTML = `<a href="https://twitter.com/${profileData.handle}" style="color:#a020f0;">@${profileData.handle}</a> <span style="color:#a020f0;">✔️</span>`;
+        twitterInfo.style.display = '';
+      }
+      
+      // Update all wallet-profile-handle elements
+      document.querySelectorAll('.wallet-profile-handle').forEach(el => {
+        el.textContent = `@${profileData.handle || 'anonymous'}`;
+      });
+      
+      console.log('Profile UI updated successfully');
+    }
+
+    // Update Twitter buttons based on auth method
 </script>
 
 
