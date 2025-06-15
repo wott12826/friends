@@ -2931,7 +2931,23 @@
 
         </div>
       </div>
-      <!-- Discover tab -->
+      <script>
+document.addEventListener('DOMContentLoaded', function () {
+  const chatSearch = document.querySelector('.chat-search');
+  if (chatSearch) {
+    chatSearch.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') {
+        const val = chatSearch.value.trim();
+        if (val.includes('|') || val.includes('%7C')) {
+          window.location.href = '/chat.html?chat=' + encodeURIComponent(val);
+        }
+      }
+    });
+  }
+});
+      </script>
+
+<!-- Discover tab -->
       <div id="tab-discover" class="tab-content" style="display:none; padding: 20px;">
         <div class="discover-tabs">
           <button class="discover-tab active" id="discoverRankingsBtn">Rankings</button>
