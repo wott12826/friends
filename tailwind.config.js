@@ -2,10 +2,14 @@
 module.exports = {
   content: [
     "./*.html",
-    "./src/**/*.{html,js}"
+    "./src/**/*.{js,jsx,ts,tsx}",
   ],
   theme: {
     extend: {},
   },
   plugins: [],
+  output: {
+    path: './public/css',
+    filename: 'output.css',
+  }
 } 

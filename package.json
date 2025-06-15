@@ -1,9 +1,13 @@
 {
+  "name": "mesh-chat",
+  "version": "1.0.0",
+  "description": "MESH Chat Application",
+  "scripts": {
+    "build": "tailwindcss -i ./src/input.css -o ./public/css/output.css",
+    "watch": "tailwindcss -i ./src/input.css -o ./public/css/output.css --watch"
+  },
   "dependencies": {
     "firebase": "^11.8.1"
-  },
-  "scripts": {
-    "build": "tailwindcss -i ./src/input.css -o ./dist/output.css"
   },
   "devDependencies": {
     "tailwindcss": "^3.4.1",
