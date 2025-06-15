@@ -3345,31 +3345,68 @@
         document.getElementById('main-app').style.display = 'flex';
         showTab('chat');
 
+        // Load saved profile data from localStorage first
+        const savedProfile = localStorage.getItem(`user_profile_${user.uid}`);
+        let profileData = null;
+        
+        if (savedProfile) {
+          try {
+            profileData = JSON.parse(savedProfile);
+            console.log('Loaded saved profile data:', profileData);
+          } catch (e) {
+            console.error('Error parsing saved profile data:', e);
+          }
+        } else {
+          console.log('No saved profile data found for user:', user.uid);
+        }
+
         // Get Twitter provider data if available
         const twitterProvider = user.providerData.find(provider => provider.providerId === 'twitter.com');
 
-        // Update avatar
+        // Update avatar - use saved data first, then Twitter data, then default
         const profileAvatar = document.querySelector('.wallet-profile-avatar');
         if (profileAvatar) {
-          profileAvatar.src = twitterProvider?.photoUrl || user.photoURL || 'https://e7.pngegg.com/pngimages/178/595/png-clipart-user-profile-computer-icons-login-user-avatars-monochrome-black-thumbnail.png';
-        }
-
-        // Update name and handle
-        const profileName = document.querySelector('.wallet-profile-name');
-        if (profileName) {
-          if (twitterProvider) {
-            profileName.innerHTML = `${twitterProvider.displayName}<span class="wallet-profile-handle">@${twitterProvider.displayName}</span>`;
+          if (profileData && profileData.photoURL) {
+            profileAvatar.src = profileData.photoURL;
+            console.log('Using saved avatar:', profileData.photoURL);
+          } else if (twitterProvider?.photoURL) {
+            profileAvatar.src = twitterProvider.photoURL;
+            console.log('Using Twitter avatar:', twitterProvider.photoURL);
+          } else if (user.photoURL) {
+            profileAvatar.src = user.photoURL;
+            console.log('Using user avatar:', user.photoURL);
           } else {
-            const randomId = Math.floor(Math.random() * 10000);
-            profileName.innerHTML = `User<span class="wallet-profile-handle">@user_${randomId}</span>`;
+            profileAvatar.src = 'https://e7.pngegg.com/pngimages/178/595/png-clipart-user-profile-computer-icons-login-user-avatars-monochrome-black-thumbnail.png';
+            console.log('Using default avatar');
           }
         }
 
-        // Update Twitter info
+        // Update name and handle - use saved data first, then Twitter data, then default
+        const profileName = document.querySelector('.wallet-profile-name');
+        if (profileName) {
+          if (profileData && profileData.displayName && profileData.handle) {
+            profileName.innerHTML = `${profileData.displayName}<span class="wallet-profile-handle">@${profileData.handle}</span>`;
+            console.log('Using saved profile name and handle:', profileData.displayName, profileData.handle);
+          } else if (twitterProvider) {
+            const handle = twitterProvider.screenName || twitterProvider.username || twitterProvider.displayName || 'anonymous';
+            profileName.innerHTML = `${twitterProvider.displayName}<span class="wallet-profile-handle">@${handle}</span>`;
+            console.log('Using Twitter profile name and handle:', twitterProvider.displayName, handle);
+          } else {
+            const randomId = Math.floor(Math.random() * 10000);
+            profileName.innerHTML = `User<span class="wallet-profile-handle">@user_${randomId}</span>`;
+            console.log('Using default profile name and handle');
+          }
+        }
+
+        // Update Twitter info - use saved data first, then Twitter data
         const twitterInfo = document.querySelector('.wallet-profile-twitter');
         if (twitterInfo) {
-          if (twitterProvider) {
-            twitterInfo.innerHTML = `<a href="https://twitter.com/${twitterProvider.screenName}" style="color:#a020f0;">@${twitterProvider.screenName}</a> <span style="color:#a020f0;">✔️</span>`;
+          if (profileData && profileData.handle) {
+            twitterInfo.innerHTML = `<a href="https://twitter.com/${profileData.handle}" style="color:#a020f0;">@${profileData.handle}</a> <span style="color:#a020f0;">✔️</span>`;
+            twitterInfo.style.display = '';
+          } else if (twitterProvider) {
+            const handle = twitterProvider.screenName || twitterProvider.username || twitterProvider.displayName || 'anonymous';
+            twitterInfo.innerHTML = `<a href="https://twitter.com/${handle}" style="color:#a020f0;">@${handle}</a> <span style="color:#a020f0;">✔️</span>`;
             twitterInfo.style.display = '';
           } else {
             twitterInfo.style.display = 'none';
@@ -3378,6 +3415,9 @@
 
         // Update wallet address
         renderWalletAddress();
+        
+        // Update Twitter buttons
+        updateTwitterButtons();
       } else {
         document.querySelector('.container').style.display = '';
         document.getElementById('wallet').style.display = 'none';
@@ -5485,43 +5525,68 @@ if (discoverItem) {
                 throw new Error('Twitter provider data not found');
               }
               
+              console.log('Twitter provider data:', twitterProvider);
+              
               // Extract Twitter data with fallbacks
               const displayName = twitterProvider.displayName || 'Anonymous';
               const photoURL = twitterProvider.photoURL || '';
-              // Универсальный handle с fallback
-              const handle = twitterProvider.screenName || twitterProvider.username || twitterProvider.rawId || twitterProvider.displayName || 'unknown';
+              
+              // Try multiple ways to get the handle/username
+              let handle = '';
+              if (twitterProvider.screenName) {
+                handle = twitterProvider.screenName;
+              } else if (twitterProvider.username) {
+                handle = twitterProvider.username;
+              } else if (twitterProvider.rawId) {
+                handle = twitterProvider.rawId;
+              } else if (twitterProvider.displayName) {
+                handle = twitterProvider.displayName.toLowerCase().replace(/\s+/g, '_');
+              } else {
+                handle = 'unknown';
+              }
+              
+              console.log('Extracted data:', { displayName, photoURL, handle });
+              
               // Update profile avatar
               const profileAvatar = document.querySelector('.wallet-profile-avatar');
               if (profileAvatar && photoURL) {
                 profileAvatar.src = photoURL;
               }
+              
               // Update profile name and handle
               const profileName = document.querySelector('.wallet-profile-name');
               if (profileName) {
                 profileName.innerHTML = `${displayName}<span class="wallet-profile-handle">@${handle}</span>`;
               }
+              
               // Update Twitter info
               const twitterInfo = document.querySelector('.wallet-profile-twitter');
               if (twitterInfo) {
                 twitterInfo.innerHTML = `<a href="https://twitter.com/${handle}" style="color:#a020f0;">@${handle}</a> <span style="color:#a020f0;">✔️</span>`;
                 twitterInfo.style.display = '';
               }
+              
               // Update all wallet-profile-handle elements
               document.querySelectorAll('.wallet-profile-handle').forEach(el => {
                 el.textContent = `@${handle}`;
               });
+              
               // Save profile data to localStorage
               const profileData = {
                 displayName,
                 photoURL,
-                handle
+                handle,
+                lastSync: new Date().toISOString()
               };
               localStorage.setItem(`user_profile_${user.uid}`, JSON.stringify(profileData));
+              console.log('Profile data saved to localStorage:', profileData);
+              
               // Update user profile in Firebase
               await updatedUser.updateProfile({
                 displayName,
                 photoURL
               });
+              
               alert('Twitter profile synced successfully!');
             } catch (error) {
               console.error('Error syncing Twitter profile:', error);
@@ -5537,6 +5602,7 @@ if (discoverItem) {
               
               // Clear Twitter-related data
               localStorage.removeItem(`user_profile_${user.uid}`);
+              console.log('Profile data cleared from localStorage');
               
               // Update UI
               const twitterInfo = document.querySelector('.wallet-profile-twitter');
@@ -5545,13 +5611,20 @@ if (discoverItem) {
               // Reset profile to default
               const profileName = document.querySelector('.wallet-profile-name');
               if (profileName) {
-                profileName.innerHTML = `User<span class="wallet-profile-handle">@user_${Math.floor(Math.random() * 10000)}</span>`;
+                const randomId = Math.floor(Math.random() * 10000);
+                profileName.innerHTML = `User<span class="wallet-profile-handle">@user_${randomId}</span>`;
               }
               
               const profileAvatar = document.querySelector('.wallet-profile-avatar');
               if (profileAvatar) {
                 profileAvatar.src = 'https://e7.pngegg.com/pngimages/178/595/png-clipart-user-profile-computer-icons-login-user-avatars-monochrome-black-thumbnail.png';
               }
+              
+              // Update user profile in Firebase to clear Twitter data
+              await user.updateProfile({
+                displayName: 'User',
+                photoURL: 'https://e7.pngegg.com/pngimages/178/595/png-clipart-user-profile-computer-icons-login-user-avatars-monochrome-black-thumbnail.png'
+              });
               
               // Update buttons
               updateTwitterButtons();
@@ -5578,18 +5651,40 @@ if (discoverItem) {
               const twitterProvider = result.user.providerData.find(provider => provider.providerId === 'twitter.com');
               
               if (twitterProvider) {
+                console.log('Connected Twitter provider data:', twitterProvider);
+                
+                // Extract Twitter data with fallbacks
+                const displayName = twitterProvider.displayName || 'Anonymous';
+                const photoURL = twitterProvider.photoURL || '';
+                
+                // Try multiple ways to get the handle/username
+                let handle = '';
+                if (twitterProvider.screenName) {
+                  handle = twitterProvider.screenName;
+                } else if (twitterProvider.username) {
+                  handle = twitterProvider.username;
+                } else if (twitterProvider.rawId) {
+                  handle = twitterProvider.rawId;
+                } else if (twitterProvider.displayName) {
+                  handle = twitterProvider.displayName.toLowerCase().replace(/\s+/g, '_');
+                } else {
+                  handle = 'anonymous';
+                }
+                
                 // Save profile data
                 const profileData = {
-                  displayName: twitterProvider.displayName || 'Anonymous',
-                  photoURL: twitterProvider.photoURL || '',
-                  screenName: twitterProvider.screenName || twitterProvider.displayName || 'anonymous'
+                  displayName,
+                  photoURL,
+                  handle,
+                  lastSync: new Date().toISOString()
                 };
                 localStorage.setItem(`user_profile_${user.uid}`, JSON.stringify(profileData));
+                console.log('Profile data saved after Twitter connection:', profileData);
                 
                 // Update user profile
                 await user.updateProfile({
-                  displayName: profileData.displayName,
-                  photoURL: profileData.photoURL
+                  displayName,
+                  photoURL
                 });
               }
               
