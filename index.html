@@ -3376,70 +3376,6 @@
             }
           }
         }
-
-        // Get Twitter provider data if available
-        const twitterProvider = user.providerData.find(provider => provider.providerId === 'twitter.com');
-
-        // Update avatar - use saved data first, then Twitter data, then default
-        const profileAvatar = document.querySelector('.wallet-profile-avatar');
-        if (profileAvatar) {
-          if (profileData && profileData.photoURL) {
-            profileAvatar.src = profileData.photoURL;
-            console.log('Using saved avatar:', profileData.photoURL);
-          } else if (twitterProvider?.photoURL) {
-            profileAvatar.src = twitterProvider.photoURL;
-            console.log('Using Twitter avatar:', twitterProvider.photoURL);
-          } else if (user.photoURL) {
-            profileAvatar.src = user.photoURL;
-            console.log('Using user avatar:', user.photoURL);
-          } else {
-            profileAvatar.src = 'https://e7.pngegg.com/pngimages/178/595/png-clipart-user-profile-computer-icons-login-user-avatars-monochrome-black-thumbnail.png';
-            console.log('Using default avatar');
-          }
-        }
-
-        // Update name and handle - use saved data first, then Twitter data, then default
-        const profileName = document.querySelector('.wallet-profile-name');
-        if (profileName) {
-          if (profileData && (profileData.displayName || profileData.handle)) {
-            const displayName = profileData.displayName || 'Anonymous';
-            const handle = profileData.handle || 'anonymous';
-            profileName.innerHTML = `${displayName}<span class="wallet-profile-handle">@${handle}</span>`;
-            console.log('Using saved profile name and handle:', displayName, handle);
-          } else if (twitterProvider) {
-            const handle = twitterProvider.screenName || twitterProvider.username || twitterProvider.displayName || 'anonymous';
-            profileName.innerHTML = `${twitterProvider.displayName}<span class="wallet-profile-handle">@${handle}</span>`;
-            console.log('Using Twitter profile name and handle:', twitterProvider.displayName, handle);
-          } else {
-            const randomId = Math.floor(Math.random() * 10000);
-            profileName.innerHTML = `User<span class="wallet-profile-handle">@user_${randomId}</span>`;
-            console.log('Using default profile name and handle');
-          }
-        }
-
-        // Update Twitter info - use saved data first, then Twitter data
-        const twitterInfo = document.querySelector('.wallet-profile-twitter');
-        if (twitterInfo) {
-          if (profileData && profileData.handle && profileData.handle !== 'anonymous') {
-            twitterInfo.innerHTML = `<a href="https://twitter.com/${profileData.handle}" style="color:#a020f0;">@${profileData.handle}</a> <span style="color:#a020f0;">✔️</span>`;
-            twitterInfo.style.display = '';
-            console.log('Using saved Twitter handle:', profileData.handle);
-          } else if (twitterProvider) {
-            const handle = twitterProvider.screenName || twitterProvider.username || twitterProvider.displayName || 'anonymous';
-            twitterInfo.innerHTML = `<a href="https://twitter.com/${handle}" style="color:#a020f0;">@${handle}</a> <span style="color:#a020f0;">✔️</span>`;
-            twitterInfo.style.display = '';
-            console.log('Using Twitter provider handle:', handle);
-          } else {
-            twitterInfo.style.display = 'none';
-            console.log('No Twitter info to display');
-          }
-        }
-
-        // Update wallet address
-        renderWalletAddress();
-        
-        // Update Twitter buttons
-        updateTwitterButtons();
       } else {
         document.querySelector('.container').style.display = '';
         document.getElementById('wallet').style.display = 'none';
@@ -5571,17 +5507,16 @@ if (discoverItem) {
                 console.log('Using username for handle:', handle);
               } else if (twitterProvider.uid && twitterProvider.uid !== twitterProvider.displayName) {
                 // Twitter API no longer provides screenName through Firebase Auth
-                // Try to get it from Twitter API or ask user to input manually
+                // Use verification system to prompt and verify handle
                 console.log('Twitter screenName not available through Firebase Auth');
                 
-                // For now, use a fallback and prompt user to enter their handle
-                const userHandle = prompt(`Twitter handle not automatically detected.\nPlease enter your Twitter handle (without @):\n\nExample: if your Twitter is @john_doe, enter: john_doe`);
+                const userHandle = await promptAndVerifyTwitterHandle(twitterProvider);
                 
-                if (userHandle && userHandle.trim()) {
-                  handle = userHandle.trim().replace('@', '');
-                  console.log('Using user-provided handle:', handle);
+                if (userHandle) {
+                  handle = userHandle;
+                  console.log('Using verified user-provided handle:', handle);
                 } else {
-                  // Use displayName as fallback if user cancels
+                  // Use displayName as fallback if user cancels or verification fails
                   handle = twitterProvider.displayName.toLowerCase().replace(/\s+/g, '_');
                   console.log('Using displayName as fallback handle:', handle);
                 }
@@ -5592,8 +5527,8 @@ if (discoverItem) {
                 handle = twitterProvider.displayName.toLowerCase().replace(/\s+/g, '_');
                 console.log('Using displayName for handle (fallback):', handle);
               } else {
-                handle = 'unknown';
-                console.log('Using unknown for handle (last fallback)');
+                handle = 'anonymous';
+                console.log('Using anonymous for handle (last fallback)');
               }
               
               console.log('Extracted data:', { displayName, photoURL, handle });
@@ -5805,6 +5740,137 @@ if (discoverItem) {
       });
       
       console.log('Profile UI updated successfully');
+    }
+
+    // Update Twitter buttons based on auth method
+
+    // Function to verify Twitter handle matches the user's account
+    async function verifyTwitterHandle(handle, expectedDisplayName, expectedPhotoURL) {
+      try {
+        console.log('Verifying Twitter handle:', handle);
+        console.log('Expected display name:', expectedDisplayName);
+        
+        // Method 1: Try to fetch user data from Twitter's public page
+        try {
+          const proxyUrl = 'https://api.allorigins.win/raw?url=';
+          const twitterUrl = `https://twitter.com/${handle}`;
+          
+          const response = await fetch(proxyUrl + encodeURIComponent(twitterUrl));
+          const html = await response.text();
+          
+          // Extract display name from Twitter page HTML
+          const displayNameMatch = html.match(/<title>([^(]+)\s*\(/);
+          const extractedName = displayNameMatch ? displayNameMatch[1].trim() : null;
+          
+          console.log('Method 1 - Extracted name from Twitter page:', extractedName);
+          
+          // Check if the extracted name matches the expected display name
+          if (extractedName && extractedName.toLowerCase() === expectedDisplayName.toLowerCase()) {
+            console.log('✅ Twitter handle verification successful (Method 1)');
+            return true;
+          }
+        } catch (error) {
+          console.log('Method 1 failed, trying alternative method:', error.message);
+        }
+        
+        // Method 2: Try alternative verification using different proxy
+        try {
+          const altProxyUrl = 'https://cors-anywhere.herokuapp.com/';
+          const twitterUrl = `https://twitter.com/${handle}`;
+          
+          const response = await fetch(altProxyUrl + twitterUrl);
+          const html = await response.text();
+          
+          // Look for the display name in meta tags or JSON-LD
+          const metaNameMatch = html.match(/<meta property="og:title" content="([^"]+)"/);
+          const extractedName = metaNameMatch ? metaNameMatch[1].trim() : null;
+          
+          console.log('Method 2 - Extracted name from meta tags:', extractedName);
+          
+          if (extractedName && extractedName.toLowerCase() === expectedDisplayName.toLowerCase()) {
+            console.log('✅ Twitter handle verification successful (Method 2)');
+            return true;
+          }
+        } catch (error) {
+          console.log('Method 2 also failed:', error.message);
+        }
+        
+        // Method 3: Basic format validation and user confirmation
+        console.log('❌ Automatic verification failed, falling back to user confirmation');
+        return 'manual_confirm';
+        
+      } catch (error) {
+        console.error('Error verifying Twitter handle:', error);
+        return 'error';
+      }
+    }
+
+    // Function to prompt user for handle and verify it
+    async function promptAndVerifyTwitterHandle(twitterProvider) {
+      const maxAttempts = 3;
+      let attempts = 0;
+      
+      while (attempts < maxAttempts) {
+        attempts++;
+        
+        const userHandle = prompt(`Twitter handle not automatically detected.\nPlease enter your Twitter handle (without @):\n\nExample: if your Twitter is @john_doe, enter: john_doe\n\nAttempt ${attempts}/${maxAttempts}`);
+        
+        if (!userHandle || !userHandle.trim()) {
+          // User cancelled or entered empty string
+          return null;
+        }
+        
+        const cleanHandle = userHandle.trim().replace('@', '');
+        
+        // Basic validation
+        if (!/^[a-zA-Z0-9_]{1,15}$/.test(cleanHandle)) {
+          alert('Invalid Twitter handle format. Please use only letters, numbers, and underscores (max 15 characters).');
+          continue;
+        }
+        
+        // Show loading message
+        const loadingMsg = document.createElement('div');
+        loadingMsg.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:white;padding:20px;border-radius:8px;box-shadow:0 4px 20px rgba(0,0,0,0.3);z-index:10000;';
+        loadingMsg.textContent = 'Verifying Twitter handle...';
+        document.body.appendChild(loadingMsg);
+        
+        try {
+          // Verify the handle
+          const verificationResult = await verifyTwitterHandle(cleanHandle, twitterProvider.displayName, twitterProvider.photoURL);
+          
+          document.body.removeChild(loadingMsg);
+          
+          if (verificationResult === true) {
+            alert('✅ Twitter handle verified successfully!');
+            return cleanHandle;
+          } else if (verificationResult === 'manual_confirm') {
+            const manualConfirm = confirm(`⚠️ Could not automatically verify Twitter handle "@${cleanHandle}".\n\nExpected account name: ${twitterProvider.displayName}\n\nAre you sure this is your correct Twitter handle?\n\nClick OK to confirm, or Cancel to try again.`);
+            if (manualConfirm) {
+              alert('✅ Twitter handle confirmed manually!');
+              return cleanHandle;
+            }
+          } else if (verificationResult === 'error') {
+            const continueAnyway = confirm('⚠️ Could not verify Twitter handle due to technical issues.\n\nDo you want to continue anyway?\n\nNote: Make sure you entered your correct Twitter handle.');
+            if (continueAnyway) {
+              return cleanHandle;
+            }
+          } else {
+            alert(`❌ Twitter handle verification failed.\n\nThe handle "@${cleanHandle}" does not appear to belong to your Twitter account.\n\nExpected name: ${twitterProvider.displayName}\n\nPlease enter your correct Twitter handle.`);
+          }
+        } catch (error) {
+          document.body.removeChild(loadingMsg);
+          console.error('Verification error:', error);
+          
+          const continueAnyway = confirm('⚠️ Error during verification.\n\nDo you want to continue anyway?\n\nNote: Make sure you entered your correct Twitter handle.');
+          if (continueAnyway) {
+            return cleanHandle;
+          }
+        }
+      }
+      
+      // Max attempts reached
+      alert('Maximum verification attempts reached. Using fallback handle.');
+      return null;
     }
 
     // Update Twitter buttons based on auth method
