@@ -5042,6 +5042,10 @@
           const address = resp.publicKey.toString();
           localStorage.setItem('wallet_address', address);
           updateClubWalletBalance(); // Скрыть кнопку сразу после подключения
+          if (typeof renderWalletAddress === 'function') {
+            renderWalletAddress(); // Обновить профиль сразу после подключения
+          }
+          // Fetch MESH balance after connecting wallet
           // Fetch MESH balance after connecting wallet
           if (typeof fetchPostBalance === 'function') {
             fetchPostBalance();
