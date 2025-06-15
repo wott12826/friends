@@ -238,6 +238,119 @@
       height: 24px;
       display: block;
     }
+
+    /* Mobile responsive styles */
+    @media (max-width: 768px) {
+      .fullscreen-chat {
+        left: 0;
+        top: 0;
+        width: 100vw;
+        height: 100vh;
+        border-radius: 0;
+        max-width: none;
+        margin: 0;
+      }
+      
+      .fschat-header {
+        padding: 0 12px;
+        height: 56px;
+      }
+
+      .fschat-form {
+        padding: 8px 12px;
+        gap: 4px;
+      }
+
+      #fullscreenChatInput {
+        padding: 8px 12px;
+        font-size: 1rem;
+      }
+
+      .fschat-balance {
+        padding: 6px 10px;
+        font-size: 0.9rem;
+        max-width: 100px;
+      }
+
+      .fschat-menu {
+        min-width: 140px;
+      }
+
+      .fschat-menu-item {
+        padding: 10px 14px;
+        font-size: 0.95rem;
+      }
+      
+      .fschat-messages {
+        padding: 12px 8px;
+      }
+      
+      .fschat-message {
+        padding: 6px 12px;
+        max-width: 85%;
+      }
+      
+      .fschat-title {
+        font-size: 16px;
+      }
+      
+      .fschat-chat-id {
+        font-size: 11px;
+      }
+      
+      .emoji-panel {
+        width: 200px;
+        left: 8px;
+        bottom: 55px;
+      }
+      
+      .fschat-back {
+        font-size: 20px;
+        margin-right: 8px;
+      }
+      
+      .fschat-avatar {
+        width: 28px;
+        height: 28px;
+        margin-right: 8px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .fschat-header {
+        padding: 0 8px;
+      }
+      
+      .fschat-form {
+        padding: 6px 8px;
+      }
+      
+      .fschat-messages {
+        padding: 8px 6px;
+      }
+      
+      .fschat-balance {
+        display: none; /* Hide balance on very small screens */
+      }
+      
+      .fschat-title {
+        font-size: 14px;
+      }
+      
+      .fschat-chat-id {
+        font-size: 10px;
+      }
+      
+      .chat-message {
+        max-width: 90%;
+        padding: 6px 10px;
+        font-size: 14px;
+      }
+      
+      .emoji-panel {
+        width: 180px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -924,35 +1037,90 @@
     backdrop.classList.add('active');
   };
 
-  // Update chat header with user info
+  // Update chat header with chat info (not user info)
   function updateChatHeader() {
     const chatId = getChatIdFromUrl();
     const avatarEl = document.getElementById('fullscreenChatAvatar');
     const titleEl = document.getElementById('fullscreenChatTitle');
     const chatIdEl = document.querySelector('.fschat-chat-id');
     
-    if (currentUserData) {
-      // Set user avatar with fallback
+    if (chatId) {
+      // Parse chat ID to extract chat info
+      // Format: "clubName|ticker" or "discover|clubName|ticker" or "user_username"
+      let chatName = 'Chat';
+      let chatAvatar = 'https://via.placeholder.com/32x32?text=💬';
+      
+      if (chatId.includes('|')) {
+        const parts = chatId.split('|');
+        if (parts[0] === 'discover') {
+          // Discover chat format: "discover|clubName|ticker"
+          chatName = parts[1];
+          if (parts[2]) {
+            chatName += ` ($${parts[2]})`;
+          }
+          // Try to get avatar from discover clubs
+          const discoverClubs = {
+            'ZENAI': 'images/ZENAI.png',
+            'KITTY': 'images/KITTY.png',
+            'MADHOUSE': 'images/MADHOUSE.png',
+            'VLOGS': 'images/VLOGS.png',
+            'GANTU': 'images/GANTU.png',
+            'MASK': 'images/MASK.png',
+            'XAI41P': 'images/XAI41P.png',
+            'AuraFarm': 'images/AuraFarm.png',
+            'DUPE': 'images/DUPE.png',
+            'KOKOK': 'images/KOKOK.png'
+          };
+          chatAvatar = discoverClubs[parts[1]] || chatAvatar;
+        } else {
+          // Regular club format: "clubName|ticker"
+          chatName = parts[0];
+          if (parts[1]) {
+            chatName += ` ($${parts[1]})`;
+          }
+          
+          // Try to get avatar from localStorage clubs
+          const clubs = JSON.parse(localStorage.getItem('clubs') || '[]');
+          const club = clubs.find(c => c.name === parts[0]);
+          if (club && club.avatar) {
+            chatAvatar = club.avatar;
+          }
+        }
+      } else if (chatId.startsWith('user_')) {
+        // User chat format: "user_username"
+        const username = chatId.replace('user_', '');
+        chatName = `@${username}`;
+        chatAvatar = 'https://e7.pngegg.com/pngimages/178/595/png-clipart-user-profile-computer-icons-login-user-avatars-monochrome-black-thumbnail.png';
+      } else {
+        // Generic chat
+        chatName = chatId;
+      }
+      
+      // Set chat avatar with fallback
       if (avatarEl) {
-        avatarEl.src = currentUserData.photoURL || 'https://e7.pngegg.com/pngimages/178/595/png-clipart-user-profile-computer-icons-login-user-avatars-monochrome-black-thumbnail.png';
+        avatarEl.src = chatAvatar;
         avatarEl.onerror = function() {
-          this.src = 'https://e7.pngegg.com/pngimages/178/595/png-clipart-user-profile-computer-icons-login-user-avatars-monochrome-black-thumbnail.png';
+          this.src = 'https://via.placeholder.com/32x32?text=💬';
         };
       }
       
       // Set chat title
       if (titleEl) {
-        let displayName = currentUserData.name || 'Anonymous';
-        if (currentUserData.handle && currentUserData.handle !== 'anonymous') {
-          displayName += ` (@${currentUserData.handle})`;
-        }
-        titleEl.textContent = displayName;
+        titleEl.textContent = chatName;
       }
-    }
-    
-    // Set chat ID
-    if (chatIdEl && chatId) {
-      chatIdEl.textContent = `Chat: ${chatId}`;
+      
+      // Set chat ID
+      if (chatIdEl) {
+        chatIdEl.textContent = `ID: ${chatId}`;
+      }
+    } else {
+      // No chat ID
+      if (titleEl) {
+        titleEl.textContent = 'No Chat';
+      }
+      if (chatIdEl) {
+        chatIdEl.textContent = 'No ID';
+      }
     }
   }
 
