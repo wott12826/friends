@@ -5548,8 +5548,21 @@ if (discoverItem) {
                 handle = twitterProvider.username;
                 console.log('Using username for handle:', handle);
               } else if (twitterProvider.uid && twitterProvider.uid !== twitterProvider.displayName) {
-                handle = twitterProvider.uid;
-                console.log('Using uid for handle:', handle);
+                // Twitter API no longer provides screenName through Firebase Auth
+                // Try to get it from Twitter API or ask user to input manually
+                console.log('Twitter screenName not available through Firebase Auth');
+                
+                // For now, use a fallback and prompt user to enter their handle
+                const userHandle = prompt(`Twitter handle not automatically detected.\nPlease enter your Twitter handle (without @):\n\nExample: if your Twitter is @john_doe, enter: john_doe`);
+                
+                if (userHandle && userHandle.trim()) {
+                  handle = userHandle.trim().replace('@', '');
+                  console.log('Using user-provided handle:', handle);
+                } else {
+                  // Use displayName as fallback if user cancels
+                  handle = twitterProvider.displayName.toLowerCase().replace(/\s+/g, '_');
+                  console.log('Using displayName as fallback handle:', handle);
+                }
               } else if (twitterProvider.rawId) {
                 handle = twitterProvider.rawId;
                 console.log('Using rawId for handle:', handle);
@@ -5557,8 +5570,8 @@ if (discoverItem) {
                 handle = twitterProvider.displayName.toLowerCase().replace(/\s+/g, '_');
                 console.log('Using displayName for handle (fallback):', handle);
               } else {
-                handle = 'anonymous';
-                console.log('Using anonymous for handle (last fallback)');
+                handle = 'unknown';
+                console.log('Using unknown for handle (last fallback)');
               }
               
               console.log('Extracted data:', { displayName, photoURL, handle });
