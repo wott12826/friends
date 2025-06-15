@@ -3372,6 +3372,16 @@
           mobileMenuBtn.classList.remove('open');
         }
       }
+
+      // Показывать mobile-menu-btn только на wallet, chat, discover и только на мобильных
+      const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
+      if (mobileMenuBtn) {
+        if (window.innerWidth <= 768 && ['wallet','chat','discover'].includes(tab)) {
+          mobileMenuBtn.style.display = 'flex';
+        } else {
+          mobileMenuBtn.style.display = 'none';
+        }
+      }
     }
     document.querySelectorAll('.sidebar-item').forEach(item => {
       item.onclick = function () {
