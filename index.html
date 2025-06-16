@@ -3379,7 +3379,12 @@ document.addEventListener('DOMContentLoaded', function () {
       if (mobileMenuBtn) {
         if (window.innerWidth <= 768 && ['wallet','chat','discover'].includes(tab)) {
           mobileMenuBtn.style.display = 'flex';
-          mobileMenuBtn.style.left = '30%';
+          // Add condition for sidebar active state
+          if (sidebar && sidebar.classList.contains('mobile-open')) {
+            mobileMenuBtn.style.left = '30%';
+          } else {
+            mobileMenuBtn.style.left = '0px';
+          }
         } else {
           mobileMenuBtn.style.display = 'none';
         }
