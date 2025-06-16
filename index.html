@@ -2658,7 +2658,6 @@
 
       .sidebar.mobile-open {
         transform: translateX(0);
-        left: 30%;
       }
 
       .main-app {
@@ -3380,6 +3379,7 @@ document.addEventListener('DOMContentLoaded', function () {
       if (mobileMenuBtn) {
         if (window.innerWidth <= 768 && ['wallet','chat','discover'].includes(tab)) {
           mobileMenuBtn.style.display = 'flex';
+          mobileMenuBtn.style.left = '30%';
         } else {
           mobileMenuBtn.style.display = 'none';
         }
