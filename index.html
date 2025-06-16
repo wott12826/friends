@@ -68,7 +68,7 @@
       border-radius: 50%;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
       cursor: pointer;
-      transition: transform 0.3s ease;
+      transition: all 0.3s ease;
     }
 
     .mobile-menu-btn img {
@@ -2689,6 +2689,14 @@
         transition: transform 0.3s ease;
       }
 
+      .mobile-menu-btn.active {
+        left: calc(220px - 20px);
+      }
+
+      .main-content {
+        margin-left: 0;
+        width: 100%;
+      }
     }
 
     @media (min-width: 769px) {
