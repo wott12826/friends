@@ -3379,15 +3379,14 @@ document.addEventListener('DOMContentLoaded', function () {
       if (mobileMenuBtn) {
         if (window.innerWidth <= 768 && ['wallet','chat','discover'].includes(tab)) {
           mobileMenuBtn.style.display = 'flex';
-          // Add condition for sidebar active state
-          if (sidebar && sidebar.classList.contains('mobile-open')) {
-            mobileMenuBtn.style.marginLeft = '40%';
-          } else {
-            mobileMenuBtn.style.marginLeft = '0px';
-          }
         } else {
           mobileMenuBtn.style.display = 'none';
         }
+      }
+      if(sidebar.classList.contains('active')){
+        mobileMenuBtn.style.right = '30%';
+      }else{
+        mobileMenuBtn.style.right = '0px';
       }
     }
     document.querySelectorAll('.sidebar-item').forEach(item => {
