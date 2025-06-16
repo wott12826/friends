@@ -2710,7 +2710,7 @@
 
     @media (min-width: 769px) {
       .mobile-menu-btn {
-        display: none;
+        display: none !important;
       }
 
       .sidebar-dim {
@@ -3391,19 +3391,14 @@ document.addEventListener('DOMContentLoaded', function () {
         }
       }
 
-      // Показывать mobile-menu-btn только на wallet, chat, discover и только на мобильных
+      // Show mobile menu button only on mobile and only for specific tabs
       const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
       if (mobileMenuBtn) {
-        if (window.innerWidth <= 768 && ['wallet','chat','discover'].includes(tab)) {
+        if (window.innerWidth <= 768 && ['wallet', 'chat', 'discover'].includes(tab)) {
           mobileMenuBtn.style.display = 'flex';
         } else {
           mobileMenuBtn.style.display = 'none';
         }
-      }
-      if(sidebar.classList.contains('sidebar mobile-open active')){
-        mobileMenuBtn.style.marginLeft = '40%';
-      }else{
-        mobileMenuBtn.style.marginLeft = '0px';
       }
     }
     document.querySelectorAll('.sidebar-item').forEach(item => {
