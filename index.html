@@ -4716,7 +4716,7 @@ document.addEventListener('DOMContentLoaded', function () {
         walletAddressEl.innerHTML = `
           ${address.substring(0, 6)}...${address.substring(address.length - 4)}
           <button class="wallet-disconnect-btn" title="Disconnect wallet">Disconnect</button>
-            <button class="wallet-copy-btn" data-address="Cm4qzi9sB9S6xgLje6kVq447aK4N5XM8DjgJXLJ963mU" title="Copy address"><img src="images/copy-icon.png" style="width:10px;height:10px;vertical-align:middle;"></button>
+            <button class="wallet-copy-btn" data-address="${address}" title="Copy address"><img src="images/copy-icon.png" style="width:10px;height:10px;vertical-align:middle;"></button>
         `;
         
         // Disconnect button handler
@@ -4750,15 +4750,20 @@ document.addEventListener('DOMContentLoaded', function () {
         // Copy button handler
         const copyBtn = walletAddressEl.querySelector('.wallet-copy-btn');
         if (copyBtn) {
-            copyBtn.addEventListener('click', function () {
-            const addr = this.dataset.address;
-            if (addr) {
-              navigator.clipboard.writeText(addr)
-                .then(() => {
-                  this.title = 'Copied!';
-                  setTimeout(() => { this.title = 'Copy address'; }, 1500);
-                })
-                .catch(() => alert('Copy failed. Please copy manually.'));
+          copyBtn.addEventListener('click', function() {
+            const address = this.getAttribute('data-address');
+            if (address) {
+              navigator.clipboard.writeText(address).then(() => {
+                // Show success feedback
+                const originalTitle = this.getAttribute('title');
+                this.setAttribute('title', 'Copied!');
+                setTimeout(() => {
+                  this.setAttribute('title', originalTitle);
+                }, 2000);
+              }).catch(err => {
+                console.error('Failed to copy:', err);
+                alert('Failed to copy address. Please try again.');
+              });
             }
           });
         }
